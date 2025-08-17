@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     mobileNo: { type: String, required: true },
+     address: { type: String },
     barangay: { type: String, required: true }, // which barangay the user is from
     idType: { type: String, required: true }, // "National ID", "Barangay ID", etc.
     idNumber: { type: String, required: true },

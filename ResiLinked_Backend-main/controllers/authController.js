@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
     try {
         const requiredFields = [
             'firstName', 'lastName', 'email', 'password',
-            'mobileNo', 'barangay', 'idType', 'idNumber', 'userType'
+            'mobileNo', 'barangay', 'address', 'idType', 'idNumber', 'userType'
         ];
 
         const missingFields = requiredFields.filter(field => !req.body[field]);
@@ -38,6 +38,7 @@ exports.register = async (req, res) => {
         const user = new User({
             ...req.body,
             password: hashedPassword,
+            profileImage: req.files?.profileImage?.[0]?.buffer.toString('base64') || '',
             idFrontImage: req.files?.idFrontImage?.[0]?.buffer.toString('base64') || '',
             idBackImage: req.files?.idBackImage?.[0]?.buffer.toString('base64') || '',
             isVerified: false,

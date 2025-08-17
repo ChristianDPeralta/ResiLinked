@@ -4,7 +4,10 @@ const { createNotification } = require('../utils/notificationHelper');
 exports.getMyNotifications = async (req, res) => {
     try {
         const { type, isRead, page = 1, limit = 10 } = req.query;
-        
+
+        const pageNum = parseInt(page, 10) || 1;
+        const limitNum = parseInt(limit, 10) || 10;
+
         let query = { recipient: req.user.id };
         if (type) query.type = type;
         if (isRead !== undefined) query.isRead = isRead === 'true';
@@ -12,8 +15,8 @@ exports.getMyNotifications = async (req, res) => {
         const [notifications, total, unreadCount] = await Promise.all([
             Notification.find(query)
                 .sort({ createdAt: -1 })
-                .skip((page - 1) * limit)
-                .limit(limit),
+                .skip((pageNum - 1) * limitNum)
+                .limit(limitNum),
             Notification.countDocuments(query),
             Notification.countDocuments({ 
                 recipient: req.user.id, 
@@ -28,9 +31,9 @@ exports.getMyNotifications = async (req, res) => {
                 total,
                 unreadCount,
                 pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    pages: Math.ceil(total / limit)
+                    page: pageNum,
+                    limit: limitNum,
+                    pages: Math.ceil(total / limitNum)
                 }
             },
             alert: unreadCount > 0 
@@ -53,7 +56,7 @@ exports.markAsRead = async (req, res) => {
                 { recipient: req.user.id, isRead: false },
                 { $set: { isRead: true } }
             );
-            
+
             return res.status(200).json({
                 message: "All notifications marked as read",
                 updatedCount: result.modifiedCount,
@@ -62,14 +65,14 @@ exports.markAsRead = async (req, res) => {
         }
 
         const notification = await Notification.findOneAndUpdate(
-            { _id: req.params.id, recipient: req.user.id },
+            { _id: req.params.id, recipient: req.user.id, isRead: false },
             { isRead: true },
             { new: true }
         );
 
         if (!notification) {
             return res.status(404).json({ 
-                message: "Notification not found",
+                message: "Notification not found or already read",
                 alert: "Notification not found or already read"
             });
         }

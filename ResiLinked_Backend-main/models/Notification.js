@@ -11,7 +11,8 @@ const notificationSchema = new mongoose.Schema({
             'verification_complete',
             'job_applied',
             'admin_message',
-            'verification_needed'
+            'verification_needed',
+            'security_alert'  // Added this value to fix validation error
         ],
         required: true
     },
