@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Magrehistro - ResiLinked</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Magrehistro</h2>
+    <form id="registerForm" enctype="multipart/form-data">
+      <input type="text" id="firstName" placeholder="Unang Pangalan" required />
+      <input type="text" id="lastName" placeholder="Apelyido" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="text" id="mobileNo" placeholder="Numero ng Telepono" required />
+      <input type="text" id="barangay" placeholder="Barangay" required />
+      <select id="idType" required>
+        <option value="">Pumili ng Uri ng ID</option>
+        <option value="National ID">National ID</option>
+        <option value="Barangay ID">Barangay ID</option>
+        <option value="Driver's License">Lisensya ng Pagmamaneho</option>
+        <option value="Passport">Pasaporte</option>
+      </select>
+      <input type="text" id="idNumber" placeholder="ID Number" required />
+      <label>Harap ng ID: <input type="file" id="idFrontImage" accept="image/*" /></label>
+      <label>Likod ng ID: <input type="file" id="idBackImage" accept="image/*" /></label>
+      <select id="userType" required>
+        <option value="">Pumili ng Uri ng User</option>
+        <option value="employee">Kontraktwal</option>
+        <option value="employer">Tagapagpagawa</option>
+        <option value="both">Pareho</option>
+      </select>
+      <select id="gender">
+        <option value="">Pumili ng Kasarian (opsyonal)</option>
+        <option value="male">Lalaki</option>
+        <option value="female">Babae</option>
+        <option value="other">Iba pa</option>
+      </select>
+      <button type="submit" class="btn">Magrehistro</button>
+    </form>
+    <p id="registerError" class="error"></p>
+    <a href="login.html">May account na? Mag-login</a>
+  </div>
+  <script src="register.js"></script>
+  <script>
+  // Fade in on page load
+  document.body.classList.add('fade-out');
+  window.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.remove('fade-out');
+    document.body.classList.add('fade-in');
+  });
+
+  // Fade out before navigating away
+  document.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Only smoothen local links
+      if (this.href && this.href.startsWith(window.location.origin)) {
+        e.preventDefault();
+        document.body.classList.remove('fade-in');
+        document.body.classList.add('fade-out');
+        setTimeout(() => {
+          window.location = this.href;
+        }, 400); // Match the CSS transition duration
+      }
+    });
+  });
+</script>
+<!-- Success Popup Modal -->
+<div id="successPopup" class="popup-modal">
+  <div class="popup-content">
+    <h3>Registered!</h3>
+    <p>Matagumpay ang iyong pagrehistro.</p>
+    <button onclick="closePopup()" class="btn">OK</button>
+  </div>
+</div>
+</body>
+</html>

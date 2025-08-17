@@ -1,0 +1,149 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  /* Unique contract portal theme:
+     gradient and icons for contractual work */
+  background: linear-gradient(135deg, #27C1C6 0%, #A7FF70 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: -80px;
+  left: -100px;
+  width: 600px;
+  height: 600px;
+  background: url('https://img.icons8.com/color/96/contract.png') no-repeat center center;
+  background-size: 160px;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -80px;
+  right: -100px;
+  width: 600px;
+  height: 600px;
+  background: url('https://img.icons8.com/color/96/agreement.png') no-repeat center center;
+  background-size: 160px;
+  opacity: 0.10;
+  z-index: 0;
+}
+
+.container {
+  width: 360px;
+  margin: 80px auto;
+  background: rgba(255,255,255,0.98);
+  padding: 36px 28px 24px 28px;
+  border-radius: 18px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.15);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+input, select {
+  width: 92%;
+  padding: 11px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 17px;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus {
+  border-color: #27C1C6;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 10px 0 0 4px;
+  font-size: 15px;
+  color: #2a4747;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 34px;
+  margin: 20px 4px;
+  background: linear-gradient(90deg, #27C1C6 40%, #A7FF70 100%);
+  color: #222;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+  text-decoration: none;
+  box-shadow: 0 2px 18px rgba(39,193,198,0.10);
+  transition: background 0.25s;
+}
+.btn:hover {
+  background: linear-gradient(90deg, #1b9296 40%, #7cc84c 100%);
+  color: #fff;
+}
+
+.error {
+  color: #d9534f;
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .container {
+    width: 95vw;
+    margin: 30px auto;
+    padding: 18px 6vw;
+  }
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+body {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+/* Popup Modal Styles */
+.popup-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(39, 193, 198, 0.19);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeInModal 0.5s;
+}
+.popup-modal.show {
+  display: flex;
+  animation: fadeInModal 0.5s;
+}
+.popup-content {
+  background: #fff;
+  padding: 36px 42px;
+  border-radius: 14px;
+  box-shadow: 0 2px 28px rgba(39,193,198,0.22);
+  text-align: center;
+  animation: scaleUp 0.4s;
+}
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleUp {
+  from { transform: scale(0.8); }
+  to { transform: scale(1); }
+}

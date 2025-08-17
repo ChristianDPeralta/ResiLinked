@@ -1,0 +1,184 @@
+:root {
+  --matcha-bg-start: #e1eed9;
+  --matcha-bg-end: #c7d7b5;
+  --matcha-bg-accent: #a7c5a1;
+  --matcha-container: #f6f8f3;
+  --matcha-green: #82a07a;
+  --matcha-green-dark: #5f7d5b;
+  --matcha-brown: #b7a99a;
+  --matcha-cream: #f8f4e6;
+  --matcha-border: #dcd9c6;
+  --matcha-shadow: 0 4px 32px rgba(130,160,122,0.08), 0 1.5px 6px rgba(183,169,154,0.11);
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, var(--matcha-bg-start), var(--matcha-bg-end) 80%, var(--matcha-bg-accent));
+  margin: 0;
+  min-height: 100vh;
+}
+
+.container {
+  background: var(--matcha-container);
+  margin: 4rem auto;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: var(--matcha-shadow);
+  border: 1.5px solid var(--matcha-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1, h2 {
+  color: var(--matcha-green-dark);
+  text-align: center;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+p {
+  color: var(--matcha-green);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-size: 1.07rem;
+}
+
+.button-row {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  flex: 1;
+  max-width: 150px;
+  min-width: 100px;
+  padding: 0.75rem 0;
+  border: none;
+  border-radius: 13px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--matcha-green);
+  color: #fff;
+  box-shadow: 0 1.5px 6px rgba(130,160,122,0.09);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+.btn:hover, .btn:focus {
+  background: var(--matcha-green-dark);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(130,160,122,0.17);
+}
+
+.btn.secondary {
+  background: var(--matcha-cream);
+  color: var(--matcha-green-dark);
+  border: 1px solid var(--matcha-brown);
+  box-shadow: none;
+}
+
+input, .dropdown, .file-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.65rem;
+  border: 1.5px solid var(--matcha-green);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f6f8f3;
+  color: var(--matcha-green-dark);
+  outline: none;
+  box-shadow: 0 0 3px var(--matcha-bg-accent);
+  transition: border 0.2s;
+}
+
+input:focus, .dropdown:focus, .file-input:focus {
+  border: 1.5px solid var(--matcha-green-dark);
+  box-shadow: 0 0 8px var(--matcha-bg-accent);
+  background: var(--matcha-cream);
+}
+
+.dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 49%, var(--matcha-green) 50%),
+    linear-gradient(135deg, var(--matcha-green) 50%, transparent 51%);
+  background-position: right 1rem top 50%, right 1rem top 50%;
+  background-size: 1em 1em, 1em 1em;
+  background-repeat: no-repeat;
+}
+
+.file-label {
+  display: block;
+  color: var(--matcha-green-dark);
+  font-size: 0.99rem;
+  margin-bottom: 0.4rem;
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+.file-input {
+  background: #f6f8f3;
+  border: 1.5px solid var(--matcha-green);
+  border-radius: 8px;
+  padding: 0.45rem;
+  font-size: 1rem;
+  color: var(--matcha-green-dark);
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: var(--matcha-brown);
+  text-align: center;
+  margin: 0.5rem 0 0.5rem 0;
+  font-size: 0.97rem;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.popup-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(198,215,181,0.09);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.popup-modal.show {
+  display: flex;
+  animation: fadeInModal 0.5s;
+}
+.popup-content {
+  background: var(--matcha-container);
+  padding: 32px 38px;
+  border-radius: 14px;
+  box-shadow: var(--matcha-shadow);
+  text-align: center;
+  color: var(--matcha-green-dark);
+  animation: scaleUp 0.4s;
+  border: 1.5px solid var(--matcha-green);
+}
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleUp {
+  from { transform: scale(0.87); }
+  to { transform: scale(1); }
+}

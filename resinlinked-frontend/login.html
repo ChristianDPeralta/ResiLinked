@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mag-login - ResiLinked</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mag-login</h2>
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit" class="btn">Mag-login</button>
+      </form>
+      <p id="loginError" class="error"></p>
+      <div class="button-row">
+        <button id="backHomeBtn" class="btn secondary">Bumalik</button>
+        <button id="registerLinkBtn" class="btn secondary">Magrehistro</button>
+      </div>
+    </div>
+    <script type="module" src="/src/login.js"></script>
+    <script type="module" src="/src/fade.js"></script>
+  </body>
+</html>
