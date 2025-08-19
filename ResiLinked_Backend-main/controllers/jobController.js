@@ -4,6 +4,7 @@ const { findMatchingJobs } = require('../utils/matchingEngine');
 const { createNotification } = require('../utils/notificationHelper');
 const { sendSMS } = require('../utils/smsService');
 
+//  POST /api/jobs → Post a new job
 exports.postJob = async (req, res) => {
     try {
         if (!req.body.title || !req.body.price || !req.body.barangay) {
@@ -59,6 +60,7 @@ exports.postJob = async (req, res) => {
     }
 };
 
+//  GET /api/jobs → Get all open jobs
 exports.getAll = async (req, res) => {
     try {
         const jobs = await Job.find({ isOpen: true })
@@ -78,6 +80,7 @@ exports.getAll = async (req, res) => {
     }
 };
 
+// GET /api/jobs/my-matches → Get jobs matching logged-in user
 exports.getMyMatches = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -96,6 +99,7 @@ exports.getMyMatches = async (req, res) => {
     }
 };
 
+// POST /api/jobs/:id/apply → Apply for a job
 exports.applyJob = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id).populate('postedBy');
@@ -158,6 +162,7 @@ exports.applyJob = async (req, res) => {
     }
 };
 
+// POST /api/jobs/:id/assign → Assign worker to a job
 exports.assignWorker = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id).populate('postedBy');
@@ -168,14 +173,25 @@ exports.assignWorker = async (req, res) => {
             });
         }
 
-        if (job.postedBy.toString() !== req.user.id) {
+        // ✅ Fix postedBy comparison
+        if (job.postedBy._id.toString() !== req.user.id) {
             return res.status(403).json({ 
                 message: "Not authorized",
                 alert: "You can only assign workers to your own jobs"
             });
         }
 
-        const isApplicant = job.applicants.some(a => a.user.toString() === req.body.userId);
+        // ✅ Ensure userId was provided
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({
+                message: "Missing userId",
+                alert: "You must provide the applicant's userId"
+            });
+        }
+
+        // ✅ Check applicant
+        const isApplicant = job.applicants.some(a => a.user.toString() === userId);
         if (!isApplicant) {
             return res.status(400).json({ 
                 message: "User didn't apply",
@@ -183,19 +199,21 @@ exports.assignWorker = async (req, res) => {
             });
         }
 
-        job.assignedTo = req.body.userId;
+        job.assignedTo = userId;
         job.isOpen = false;
         job.status = 'assigned';
+
         job.applicants = job.applicants.map(a => ({
             ...a.toObject(),
-            status: a.user.toString() === req.body.userId ? 'accepted' : 'rejected'
+            status: a.user.toString() === userId ? 'accepted' : 'rejected'
         }));
-        
+
         await job.save();
 
-        const worker = await User.findById(req.body.userId);
+        const worker = await User.findById(userId);
+
         await createNotification({
-            recipient: req.body.userId,
+            recipient: userId,
             type: 'job_accepted',
             message: `You've been assigned to "${job.title}"`,
             relatedJob: job._id
@@ -203,7 +221,7 @@ exports.assignWorker = async (req, res) => {
 
         if (worker.notificationPreferences?.sms) {
             await sendSMS(
-                req.body.userId,
+                userId,
                 `You got the job: ${job.title}. Contact ${job.postedBy.firstName} at ${job.postedBy.mobileNo}`
             );
         }
@@ -226,6 +244,8 @@ exports.assignWorker = async (req, res) => {
     }
 };
 
+
+// GET /api/jobs/search → Search jobs with filters
 exports.search = async (req, res) => {
     try {
         const { skill, barangay, minPrice, maxPrice, sortBy = 'datePosted', order = 'desc', page = 1, limit = 10 } = req.query;

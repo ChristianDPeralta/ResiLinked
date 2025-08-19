@@ -50,23 +50,25 @@ exports.register = async (req, res) => {
 
         await sendVerificationEmail(user.email, verificationToken);
 
-        // Find admin user by userType 'admin' to notify
+        // Notify admin
         const adminUser = await User.findOne({ userType: 'admin' });
-
         if (adminUser) {
             await createNotification({
-                recipient: adminUser._id,      // ObjectId, not string 'admin'
-                type: 'admin_message',         // valid enum type
+                recipient: adminUser._id,
+                type: 'admin_message',
                 message: `New user ${user.email} requires verification`
             });
-        } else {
-            console.warn('Admin user not found. Notification not created.');
         }
 
         res.status(201).json({
             success: true,
             message: "Registration successful - please check your email",
-            data: { userId: user._id, email: user.email },
+            data: {
+                userId: user._id,       // explicitly showing the user's id
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName
+            },
             alert: "Verification email sent!"
         });
 
@@ -80,6 +82,7 @@ exports.register = async (req, res) => {
         });
     }
 };
+
 
 
 // Login

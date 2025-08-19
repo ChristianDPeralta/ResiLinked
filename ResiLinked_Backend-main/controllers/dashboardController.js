@@ -12,14 +12,22 @@ exports.barangayStats = async (req, res) => {
             });
         }
 
+        // Fetch users and jobs
         const [users, jobs] = await Promise.all([
             User.find({ barangay }),
             Job.find({ barangay })
         ]);
 
-        const male = users.filter(u => u.gender === 'male').length;
-        const female = users.filter(u => u.gender === 'female').length;
-        
+        // Normalize gender counts
+        let male = 0, female = 0, others = 0;
+        users.forEach(u => {
+            const g = (u.gender || "").toLowerCase().trim();
+            if (g === "male" || g === "m") male++;
+            else if (g === "female" || g === "f") female++;
+            else others++;
+        });
+
+        // Top 5 skills
         const topSkills = {};
         users.forEach(u => {
             (u.skills || []).forEach(skill => {
@@ -34,7 +42,7 @@ exports.barangayStats = async (req, res) => {
         res.status(200).json({
             totalUsers: users.length,
             totalJobs: jobs.length,
-            genderDistribution: { male, female },
+            genderDistribution: { male, female, others },
             topSkills: sortedSkills,
             recentJobs: jobs.slice(0, 5),
             alert: `Statistics loaded for ${barangay}`

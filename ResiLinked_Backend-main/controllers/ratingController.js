@@ -1,7 +1,14 @@
+// controllers/ratingController.js
+
 const Rating = require('../models/Rating');
 const Job = require('../models/Job');
+const User = require('../models/User'); // ✅ for fetching admins
 const { createNotification } = require('../utils/notificationHelper');
 
+/**
+ * @controller rateUser
+ * Allow a user to rate another user for a specific job
+ */
 exports.rateUser = async (req, res) => {
     try {
         const { jobId, rateeId, rating, comment } = req.body;
@@ -50,7 +57,7 @@ exports.rateUser = async (req, res) => {
         });
         await newRating.save();
 
-        // Notify the rated user
+        // ✅ Notify the rated user
         await createNotification({
             recipient: rateeId,
             type: 'rating_received',
@@ -72,6 +79,10 @@ exports.rateUser = async (req, res) => {
     }
 };
 
+/**
+ * @controller getRatings
+ * Fetch all ratings for a specific user, with stats
+ */
 exports.getRatings = async (req, res) => {
     try {
         const ratings = await Rating.find({ ratee: req.params.userId })
@@ -79,7 +90,7 @@ exports.getRatings = async (req, res) => {
             .populate('job', 'title')
             .sort({ createdAt: -1 });
 
-        // Calculate average rating safely
+        // ✅ Calculate average rating safely
         let averageRating = 0;
         if (ratings.length > 0) {
             const total = ratings.reduce((sum, r) => sum + r.rating, 0);
@@ -107,6 +118,10 @@ exports.getRatings = async (req, res) => {
     }
 };
 
+/**
+ * @controller reportRating
+ * Mark a rating as reported and notify all admins
+ */
 exports.reportRating = async (req, res) => {
     try {
         const rating = await Rating.findById(req.params.ratingId);
@@ -117,14 +132,19 @@ exports.reportRating = async (req, res) => {
             });
         }
 
+        // ✅ Mark rating as reported
         rating.reported = true;
         await rating.save();
 
-        await createNotification({
-            recipient: 'admin',
-            type: 'rating_reported',
-            message: `Rating ${req.params.ratingId} was reported as inappropriate`
-        });
+        // ✅ Notify all admins instead of "admin" string
+        const admins = await User.find({ userType: 'admin' });
+        for (const admin of admins) {
+            await createNotification({
+                recipient: admin._id,
+                type: 'rating_reported', // ⚠️ make sure this exists in Notification schema
+                message: `Rating ${req.params.ratingId} was reported as inappropriate`
+            });
+        }
 
         res.status(200).json({ 
             message: "Rating reported",

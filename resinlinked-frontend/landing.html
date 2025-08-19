@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResiLinked - Landing</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+    }
+
+    header {
+      background: #2b6cb0;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem;
+      background: url('/images/hero-bg.jpg') center/cover no-repeat;
+      color: white;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero button {
+      background: #38a169;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+
+    .hero button:hover {
+      background: #2f855a;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      padding: 3rem 2rem;
+      background: #fff;
+    }
+
+    .feature-card {
+      background: #f9fafb;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .feature-card h3 {
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      color: #2b6cb0;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #2b6cb0;
+      color: white;
+    }
+
+    @media(max-width:600px){
+      .hero h2{
+        font-size: 2rem;
+      }
+      .hero p{
+        font-size:1rem;
+      }
+    }
+  </style>
+</head>
+<body class="fade-in">
+
+  <header>
+    <h1>ResiLinked</h1>
+    <nav>
+      <!-- Dynamic nav links inserted by landing.js -->
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Mag-connect sa Pinakamagagaling na Trabaho at Kandidato</h2>
+    <p>Hanapin ang iyong pangarap na trabaho, mag-post ng trabaho, at pamahalaan ang iyong profile nang madali.</p>
+    <button id="seeJobsBtn">Tingnan ang Trabaho</button>
+    <button id="postJobBtn">Mag-post ng Trabaho</button>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>Maghanap ng Trabaho</h3>
+      <p>Mag-browse sa libu-libong job listings at hanapin ang tamang match sa iyong skills.</p>
+    </div>
+    <div class="feature-card">
+      <h3>I-edit ang Profile</h3>
+      <p>I-update ang iyong personal info, mag-upload ng dokumento, at pamahalaan ang iyong account.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Mag-post ng Trabaho</h3>
+      <p>Maaaring mag-post ng trabaho ang mga employer at makakonekta sa mga kwalipikadong kandidato.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Admin Dashboard</h3>
+      <p>Maaaring pamahalaan ng admin ang users, jobs, reports, at subaybayan ang activity sa platform.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Ratings & Reviews</h3>
+      <p>Mag-rate ng employer at empleyado para sa transparency at tiwala sa platform.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Notifications</h3>
+      <p>Makakuha ng real-time notifications para sa job updates, messages, at alerts mula sa admin.</p>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 ResiLinked. Lahat ng karapatan ay nakalaan.
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import '/src/fade.js';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const nav = document.querySelector("nav");
+      const seeJobsBtn = document.getElementById("seeJobsBtn");
+      const postJobBtn = document.getElementById("postJobBtn");
+
+      // Check login status
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          method: "GET",
+          credentials: "include"
+        });
+        const data = await res.json();
+
+        if (res.ok && data.user) {
+          // User is logged in
+          nav.innerHTML = `
+            <a href="/linked.html">Linked</a>
+            <a href="/settings.html">Settings</a>
+            <a href="#" id="logoutBtn">Mag-logout</a>
+          `;
+
+          document.getElementById("logoutBtn").onclick = async () => {
+            await fetch("http://localhost:5000/api/auth/logout", {
+              method: "POST",
+              credentials: "include"
+            });
+            window.location.reload();
+          };
+
+          seeJobsBtn.onclick = () => window.location.href = "/jobs.html";
+          postJobBtn.onclick = () => window.location.href = "/post-job.html";
+
+        } else {
+          // User is not logged in
+          nav.innerHTML = `
+            <a href="/login.html">Mag-login</a>
+            <a href="/register.html">Magrehistro</a>
+          `;
+
+          seeJobsBtn.onclick = () => window.location.href = "/login.html";
+          postJobBtn.onclick = () => window.location.href = "/login.html";
+        }
+      } catch (err) {
+        console.error("Error checking login status:", err);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,11 +1,44 @@
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const passwordError = document.getElementById("passwordError");
+const registerError = document.getElementById("registerError");
+
+// Real-time password match check
+function checkPasswordsMatch() {
+  if (confirmPasswordInput.value === "") {
+    confirmPasswordInput.style.borderColor = "";
+    passwordError.textContent = "";
+    return;
+  }
+
+  if (passwordInput.value === confirmPasswordInput.value) {
+    confirmPasswordInput.style.borderColor = "green";
+    passwordError.style.color = "green";
+    passwordError.textContent = "Password match!";
+  } else {
+    confirmPasswordInput.style.borderColor = "red";
+    passwordError.style.color = "red";
+    passwordError.textContent = "Password do not match!";
+  }
+}
+
+passwordInput.addEventListener("input", checkPasswordsMatch);
+confirmPasswordInput.addEventListener("input", checkPasswordsMatch);
+
+// Form submission
 document.getElementById("registerForm").addEventListener("submit", async function(event) {
   event.preventDefault();
+
+  if (passwordInput.value !== confirmPasswordInput.value) {
+    alert("Password do not match!");
+    return;
+  }
 
   const formData = new FormData();
   formData.append("firstName", document.getElementById("firstName").value);
   formData.append("lastName", document.getElementById("lastName").value);
   formData.append("email", document.getElementById("email").value);
-  formData.append("password", document.getElementById("password").value);
+  formData.append("password", passwordInput.value);
   formData.append("address", document.getElementById("address").value);
   formData.append("barangay", document.getElementById("barangay").value);
   formData.append("mobileNo", document.getElementById("mobileNo").value);
@@ -14,35 +47,25 @@ document.getElementById("registerForm").addEventListener("submit", async functio
   formData.append("idNumber", document.getElementById("idNumber").value);
   formData.append("userType", document.getElementById("userType").value);
 
-  // Images
   const idFrontImageInput = document.getElementById("idFrontImage");
-  if (idFrontImageInput.files.length > 0) {
-    formData.append("idFrontImage", idFrontImageInput.files[0]);
-  }
-  const idBackImageInput = document.getElementById("idBackImage");
-  if (idBackImageInput.files.length > 0) {
-    formData.append("idBackImage", idBackImageInput.files[0]);
-  }
-  const profilePictureInput = document.getElementById("profilePicture");
-  if (profilePictureInput && profilePictureInput.files.length > 0) {
-    formData.append("profilePicture", profilePictureInput.files[0]);
-  }
+  if (idFrontImageInput.files.length > 0) formData.append("idFrontImage", idFrontImageInput.files[0]);
 
-  // Skills (comma separated)
+  const idBackImageInput = document.getElementById("idBackImage");
+  if (idBackImageInput.files.length > 0) formData.append("idBackImage", idBackImageInput.files[0]);
+
+  const profilePictureInput = document.getElementById("profilePicture");
+  if (profilePictureInput && profilePictureInput.files.length > 0) formData.append("profilePicture", profilePictureInput.files[0]);
+
   const skillsInput = document.getElementById("skills");
   if (skillsInput && skillsInput.value.trim() !== "") {
     const skillsArray = skillsInput.value.split(",").map(s => s.trim()).filter(s => s.length > 0);
     skillsArray.forEach(skill => formData.append("skills[]", skill));
   }
 
-  const registerError = document.getElementById("registerError");
   registerError.textContent = "";
 
   try {
-    const res = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch("http://localhost:5000/api/auth/register", { method: "POST", body: formData });
     const data = await res.json();
 
     if (res.ok && data.success) {
@@ -71,15 +94,11 @@ window.closePopup = function() {
 document.getElementById('backHomeBtn').onclick = () => {
   document.body.classList.remove('fade-in');
   document.body.classList.add('fade-out');
-  setTimeout(() => {
-    window.location.href = '/index.html';
-  }, 300);
+  setTimeout(() => window.location.href = '/index.html', 300);
 };
 
 document.getElementById('loginLinkBtn').onclick = () => {
   document.body.classList.remove('fade-in');
   document.body.classList.add('fade-out');
-  setTimeout(() => {
-    window.location.href = '/login.html';
-  }, 300);
+  setTimeout(() => window.location.href = '/login.html', 300);
 };

@@ -1,3 +1,4 @@
+const fs = require('fs'); // needed for PDF deletion
 const User = require('../models/User');
 const Job = require('../models/Job');
 const Rating = require('../models/Rating');
@@ -5,7 +6,7 @@ const Report = require('../models/Report');
 const { generateUserReport } = require('../utils/pdfGenerator');
 const { createNotification } = require('../utils/notificationHelper');
 
-// Dashboard summary - fixed to be a proper async function
+// Dashboard summary
 exports.getDashboard = async (req, res) => {
     try {
         const [totalUsers, totalJobs, totalRatings, totalReports] = await Promise.all([
@@ -15,17 +16,9 @@ exports.getDashboard = async (req, res) => {
             Report.countDocuments()
         ]);
 
-        res.status(200).json({ 
-            totalUsers, 
-            totalJobs, 
-            totalRatings, 
-            totalReports 
-        });
+        res.status(200).json({ totalUsers, totalJobs, totalRatings, totalReports });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Dashboard error", 
-            error: err.message 
-        });
+        res.status(500).json({ message: "Dashboard error", error: err.message });
     }
 };
 
@@ -34,7 +27,7 @@ exports.searchUsers = async (req, res) => {
     try {
         const { q, sortBy = 'lastName', order = 'asc', page = 1, limit = 10 } = req.query;
         let query = {};
-        
+
         if (q) {
             query.$or = [
                 { firstName: new RegExp(q, 'i') },
@@ -70,11 +63,7 @@ exports.searchUsers = async (req, res) => {
             alert: `Found ${total} matching users`
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error searching users", 
-            error: err.message,
-            alert: "Search operation failed"
-        });
+        res.status(500).json({ message: "Error searching users", error: err.message, alert: "Search operation failed" });
     }
 };
 
@@ -83,10 +72,7 @@ exports.deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
-            return res.status(404).json({ 
-                message: "User not found",
-                alert: "No user found with that ID"
-            });
+            return res.status(404).json({ message: "User not found", alert: "No user found with that ID" });
         }
 
         await createNotification({
@@ -95,21 +81,13 @@ exports.deleteUser = async (req, res) => {
             message: `User ${user.email} has been deleted by ${req.user.email}`
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "User deleted successfully",
-            deletedUser: {
-                id: user._id,
-                email: user.email,
-                name: `${user.firstName} ${user.lastName}`
-            },
+            deletedUser: { id: user._id, email: user.email, name: `${user.firstName} ${user.lastName}` },
             alert: "User account permanently deleted"
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error deleting user", 
-            error: err.message,
-            alert: "Failed to delete user account"
-        });
+        res.status(500).json({ message: "Error deleting user", error: err.message, alert: "Failed to delete user account" });
     }
 };
 
@@ -118,25 +96,15 @@ exports.editUser = async (req, res) => {
     try {
         const originalUser = await User.findById(req.params.id);
         if (!originalUser) {
-            return res.status(404).json({ 
-                message: "User not found",
-                alert: "No user found with that ID"
-            });
+            return res.status(404).json({ message: "User not found", alert: "No user found with that ID" });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { new: true, runValidators: true }
-        );
+        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
         const changes = {};
         Object.keys(req.body).forEach(key => {
             if (originalUser[key] !== updatedUser[key]) {
-                changes[key] = {
-                    from: originalUser[key],
-                    to: updatedUser[key]
-                };
+                changes[key] = { from: originalUser[key], to: updatedUser[key] };
             }
         });
 
@@ -152,16 +120,10 @@ exports.editUser = async (req, res) => {
             message: "User updated successfully",
             user: updatedUser,
             changes,
-            alert: Object.keys(changes).length > 0 
-                ? "User profile updated" 
-                : "No changes detected"
+            alert: Object.keys(changes).length > 0 ? "User profile updated" : "No changes detected"
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error editing user", 
-            error: err.message,
-            alert: "Failed to update user profile"
-        });
+        res.status(500).json({ message: "Error editing user", error: err.message, alert: "Failed to update user profile" });
     }
 };
 
@@ -170,10 +132,7 @@ exports.deleteJob = async (req, res) => {
     try {
         const job = await Job.findByIdAndDelete(req.params.id);
         if (!job) {
-            return res.status(404).json({ 
-                message: "Job not found",
-                alert: "No job found with that ID"
-            });
+            return res.status(404).json({ message: "Job not found", alert: "No job found with that ID" });
         }
 
         await createNotification({
@@ -182,21 +141,13 @@ exports.deleteJob = async (req, res) => {
             message: `Your job "${job.title}" was removed by admin`
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Job deleted successfully",
-            deletedJob: {
-                id: job._id,
-                title: job.title,
-                postedBy: job.postedBy
-            },
+            deletedJob: { id: job._id, title: job.title, postedBy: job.postedBy },
             alert: "Job permanently deleted"
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error deleting job", 
-            error: err.message,
-            alert: "Failed to delete job"
-        });
+        res.status(500).json({ message: "Error deleting job", error: err.message, alert: "Failed to delete job" });
     }
 };
 
@@ -205,25 +156,15 @@ exports.editJob = async (req, res) => {
     try {
         const originalJob = await Job.findById(req.params.id);
         if (!originalJob) {
-            return res.status(404).json({ 
-                message: "Job not found",
-                alert: "No job found with that ID"
-            });
+            return res.status(404).json({ message: "Job not found", alert: "No job found with that ID" });
         }
 
-        const updatedJob = await Job.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { new: true, runValidators: true }
-        );
+        const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
         const changes = {};
         Object.keys(req.body).forEach(key => {
             if (originalJob[key] !== updatedJob[key]) {
-                changes[key] = {
-                    from: originalJob[key],
-                    to: updatedJob[key]
-                };
+                changes[key] = { from: originalJob[key], to: updatedJob[key] };
             }
         });
 
@@ -240,16 +181,10 @@ exports.editJob = async (req, res) => {
             message: "Job updated successfully",
             job: updatedJob,
             changes,
-            alert: Object.keys(changes).length > 0 
-                ? "Job details updated" 
-                : "No changes detected"
+            alert: Object.keys(changes).length > 0 ? "Job details updated" : "No changes detected"
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error editing job", 
-            error: err.message,
-            alert: "Failed to update job"
-        });
+        res.status(500).json({ message: "Error editing job", error: err.message, alert: "Failed to update job" });
     }
 };
 
@@ -258,7 +193,7 @@ exports.downloadUsersPdf = async (req, res) => {
     try {
         const users = await User.find().select('-password');
         const filename = generateUserReport(users);
-        
+
         await createNotification({
             recipient: req.user.id,
             type: 'admin_message',
@@ -266,16 +201,35 @@ exports.downloadUsersPdf = async (req, res) => {
         });
 
         res.download(filename, `ResiLinked-Users-${new Date().toISOString().split('T')[0]}.pdf`, (err) => {
-            if (err) {
-                console.error('Download error:', err);
-            }
+            if (err) console.error('Download error:', err);
             fs.unlinkSync(filename);
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error generating PDF", 
+        res.status(500).json({ message: "Error generating PDF", error: err.message, alert: "Failed to generate user report" });
+    }
+};
+
+// Get single user by ID
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                alert: "No user found with that ID"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            user,
+            alert: "User retrieved successfully"
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Error fetching user",
             error: err.message,
-            alert: "Failed to generate user report"
+            alert: "Failed to fetch user"
         });
     }
 };

@@ -2,31 +2,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const loginError = document.getElementById("loginError");
   const backHomeBtn = document.getElementById('backHomeBtn');
-  const registerLinkBtn = document.getElementById('registerLinkBtn'); // fixed id from your error was loginLinkBtn but you had registerLinkBtn in HTML?
+  const registerLinkBtn = document.getElementById('registerLinkBtn');
 
   if (loginForm && loginError) {
     loginForm.addEventListener("submit", async function(event) {
       event.preventDefault();
       loginError.textContent = "";
 
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
       try {
+        console.log("Sending login request:", { email, password });
+
         const res = await fetch("http://localhost:5000/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-          }),
+          body: JSON.stringify({ email, password }),
+          credentials: 'include' // maintain cookies/session
         });
 
         const data = await res.json();
+        console.log("Response from server:", data);
 
         if (res.ok && data.success) {
-          window.location.href = "/dashboard.html";
+          // Redirect to landing page after successful login
+          window.location.href = "/landing.html";
+        } else if (res.status === 401) {
+          loginError.textContent = "Maling email o password.";
         } else {
-          loginError.textContent = (data.alert || "Hindi matagumpay ang pag-login.");
+          loginError.textContent = data.message || "Hindi matagumpay ang pag-login.";
         }
+
       } catch (err) {
+        console.error("Login fetch error:", err);
         loginError.textContent = "May problema sa koneksyon.";
       }
     });

@@ -13,11 +13,11 @@ const transporter = nodemailer.createTransport({
 /**
  * Sends verification email to new users
  * @param {string} email - User's email address
- * @param {string} userId - User's MongoDB _id
+ * @param {string} token - Verification token
  */
-const sendVerificationEmail = async (email, userId) => {
+const sendVerificationEmail = async (email, token) => {
     try {
-        const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${userId}`;
+        const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${token}`;
         
         const mailOptions = {
             from: `ResiLinked <${process.env.EMAIL_USER}>`,
@@ -40,8 +40,9 @@ const sendVerificationEmail = async (email, userId) => {
         };
 
         await transporter.sendMail(mailOptions);
+        console.log(`✅ Verification email sent to ${email}`);
     } catch (error) {
-        console.error('Email sending error:', error);
+        console.error('❌ Verification email error:', error);
         throw new Error('Failed to send verification email');
     }
 };
@@ -58,16 +59,24 @@ const sendResetEmail = async (to, resetLink) => {
             to,
             subject: "ResiLinked Password Reset",
             html: `
-                <div style="font-family: Arial, sans-serif;">
-                    <p>Click the link below to reset your password:</p>
-                    <a href="${resetLink}">Reset Password</a>
-                    <p>This link expires in 30 minutes.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #0066ee;">Password Reset Request</h2>
+                    <p>Click the button below to reset your password:</p>
+                    <a href="${resetLink}" 
+                       style="display: inline-block; background: #ff6600; color: white; 
+                              padding: 10px 20px; text-decoration: none; border-radius: 5px;
+                              margin: 15px 0;">
+                        Reset Password
+                    </a>
+                    <p>This link will expire in 30 minutes.</p>
+                    <p>If you did not request a password reset, please ignore this email.</p>
                 </div>
             `
         });
+        console.log(`✅ Password reset email sent to ${to}`);
     } catch (error) {
-        console.error('Password reset email error:', error);
-        throw error;
+        console.error('❌ Password reset email error:', error);
+        throw new Error('Failed to send password reset email');
     }
 };
 

@@ -2,47 +2,36 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const auth = require('../middleware/auth');
+const verifyAdmin = require('../middleware/verifyAdmin'); // admin check
 
-// Verify all admin routes
-router.use(auth.verify);
-router.use(auth.verifyAdmin);
+// Apply authentication and admin verification to all routes
+router.use(auth.verify);      // checks JWT
+router.use(verifyAdmin);      // checks userType === "admin"
 
-/**
- * Dashboard Routes
- */
-router.route('/dashboard')
-  .get(adminController.getDashboard);
+// Dashboard
+router.get('/dashboard', adminController.getDashboard);
 
-/**
- * User Management Routes
- */
-router.route('/users')
-  .get(adminController.searchUsers);
 
-router.route('/users/:id')
-  .delete(adminController.deleteUser)
-  .put(adminController.editUser);
+// User management
+router.get('/users', adminController.searchUsers);
+router.get('/users/:id', adminController.getUserById); // <--- new route
+router.delete('/users/:id', adminController.deleteUser);
+router.put('/users/:id', adminController.editUser);
 
-/**
- * Job Management Routes
- */ 
-router.route('/jobs/:id')
-  .delete(adminController.deleteJob)
-  .put(adminController.editJob);
+// Job management
+router.delete('/jobs/:id', adminController.deleteJob);
+router.put('/jobs/:id', adminController.editJob);
 
-/**
- * Report Routes
- */
-router.route('/users/download/pdf')
-  .get(adminController.downloadUsersPdf);
+// Reports
+router.get('/users/download/pdf', adminController.downloadUsersPdf);
 
-// Error handling middleware for admin routes
+// Global error handling for this router
 router.use((err, req, res, next) => {
-  console.error('Admin route error:', err);
+  console.error('Admin route error:', err.stack || err);
   res.status(500).json({
     success: false,
     message: 'Admin operation failed',
-    error: err.message
+    error: err.message || err
   });
 });
 

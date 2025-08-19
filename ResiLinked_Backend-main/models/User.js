@@ -1,27 +1,48 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+    // Personal Information
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     mobileNo: { type: String, required: true },
-     address: { type: String },
-    barangay: { type: String, required: true }, // which barangay the user is from
-    idType: { type: String, required: true }, // "National ID", "Barangay ID", etc.
+    address: { type: String },
+    barangay: { type: String, required: true },
+
+    // Identification Information
+    idType: { type: String, required: true },
     idNumber: { type: String, required: true },
-    idFrontImage: { type: String }, // URL/path to image
+    idFrontImage: { type: String },
     idBackImage: { type: String },
-    skills: [{ type: String }], // e.g., ["magaling maglaba", "carpentry"]
-    userType: { type: String, enum: ['employee', 'employer', 'both'], required: true },
-    isVerified: { type: Boolean, default: false }, // Barangay official verification
-    gender: { type: String, enum: ['Male', 'Female', 'others'] },
+
+    // Skills Information
+    skills: [{ type: String }],
+
+    // User Role Information
+    userType: { 
+        type: String, 
+        enum: ['employee', 'employer', 'both', 'admin'], 
+        required: true 
+    },
+
+    // Verification and Profile Information
+    isVerified: { type: Boolean, default: false },
+    gender: { 
+        type: String, 
+        enum: ['male', 'female', 'others'], 
+        lowercase: true 
+    },
     profilePicture: { type: String, default: "" },
+
+    // Goals Information
     goals: [{
         targetAmount: Number,
         progress: { type: Number, default: 0 },
         description: String
     }],
+
+    // Metadata Information
     createdAt: { type: Date, default: Date.now }
 });
 

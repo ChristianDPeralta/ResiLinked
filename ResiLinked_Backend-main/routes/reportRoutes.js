@@ -3,9 +3,13 @@ const router = express.Router();
 const reportController = require('../controllers/reportController');
 const auth = require('../middleware/auth');
 
-// Reports
+// User reports another user
 router.post('/', auth.verify, reportController.reportUser);
-router.get('/', auth.verify, reportController.getReports);
-router.patch('/:id', auth.verify, reportController.updateReportStatus);
+
+// Admin fetches all reports
+router.get('/', auth.verify, auth.verifyAdmin, reportController.getReports);
+
+// Admin updates report status
+router.patch('/:id', auth.verify, auth.verifyAdmin, reportController.updateReportStatus);
 
 module.exports = router;

@@ -1,10 +1,15 @@
 const Report = require('../models/Report');
+const User = require('../models/User');
 const { createNotification } = require('../utils/notificationHelper');
 
+/**
+ * REPORT USER
+ * Allows a logged-in user to report another user.
+ */
 exports.reportUser = async (req, res) => {
     try {
         const { reportedUserId, reason } = req.body;
-        
+
         if (!reportedUserId || !reason) {
             return res.status(400).json({
                 message: "Missing required fields",
@@ -25,6 +30,7 @@ exports.reportUser = async (req, res) => {
             reportedUser: reportedUserId,
             status: 'pending'
         });
+
         if (existingReport) {
             return res.status(400).json({
                 message: "Already reported",
@@ -39,11 +45,18 @@ exports.reportUser = async (req, res) => {
         });
         await report.save();
 
-        await createNotification({
-            recipient: 'admin',
-            type: 'user_reported',
-            message: `New report against user ${reportedUserId}: ${reason}`
-        });
+        const admins = await User.find({ userType: 'admin' });
+        for (const admin of admins) {
+            await createNotification({
+                recipient: admin._id,
+                type: 'user_reported',
+                message: `New report against user ${reportedUserId}: ${reason}`
+            });
+        }
+
+        // Populate reporter and reportedUser for response
+        await report.populate('reporter', 'firstName lastName email')
+                    .populate('reportedUser', 'firstName lastName email');
 
         res.status(201).json({
             message: "Report submitted successfully",
@@ -59,12 +72,18 @@ exports.reportUser = async (req, res) => {
     }
 };
 
+/**
+ * GET REPORTS
+ * Admin can fetch all reports (optionally filter by status).
+ */
 exports.getReports = async (req, res) => {
     try {
+        if (!req.user || req.user.userType !== 'admin') {
+            return res.status(403).json({ message: "Admin access required" });
+        }
+
         const { status } = req.query;
-        
-        let query = {};
-        if (status) query.status = status;
+        const query = status ? { status } : {};
 
         const reports = await Report.find(query)
             .populate('reporter', 'firstName lastName email')
@@ -84,10 +103,15 @@ exports.getReports = async (req, res) => {
     }
 };
 
+/**
+ * UPDATE REPORT STATUS
+ * Admin can mark a report as pending/resolved/dismissed.
+ */
 exports.updateReportStatus = async (req, res) => {
     try {
         const { status } = req.body;
-        
+
+        // Validate status
         if (!['pending', 'resolved', 'dismissed'].includes(status)) {
             return res.status(400).json({
                 message: "Invalid status",
@@ -95,24 +119,32 @@ exports.updateReportStatus = async (req, res) => {
             });
         }
 
+        // Update report
         const report = await Report.findByIdAndUpdate(
             req.params.id,
             { status },
             { new: true }
-        ).populate('reportedUser', 'firstName lastName email');
+        )
+        .populate('reportedUser', 'firstName lastName email')
+        .populate('reporter', 'firstName lastName email');
 
         if (!report) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "Report not found",
                 alert: "No report found with that ID"
             });
         }
 
+        // Notify reporter if resolved
         if (status === 'resolved') {
+            const reportedName = report.reportedUser 
+                ? `${report.reportedUser.firstName} ${report.reportedUser.lastName}`
+                : "the user";
+
             await createNotification({
-                recipient: report.reporter,
+                recipient: report.reporter._id,
                 type: 'report_resolved',
-                message: `Your report against ${report.reportedUser.firstName} has been resolved`
+                message: `Your report against ${reportedName} has been resolved`
             });
         }
 
@@ -122,8 +154,8 @@ exports.updateReportStatus = async (req, res) => {
             alert: "Report status updated"
         });
     } catch (err) {
-        res.status(500).json({ 
-            message: "Error updating report", 
+        res.status(500).json({
+            message: "Error updating report",
             error: err.message,
             alert: "Failed to update report status"
         });

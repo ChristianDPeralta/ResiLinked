@@ -12,7 +12,14 @@ const notificationSchema = new mongoose.Schema({
             'job_applied',
             'admin_message',
             'verification_needed',
-            'security_alert'  // Added this value to fix validation error
+            'security_alert',
+             'goal_created',
+             'job_match', 
+            'application_sent',
+            'rating_reported',
+            'user_reported',  
+            'report_resolved',
+            'profile_update' 
         ],
         required: true
     },
