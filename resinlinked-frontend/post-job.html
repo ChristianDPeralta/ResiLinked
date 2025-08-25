@@ -1,21 +1,302 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tl">
 <head>
   <meta charset="UTF-8">
-  <title>Post Job</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Mag-Post ng Trabaho | ResiLinked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root {
+      --primary: #379aff;
+      --bg: #eaf4ff;
+      --panel: #cbe6ff;
+      --header: #379aff;
+      --border: #a3c5e8;
+      --text-dark: #222d3e;
+      --text-light: #4a6b7a;
+      --radius: 18px;
+      --shadow: 0 2px 16px rgba(0,0,0,0.09);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+    .header {
+      background: var(--header);
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      padding: 10px 28px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+    }
+    .header img {
+      width: 26px;
+      margin-right: 12px;
+    }
+    .container {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 730px;
+      margin: 40px auto;
+      padding: 34px 30px 28px 30px;
+      position: relative;
+      min-width: 290px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 26px;
+      font-size: 2.1rem;
+      color: var(--text-dark);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .close-btn:hover {
+      color: var(--primary);
+    }
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      letter-spacing: -1px;
+    }
+    .desc {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-bottom: 18px;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .form-group {
+      flex: 1 1 260px;
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .form-group input,
+    .form-group textarea {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      background: #f7fbff;
+      transition: border-color 0.2s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+    .form-group textarea {
+      min-height: 60px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .skills-area label {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+    .skill-tag {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 17px;
+      padding: 3px 13px;
+      font-size: 0.98rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .remove-skill {
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 2px;
+      font-size: 1.1em;
+    }
+    .skill-input {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 7px 12px;
+      font-size: 1rem;
+      background: #f7fbff;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .post-method {
+      margin-top: 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .post-method label {
+      font-size: 1rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      margin-right: 7px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      padding: 10px 26px;
+      border-radius: 7px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1.5px 6px rgba(56,154,255,0.15);
+      transition: background 0.2s;
+    }
+    .btn.save {
+      background: #fff;
+      color: var(--text-dark);
+      border: 1px solid var(--border);
+    }
+    .btn.save:hover {
+      background: #d7eaff;
+    }
+    .btn.post {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn.post:hover {
+      background: #227fd1;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 20px 8px 18px 8px;
+        max-width: 98vw;
+      }
+      form {
+        flex-direction: column;
+        gap: 0;
+      }
+      .form-group {
+        gap: 11px;
+        min-width: 0px;
+      }
+      .btn-row {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Post a Job</h2>
-  <form id="post-job-form">
-    <input type="text" id="title" placeholder="Job Title" required>
-    <textarea id="description" placeholder="Job Description" required></textarea>
-    <input type="number" id="price" placeholder="Price" required>
-    <input type="text" id="skillsRequired" placeholder="Skills Required (comma separated)" required>
-    <input type="text" id="barangay" placeholder="Barangay" required>
-    <button type="submit">Post Job</button>
-  </form>
+  <div class="header">
+    <img src="logo.png" alt="ResiLinked Logo" />
+    <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
+  </div>
+  <div class="container">
+    <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
+    <div class="title">Mag-Post ng Trabaho</div>
+    <div class="desc">Punan ang mga detalye sa ibaba upang makagawa ng kumpletong listahan ng trabaho.</div>
+    <form id="postJobForm" autocomplete="off">
+      <div class="form-group">
+        <input type="text" name="jobType" id="jobType" placeholder="Klase ng Trabaho" required>
+        <input type="text" name="location" id="location" placeholder="Lokasyon" required>
+        <input type="text" name="workTime" id="workTime" placeholder="Oras ng Trabaho" required>
+        <input type="text" name="salary" id="salary" placeholder="Sweldo/Bayad" required>
+        <textarea name="description" id="description" placeholder="Paglalarawan ng Trabaho" required></textarea>
+      </div>
+      <div class="form-group skills-area">
+        <label for="skillInput">Mga Kailangan na Kasanayan</label>
+        <div class="skill-tags" id="skillTags"></div>
+        <input type="text" id="skillInput" class="skill-input" placeholder="I-type ang isang kasanayan at pindutin ang Enter">
+      <div class="post-method">
+        <label class="radio-label">
+          <input type="radio" id="postNow" name="postMethod" value="now">
+          I-post Kaagad
+        </label>
+        <label class="radio-label">
+          <input type="radio" id="postSchedule" name="postMethod" value="schedule">
+          I-schedule ang Pag-post
+        </label>
+      </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn save" id="saveBtn">I-save muna</button>
+        <button type="submit" class="btn post" id="postBtn">I-post na ngayon</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    // Tag input for skills
+    const skillInput = document.getElementById('skillInput');
+    const skillTags = document.getElementById('skillTags');
+    let skills = [];
 
-  <script src="./src/post-job.js"></script>
+    skillInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && skillInput.value.trim()) {
+        e.preventDefault();
+        addSkill(skillInput.value.trim());
+        skillInput.value = '';
+      }
+    });
+
+    function addSkill(skill) {
+      if (!skills.includes(skill)) {
+        skills.push(skill);
+        renderSkills();
+      }
+    }
+    function removeSkill(skill) {
+      skills = skills.filter(s => s !== skill);
+      renderSkills();
+    }
+    function renderSkills() {
+      skillTags.innerHTML = '';
+      skills.forEach(skill => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag';
+        tag.innerHTML = `${skill} <span class="remove-skill" title="Tanggalin" onclick="removeSkill('${skill}')">&times;</span>`;
+        skillTags.appendChild(tag);
+      });
+    }
+
+    // Save button demo
+    document.getElementById('saveBtn').onclick = function() {
+      alert('Ang trabaho ay na-save (lokal na demo lamang).');
+    };
+
+    // Submit (Post) demo
+    document.getElementById('postJobForm').onsubmit = function(e) {
+      e.preventDefault();
+      alert('Ang trabaho ay nai-post na! (lokal na demo lamang)');
+      this.reset();
+      skills = [];
+      renderSkills();
+    };
+  </script>
 </body>
 </html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <title>Mga Setting | ResiLinked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root {
+      --primary: #379aff;
+      --bg: #eaf4ff;
+      --panel: #cbe6ff;
+      --header: #379aff;
+      --border: #a3c5e8;
+      --text-dark: #222d3e;
+      --text-light: #4a6b7a;
+      --radius: 18px;
+      --shadow: 0 2px 16px rgba(0,0,0,0.09);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+    .header {
+      background: var(--header);
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      padding: 10px 28px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+    }
+    .header img {
+      width: 26px;
+      margin-right: 12px;
+    }
+    .container {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 34px 30px 28px 30px;
+      position: relative;
+      min-width: 270px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 26px;
+      font-size: 2rem;
+      color: var(--text-dark);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .close-btn:hover {
+      color: var(--primary);
+    }
+    .title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .title .icon {
+      font-size: 1.25em;
+      color: var(--primary);
+    }
+    .section {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .section label {
+      display: block;
+      font-size: 1.03em;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+    .section input[type="checkbox"] {
+      margin-right: 7px;
+      accent-color: var(--primary);
+    }
+    .section .sub {
+      color: var(--text-light);
+      font-size: 0.98em;
+      margin-bottom: 7px;
+    }
+    .faq-link {
+      color: var(--primary);
+      text-decoration: underline;
+      font-size: 0.95em;
+      cursor: pointer;
+      margin-left: 7px;
+    }
+    .btn-row {
+      margin-top: 22px;
+      text-align: center;
+    }
+    .btn {
+      border: none;
+      padding: 9px 22px;
+      border-radius: 7px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1.5px 6px rgba(56,154,255,0.13);
+      transition: background 0.2s;
+      background: #fff;
+      color: var(--text-dark);
+      border: 1px solid var(--border);
+    }
+    .btn:hover {
+      background: #d7eaff;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 18px 6px 12px 6px;
+        max-width: 99vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="logo.png" alt="ResiLinked Logo" />
+    <h1><a href="landing.html" class="">ResiLinked</a></h1>
+  </div>
+  <div class="container">
+    <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
+    <div class="title"><span class="icon">&#9881;</span> Mga Setting</div>
+    <div class="section">
+      <label>Mga Setting ng Account</label>
+      <span class="sub">I-update ang Profile <span title="Update profile">&#9432;</span></span>
+    </div>
+    <div class="section">
+      <label>Notipikasyon</label>
+      <span class="sub">Notipikasyon sa Trabaho <span title="Notipikasyon">&#9432;</span></span>
+      <span class="sub">Notipikasyon sa Mensahe <span title="Notipikasyon">&#9432;</span></span>
+    </div>
+    <div class="checkbox-row">
+        <label class="checkbox-label">
+            <input type="radio" name="language" value="tagalog" id="tagalog-lang"> Tagalog
+        </label>
+        <label class="checkbox-label">
+            <input type="radio" name="language" value="english" id="english-lang"> English
+        </label>
+    </div>
+    <br>
+    <br>
+    <div class="section">
+      <span class="faq-link" onclick="alert('FAQ at Tulong page (demo).')">Tulong at FAQs &#9432;</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="alert('Logged out (demo).')">Mag Log Out</button>
+    </div>
+  </div>
+</body>
+</html>

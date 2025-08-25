@@ -20,10 +20,13 @@
       justify-content: space-between;
       align-items: center;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
+    header h1 a {
+      color: white;
+      text-decoration: none;
     }
+    header h1 a:hover {
+      color: #cbe6ff; /* lighter on hover */
+  }
     nav a {
       color: white;
       text-decoration: none;
@@ -226,21 +229,22 @@
 </head>
 <body class="fade-in">
   <header>
-    <h1>ResiLinked</h1>
+    <header class="landing-header">
+      <h1>ResiLinked</h1>
+    </header>
     <nav>
-      <a href="#">Hanap ng trabaho</a>
-      <a href="#">Hanap ng Trabahador</a>
-      <a href="#" id="profileBtn">Profile</a>
+      <a href="profile.html" class="">Profile</a>
+      <a href="settings.html" class="">Settings</a>
     </nav>
 
 
   </header>
   <section class="hero">
     <h2>Maligayang pagdating sa ResiLinked Dito ay makakakita ka ng trabaho batay sa iyong mga kakayahan!</h2>
-    <p>Pumili, maghanap, at mag-post ng trabaho ayon sa iyong skills!</p>
+    <p class="landing-gray">Kontraktwal na serbisyo para sa iyong komunidad.</p>
     <div class="button-row">
-      <button id="seeJobsBtn">Maghanap ng Trabaho</button>
-      <button id="postJobBtn">Mag-post ng Trabaho</button>
+      <a href="search-jobs.html" class="btn">Maghanap ng Trabaho</a>
+      <a href="post-job.html" class="btn">Mag-Post ng Trabaho</a>
     </div>
   </section>
   <section class="how-section">
