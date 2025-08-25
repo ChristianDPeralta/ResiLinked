@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - ResiLinked</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+    }
+    .profile-header {
+      background: #234567;
+      color: white;
+      padding: 2.2rem 1rem 1rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      border-top-left-radius: 0.8rem;
+      border-top-right-radius: 0.8rem;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    }
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #eee;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.11);
+    }
+    .verified-badge {
+      background: #38a169;
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      margin-left: 0.5rem;
+      font-weight: 500;
+    }
+    .edit-profile {
+      background: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      margin-top: 0.7rem;
+      box-shadow: 0 2px 8px rgba(43,108,176,0.13);
+    }
+    .profile-section {
+      background: #fff;
+      border-radius: 0.8rem;
+      margin: 2rem auto;
+      max-width: 700px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding-bottom: 2rem;
+    }
+    .profile-skills, .profile-description, .profile-recommended-jobs, .profile-financial-goal, .profile-languages, .profile-contact, .profile-ratings {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #eee;
+    }
+    .profile-skills h3, .profile-description h3, .profile-recommended-jobs h3, .profile-financial-goal h3, .profile-languages h3, .profile-contact h3, .profile-ratings h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #2b6cb0;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .skills-list, .recommended-jobs-list, .languages-list {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .skill-tag, .job-tag, .lang-tag {
+      background: #e1eed9;
+      color: #234567;
+      border-radius: 7px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.97rem;
+      font-weight: 500;
+      box-shadow: 0 1.5px 6px rgba(183,169,154,0.11);
+    }
+    .profile-description p {
+      color: #333;
+      font-size: 1.05rem;
+      margin-bottom: 0;
+    }
+    .progress-bar-container {
+      margin: 1rem 0;
+      text-align: left;
+    }
+    .progress-bar-label {
+      font-size: 1rem;
+      color: #234567;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .progress-bar {
+      background: #eee;
+      border-radius: 12px;
+      height: 20px;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+    }
+    .progress-bar-fill {
+      background: #38a169;
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.2s;
+    }
+    .progress-bar-percent {
+      font-size: 0.98rem;
+      color: #38a169;
+      font-weight: 500;
+    }
+    .profile-contact p {
+      color: #234567;
+      font-size: 1rem;
+      margin-bottom: 0;
+      font-weight: 500;
+      word-break: break-all;
+    }
+    .ratings-list {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .testimonial-card {
+      background: #f9fafb;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.3rem 1rem;
+      min-width: 220px;
+      max-width: 260px;
+      text-align: left;
+      flex: 1;
+    }
+    .testimonial-stars {
+      color: #ffc107;
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+    .testimonial-content {
+      color: #2b6cb0;
+      margin-bottom: 0.7rem;
+      font-size: 0.97rem;
+      font-style: italic;
+    }
+    .testimonial-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .testimonial-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e1eed9;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    .testimonial-name {
+      font-weight: bold;
+      color: #38a169;
+    }
+    .testimonial-role {
+      color: #2b6cb0;
+      font-size: 0.85rem;
+    }
+    @media(max-width:600px){
+      .profile-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 2rem 1rem 1rem 1rem;
+      }
+      .profile-section {
+        max-width: 100vw;
+        margin: 0;
+        border-radius: 0;
+      }
+      .ratings-list {
+        flex-direction: column;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-section">
+    <div class="profile-header">
+      <img src="/images/avatar.jpg" alt="Avatar" class="profile-avatar">
+      <div>
+        <h2>Micko Deloria</h2>
+        <p>Barangay <span class="verified-badge">Barangay-Verified</span></p>
+        <button class="edit-profile">Edit Profile</button>
+      </div>
+    </div>
+    <div class="profile-skills">
+      <h3>Mga Kasanayan At Serbisyo</h3>
+      <div class="skills-list">
+        <span class="skill-tag">Pintor</span>
+        <span class="skill-tag">Lipat Bahay</span>
+        <span class="skill-tag">Pag Aalaga</span>
+        <span class="skill-tag">Paglilinis</span>
+      </div>
+    </div>
+    <div class="profile-description">
+      <h3>Deskripsyon</h3>
+      <p>Empleyado ni Micko for 1 DAY</p>
+    </div>
+    <div class="profile-recommended-jobs">
+      <h3>Mga Inirerekomendang Trabaho</h3>
+      <div class="recommended-jobs-list">
+        <span class="job-tag">Tagalaba</span>
+        <span class="job-tag">Tagapaglaba</span>
+        <span class="job-tag">Tagapag-alaga ng matanda</span>
+        <span class="job-tag">Tagalinis</span>
+      </div>
+    </div>
+    <div class="profile-financial-goal">
+      <h3>Layunin Sa Pananalapi</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar-label">65,560/100,000</div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:65%"></div>
+        </div>
+        <div class="progress-bar-percent">65%</div>
+      </div>
+    </div>
+    <div class="profile-languages">
+      <h3>Mga Wika Na Sinasalita</h3>
+      <div class="languages-list">
+        <span class="lang-tag">Tagalog</span>
+        <span class="lang-tag">English</span>
+      </div>
+    </div>
+    <div class="profile-contact">
+      <h3>Impormasyon Sa Pakikipag-Ugnayan</h3>
+      <p>mickodeloria@yahoo.com<br>+622345678910</p>
+    </div>
+    <div class="profile-ratings">
+      <h3>Rating Ng Manggagawa</h3>
+      <div class="ratings-list">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-content">Excellent work! Highly recommended.</div>
+          <div class="testimonial-footer">
+            <span class="testimonial-avatar"></span>
+            <span class="testimonial-name">Robert Fox</span>
+            <span class="testimonial-role">UI/UX Designer</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-content">Mabilis at mahusay magtrabaho.</div>
+          <div class="testimonial-footer">
+            <span class="testimonial-avatar"></span>
+            <span class="testimonial-name">Resie Cooper</span>
+            <span class="testimonial-role">Senior Analyst</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-content">Very reliable and professional!</div>
+          <div class="testimonial-footer">
+            <span class="testimonial-avatar"></span>
+            <span class="testimonial-name">Jane Cooper</span>
+            <span class="testimonial-role">Project Manager</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

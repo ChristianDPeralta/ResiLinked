@@ -12,7 +12,6 @@
       background: #f4f6f8;
       color: #333;
     }
-
     header {
       background: #2b6cb0;
       color: white;
@@ -21,89 +20,196 @@
       justify-content: space-between;
       align-items: center;
     }
-
     header h1 {
       margin: 0;
       font-size: 1.8rem;
     }
-
     nav a {
       color: white;
       text-decoration: none;
       margin-left: 1.5rem;
       font-weight: 500;
     }
-
     nav a:hover {
       text-decoration: underline;
     }
-
     .hero {
       text-align: center;
       padding: 4rem 1rem;
       background: url('/images/hero-bg.jpg') center/cover no-repeat;
       color: white;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
     }
-
     .hero h2 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.13);
     }
-
     .hero p {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       margin-bottom: 2rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.10);
     }
-
+    .hero .button-row {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
     .hero button {
       background: #38a169;
       color: white;
       border: none;
       padding: 1rem 2rem;
       font-size: 1rem;
-      border-radius: 5px;
+      border-radius: 7px;
       cursor: pointer;
       margin: 0.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(56,161,105,0.15);
+      transition: background 0.2s;
     }
-
     .hero button:hover {
       background: #2f855a;
     }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 2rem;
-      padding: 3rem 2rem;
+    .how-section {
       background: #fff;
-    }
-
-    .feature-card {
-      background: #f9fafb;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 3rem 2rem 2rem 2rem;
       text-align: center;
     }
-
-    .feature-card h3 {
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
+    .how-section h2 {
+      margin-bottom: 2rem;
+      font-size: 1.7rem;
       color: #2b6cb0;
     }
-
-    .feature-card p {
-      font-size: 0.95rem;
-      color: #555;
+    .how-steps {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
-
+    .how-steps div {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      font-size: 1rem;
+      font-weight: 500;
+      min-width: 180px;
+      color: #2b6cb0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .how-steps span {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #38a169;
+      margin-bottom: 0.7rem;
+    }
+    .jobs-section {
+      background: #f7f7fc;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .jobs-section h2 {
+      font-size: 1.5rem;
+      color: #2b6cb0;
+      margin-bottom: 2rem;
+    }
+    .jobs-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .job-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.1rem;
+      text-align: center;
+      font-size: 1rem;
+      color: #2b6cb0;
+      font-weight: 500;
+      transition: transform 0.13s;
+      cursor: pointer;
+    }
+    .job-card:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 4px 16px rgba(56,161,105,0.12);
+    }
+    .testimonials-section {
+      background: #fff;
+      padding: 3rem 2rem 2rem 2rem;
+      text-align: center;
+    }
+    .testimonials-section h2 {
+      font-size: 1.5rem;
+      color: #2b6cb0;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+    .testimonials-list {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .testimonial-card {
+      background: #f9fafb;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.3rem 1rem;
+      min-width: 220px;
+      max-width: 260px;
+      text-align: left;
+      flex: 1;
+    }
+    .testimonial-stars {
+      color: #ffc107;
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+    .testimonial-content {
+      color: #2b6cb0;
+      margin-bottom: 0.7rem;
+      font-size: 0.97rem;
+      font-style: italic;
+    }
+    .testimonial-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .testimonial-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e1eed9;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    .testimonial-name {
+      font-weight: bold;
+      color: #38a169;
+    }
+    .testimonial-role {
+      color: #2b6cb0;
+      font-size: 0.85rem;
+    }
     footer {
       text-align: center;
       padding: 2rem;
       background: #2b6cb0;
       color: white;
     }
-
     @media(max-width:600px){
       .hero h2{
         font-size: 2rem;
@@ -111,107 +217,90 @@
       .hero p{
         font-size:1rem;
       }
+      .how-steps, .testimonials-list, .jobs-list {
+        flex-direction: column !important;
+        display: block;
+      }
     }
   </style>
 </head>
 <body class="fade-in">
-
   <header>
     <h1>ResiLinked</h1>
     <nav>
-      <!-- Dynamic nav links inserted by landing.js -->
+      <a href="#">Hanap ng trabaho</a>
+      <a href="#">Hanap ng Trabahador</a>
+      <a href="#" id="profileBtn">Profile</a>
     </nav>
+
+
   </header>
-
   <section class="hero">
-    <h2>Mag-connect sa Pinakamagagaling na Trabaho at Kandidato</h2>
-    <p>Hanapin ang iyong pangarap na trabaho, mag-post ng trabaho, at pamahalaan ang iyong profile nang madali.</p>
-    <button id="seeJobsBtn">Tingnan ang Trabaho</button>
-    <button id="postJobBtn">Mag-post ng Trabaho</button>
-  </section>
-
-  <section class="features">
-    <div class="feature-card">
-      <h3>Maghanap ng Trabaho</h3>
-      <p>Mag-browse sa libu-libong job listings at hanapin ang tamang match sa iyong skills.</p>
-    </div>
-    <div class="feature-card">
-      <h3>I-edit ang Profile</h3>
-      <p>I-update ang iyong personal info, mag-upload ng dokumento, at pamahalaan ang iyong account.</p>
-    </div>
-    <div class="feature-card">
-      <h3>Mag-post ng Trabaho</h3>
-      <p>Maaaring mag-post ng trabaho ang mga employer at makakonekta sa mga kwalipikadong kandidato.</p>
-    </div>
-    <div class="feature-card">
-      <h3>Admin Dashboard</h3>
-      <p>Maaaring pamahalaan ng admin ang users, jobs, reports, at subaybayan ang activity sa platform.</p>
-    </div>
-    <div class="feature-card">
-      <h3>Ratings & Reviews</h3>
-      <p>Mag-rate ng employer at empleyado para sa transparency at tiwala sa platform.</p>
-    </div>
-    <div class="feature-card">
-      <h3>Notifications</h3>
-      <p>Makakuha ng real-time notifications para sa job updates, messages, at alerts mula sa admin.</p>
+    <h2>Maligayang pagdating sa ResiLinked Dito ay makakakita ka ng trabaho batay sa iyong mga kakayahan!</h2>
+    <p>Pumili, maghanap, at mag-post ng trabaho ayon sa iyong skills!</p>
+    <div class="button-row">
+      <button id="seeJobsBtn">Maghanap ng Trabaho</button>
+      <button id="postJobBtn">Mag-post ng Trabaho</button>
     </div>
   </section>
-
+  <section class="how-section">
+    <h2>Paano gumagana ang ResiLinked</h2>
+    <div class="how-steps">
+      <div><span>1</span> Mag-Sign-in at Gawa ng Profile</div>
+      <div><span>2</span> Maghanap ng Trabaho o Kandidato</div>
+      <div><span>3</span> May Jobs at Mag-apply</div>
+      <div><span>4</span> Ibigay ang Rating at Makatanggap ng Komunikasyon</div>
+    </div>
+  </section>
+  <section class="jobs-section">
+    <h2>Sikat na trabaho</h2>
+    <div class="jobs-list">
+      <div class="job-card">Kasambahay<br><span>Lahat around</span></div>
+      <div class="job-card">Tagapag-alaga ng bata<br><span>Child care</span></div>
+      <div class="job-card">Tagalaba<br><span>Laundry services</span></div>
+      <div class="job-card">Tagalinis<br><span>Cleaning services</span></div>
+      <div class="job-card">Tagapagluto<br><span>Cooking services</span></div>
+      <div class="job-card">Tagapaglaba<br><span>Laundry assistant</span></div>
+      <div class="job-card">Tagapag-alaga ng matanda<br><span>Elderly care</span></div>
+      <div class="job-card">Tagalinis ng sasakyan<br><span>Car cleaning</span></div>
+      <div class="job-card">Tagapinta<br><span>Painting services</span></div>
+    </div>
+  </section>
+  <section class="testimonials-section">
+    <h2>“Mga Sabi ng Kliyente”</h2>
+    <div class="testimonials-list">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-content">Excellent work! Highly recommended.</div>
+        <div class="testimonial-footer">
+          <span class="testimonial-avatar"></span>
+          <span class="testimonial-name">Robert Fox</span>
+          <span class="testimonial-role">UI/UX Designer</span>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-content">Mabilis at mahusay magtrabaho.</div>
+        <div class="testimonial-footer">
+          <span class="testimonial-avatar"></span>
+          <span class="testimonial-name">Resie Cooper</span>
+          <span class="testimonial-role">Senior Analyst</span>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-content">Very reliable and professional!</div>
+        <div class="testimonial-footer">
+          <span class="testimonial-avatar"></span>
+          <span class="testimonial-name">Jane Cooper</span>
+          <span class="testimonial-role">Project Manager</span>
+        </div>
+      </div>
+    </div>
+  </section>
   <footer>
-    &copy; 2025 ResiLinked. Lahat ng karapatan ay nakalaan.
+    V.1 ResiLinked | +6390 06681 8015 | product.student@pga.edu.ph
   </footer>
-
-  <!-- Scripts -->
-  <script type="module">
-    import '/src/fade.js';
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const nav = document.querySelector("nav");
-      const seeJobsBtn = document.getElementById("seeJobsBtn");
-      const postJobBtn = document.getElementById("postJobBtn");
-
-      // Check login status
-      try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
-          method: "GET",
-          credentials: "include"
-        });
-        const data = await res.json();
-
-        if (res.ok && data.user) {
-          // User is logged in
-          nav.innerHTML = `
-            <a href="/linked.html">Linked</a>
-            <a href="/settings.html">Settings</a>
-            <a href="#" id="logoutBtn">Mag-logout</a>
-          `;
-
-          document.getElementById("logoutBtn").onclick = async () => {
-            await fetch("http://localhost:5000/api/auth/logout", {
-              method: "POST",
-              credentials: "include"
-            });
-            window.location.reload();
-          };
-
-          seeJobsBtn.onclick = () => window.location.href = "/jobs.html";
-          postJobBtn.onclick = () => window.location.href = "/post-job.html";
-
-        } else {
-          // User is not logged in
-          nav.innerHTML = `
-            <a href="/login.html">Mag-login</a>
-            <a href="/register.html">Magrehistro</a>
-          `;
-
-          seeJobsBtn.onclick = () => window.location.href = "/login.html";
-          postJobBtn.onclick = () => window.location.href = "/login.html";
-        }
-      } catch (err) {
-        console.error("Error checking login status:", err);
-      }
-    });
-  </script>
-
+  <script type="module" src="/src/landing.js"></script>
 </body>
 </html>
