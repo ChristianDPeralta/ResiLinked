@@ -5,18 +5,27 @@
   <title>Mag-Post ng Trabaho | ResiLinked</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="fade.css" />
   <style>
     :root {
-      --primary: #379aff;
-      --bg: #eaf4ff;
-      --panel: #cbe6ff;
-      --header: #379aff;
+      --primary: #38a169;
+      --primary-dark: #2f855a;
+      --header-bg: #2b6cb0;
+      --panel: #fff;
+      --bg: #f4f6f8;
       --border: #a3c5e8;
-      --text-dark: #222d3e;
+      --text-dark: #333;
       --text-light: #4a6b7a;
-      --radius: 18px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.09);
+      --radius: 10px;
+      --shadow: 0 4px 32px rgba(0,0,0,0.10);
+
+      /* Fixed header/navbar/branding sizes for consistency */
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
     }
     body {
       margin: 0;
@@ -25,21 +34,85 @@
       color: var(--text-dark);
       min-height: 100vh;
     }
-    .header {
-      background: var(--header);
-      color: var(--text-dark);
+    /* --- HEADER AND NAV FROM LANDING PAGE --- */
+    header {
+      background: var(--header-bg);
+      color: white;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 10px 28px;
-      font-size: 1.25rem;
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
       font-weight: 600;
       letter-spacing: 0.5px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
     }
-    .header img {
-      width: 26px;
-      margin-right: 12px;
+    .branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
+    .branding img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #fff;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    header h1 a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    header h1 a:hover {
+      color: #cbe6ff;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      background: var(--header-bg);
+      margin-left: 1.5rem;
+      font-weight: 500;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
+      text-decoration: underline;
+    }
+    /* ---- rest of your post-job styles... ---- */
     .container {
       background: var(--panel);
       border-radius: var(--radius);
@@ -64,23 +137,29 @@
       line-height: 1;
     }
     .close-btn:hover {
-      color: var(--primary);
+      color: var(--header-bg);
     }
     .title {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 700;
       margin-bottom: 5px;
       letter-spacing: -1px;
+      color: var(--header-bg);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      text-align: center;
     }
     .desc {
-      font-size: 1rem;
+      font-size: 1.09rem;
       color: var(--text-light);
       margin-bottom: 18px;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.10);
     }
     form {
       display: flex;
       flex-wrap: wrap;
       gap: 24px;
+      justify-content: center;
     }
     .form-group {
       flex: 1 1 260px;
@@ -88,6 +167,12 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+      background: #f9fafb;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1rem 1.5rem;
+      color: var(--header-bg);
+      margin-bottom: 1rem;
     }
     .form-group input,
     .form-group textarea {
@@ -99,10 +184,11 @@
       transition: border-color 0.2s;
       width: 100%;
       box-sizing: border-box;
+      color: var(--text-dark);
     }
     .form-group input:focus,
     .form-group textarea:focus {
-      border-color: var(--primary);
+      border-color: var(--header-bg);
       outline: none;
     }
     .form-group textarea {
@@ -114,6 +200,7 @@
       font-size: 1rem;
       font-weight: 500;
       margin-bottom: 2px;
+      color: var(--header-bg);
     }
     .skill-tags {
       display: flex;
@@ -130,6 +217,8 @@
       display: flex;
       align-items: center;
       gap: 3px;
+      font-weight: 500;
+      box-shadow: 0 2px 12px rgba(56,161,105,0.15);
     }
     .remove-skill {
       cursor: pointer;
@@ -145,17 +234,22 @@
       background: #f7fbff;
       width: 100%;
       box-sizing: border-box;
+      color: var(--text-dark);
+    }
+    .skill-input:focus {
+      border-color: var(--header-bg);
     }
     .post-method {
-      margin-top: 16px;
+      margin-top: 12px;
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
     }
     .post-method label {
       font-size: 1rem;
-      color: var(--text-dark);
+      color: var(--header-bg);
       cursor: pointer;
       margin-right: 7px;
     }
@@ -163,18 +257,19 @@
       display: flex;
       gap: 12px;
       margin-top: 28px;
-      justify-content: flex-end;
+      justify-content: center;
       flex-wrap: wrap;
     }
     .btn {
       border: none;
-      padding: 10px 26px;
+      padding: 1rem 2rem;
       border-radius: 7px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 1.5px 6px rgba(56,154,255,0.15);
+      box-shadow: 0 2px 12px rgba(56,161,105,0.15);
       transition: background 0.2s;
+      margin: 0.5rem;
     }
     .btn.save {
       background: #fff;
@@ -189,9 +284,46 @@
       color: #fff;
     }
     .btn.post:hover {
-      background: #227fd1;
+      background: var(--primary-dark);
     }
+    .post-method {
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  gap: 0.6rem;
+  align-items: flex-start; /* everything flush left */
+}
+
+.radio-label {
+  display: grid;
+  grid-template-columns: auto 1fr; /* radio in column 1, text in column 2 */
+  align-items: start;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.radio-label input[type="radio"] {
+  margin-top: 0.2rem; /* small vertical alignment tweak */
+}
+
+
     @media (max-width: 700px) {
+      header {
+        padding: 0 0.5rem;
+        height: var(--header-height);
+        min-height: var(--header-height);
+      }
+      .branding img {
+        width: 32px;
+        height: 32px;
+      }
+      nav a {
+        min-width: var(--nav-btn-width);
+        min-height: var(--nav-btn-height);
+        font-size: var(--nav-btn-font-size);
+        margin-left: 0.5rem;
+      }
       .container {
         padding: 20px 8px 18px 8px;
         max-width: 98vw;
@@ -212,11 +344,18 @@
     }
   </style>
 </head>
-<body>
-  <div class="header">
-    <img src="logo.png" alt="ResiLinked Logo" />
-    <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
-  </div>
+<body class="fade-in">
+  <header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="landing.html">ResiLinked</a></h1>
+    </div>
+    <nav>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
+      <!-- Add more links as needed -->
+    </nav>
+  </header>
   <div class="container">
     <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
     <div class="title">Mag-Post ng Trabaho</div>
@@ -298,5 +437,6 @@
       renderSkills();
     };
   </script>
+  <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

@@ -2,74 +2,210 @@
 <html lang="tl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile - ResiLinked</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="fade.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --primary: #38a169;
+      --primary-dark: #2f855a;
+      --header-bg: #2b6cb0;
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
+      --panel: #fff;
+      --bg: #f4f6f8;
+      --border: #a3c5e8;
+      --text-dark: #333;
+      --text-light: #2b6cb0;
+      --radius: 10px;
+      --shadow: 0 4px 32px rgba(0,0,0,0.10);
+      --maxw: 800px;
+    }
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f8;
-      color: #333;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
     }
-    .profile-header {
-      background: #234567;
+    /* --- HEADER AND NAV FROM LANDING PAGE --- */
+    header {
+      background: var(--header-bg);
       color: white;
-      padding: 2.2rem 1rem 1rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
+    }
+    .branding {
       display: flex;
       align-items: center;
-      gap: 2.5rem;
-      border-top-left-radius: 0.8rem;
-      border-top-right-radius: 0.8rem;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      gap: 1rem;
+    }
+    .branding img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #fff;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    header h1 a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    header h1 a:hover {
+      color: #cbe6ff;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      background: var(--header-bg);
+      margin-left: 1.5rem;
+      font-weight: 500;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
+      text-decoration: underline;
+    }
+    /* --- END HEADER/NAV LANDING STYLE --- */
+    .profile-header {
+      background: var(--header-bg);
+      color: white;
+      padding: 2.4rem 1.2rem 2rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 2.2rem;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      max-width: var(--maxw);
+      margin: 2.5rem auto 0 auto;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 2rem;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.2s;
+      line-height: 1;
+      z-index: 2;
+    }
+    .close-btn:hover {
+      color: #cbe6ff;
     }
     .profile-avatar {
-      width: 90px;
-      height: 90px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
-      background: #eee;
+      background: #e1eed9;
       object-fit: cover;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.11);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      border: 3px solid #fff;
+    }
+    .profile-header-info h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
     .verified-badge {
-      background: #38a169;
+      background: var(--primary);
       color: white;
       padding: 0.2rem 0.6rem;
       border-radius: 8px;
       font-size: 0.92rem;
       margin-left: 0.5rem;
       font-weight: 500;
+      vertical-align: middle;
+      display: inline-block;
     }
     .edit-profile {
-      background: #2b6cb0;
+      background: var(--primary);
       color: white;
       border: none;
       border-radius: 7px;
-      padding: 0.6rem 1.2rem;
+      padding: 0.6rem 1.3rem;
       font-size: 1rem;
       cursor: pointer;
-      font-weight: 500;
-      margin-top: 0.7rem;
-      box-shadow: 0 2px 8px rgba(43,108,176,0.13);
-    }
-    .profile-section {
-      background: #fff;
-      border-radius: 0.8rem;
-      margin: 2rem auto;
-      max-width: 700px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding-bottom: 2rem;
-    }
-    .profile-skills, .profile-description, .profile-recommended-jobs, .profile-financial-goal, .profile-languages, .profile-contact, .profile-ratings {
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid #eee;
-    }
-    .profile-skills h3, .profile-description h3, .profile-recommended-jobs h3, .profile-financial-goal h3, .profile-languages h3, .profile-contact h3, .profile-ratings h3 {
-      margin-top: 0;
-      font-size: 1.1rem;
-      color: #2b6cb0;
-      margin-bottom: 1rem;
       font-weight: 600;
+      margin-top: 1rem;
+      box-shadow: 0 2px 12px rgba(56,161,105,0.15);
+      transition: background 0.2s;
+    }
+    .edit-profile:hover {
+      background: var(--primary-dark);
+    }
+    main {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      background: none;
+    }
+    section {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin: 2rem 0;
+      padding: 1.7rem 2rem 1.5rem 2rem;
+      border: 1px solid #f1f1f1;
+    }
+    section:last-child {
+      margin-bottom: 2.5rem;
+    }
+    section h3 {
+      margin-top: 0;
+      font-size: 1.15rem;
+      color: var(--header-bg);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
     .skills-list, .recommended-jobs-list, .languages-list {
       display: flex;
@@ -78,16 +214,17 @@
       margin-bottom: 1rem;
     }
     .skill-tag, .job-tag, .lang-tag {
-      background: #e1eed9;
-      color: #234567;
+      background: #f9fafb;
+      color: var(--header-bg);
       border-radius: 7px;
       padding: 0.5rem 1.1rem;
       font-size: 0.97rem;
       font-weight: 500;
-      box-shadow: 0 1.5px 6px rgba(183,169,154,0.11);
+      box-shadow: 0 1.5px 6px rgba(43,108,176,0.09);
+      border: 1px solid #e1eed9;
     }
     .profile-description p {
-      color: #333;
+      color: var(--text-dark);
       font-size: 1.05rem;
       margin-bottom: 0;
     }
@@ -97,8 +234,8 @@
     }
     .progress-bar-label {
       font-size: 1rem;
-      color: #234567;
-      font-weight: 600;
+      color: var(--header-bg);
+      font-weight: 700;
       margin-bottom: 0.25rem;
     }
     .progress-bar {
@@ -110,18 +247,19 @@
       margin-bottom: 0.3rem;
     }
     .progress-bar-fill {
-      background: #38a169;
+      background: var(--primary);
       height: 100%;
       border-radius: 12px;
       transition: width 0.2s;
+      width: 65%;
     }
     .progress-bar-percent {
       font-size: 0.98rem;
-      color: #38a169;
-      font-weight: 500;
+      color: var(--primary);
+      font-weight: 600;
     }
     .profile-contact p {
-      color: #234567;
+      color: var(--header-bg);
       font-size: 1rem;
       margin-bottom: 0;
       font-weight: 500;
@@ -142,6 +280,7 @@
       max-width: 260px;
       text-align: left;
       flex: 1;
+      border: 1px solid #e1eed9;
     }
     .testimonial-stars {
       color: #ffc107;
@@ -149,7 +288,7 @@
       margin-bottom: 0.4rem;
     }
     .testimonial-content {
-      color: #2b6cb0;
+      color: var(--header-bg);
       margin-bottom: 0.7rem;
       font-size: 0.97rem;
       font-style: italic;
@@ -159,7 +298,7 @@
       align-items: center;
       gap: 0.7rem;
       font-size: 0.9rem;
-      color: #333;
+      color: var(--text-dark);
     }
     .testimonial-avatar {
       width: 32px;
@@ -171,42 +310,84 @@
     }
     .testimonial-name {
       font-weight: bold;
-      color: #38a169;
+      color: var(--primary);
     }
     .testimonial-role {
-      color: #2b6cb0;
+      color: var(--header-bg);
       font-size: 0.85rem;
+    }
+    @media(max-width:800px){
+      main, .profile-header {
+        max-width: 99vw;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      header {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
     }
     @media(max-width:600px){
       .profile-header {
         flex-direction: column;
-        gap: 1rem;
-        padding: 2rem 1rem 1rem 1rem;
+        gap: 1.2rem;
+        padding: 2rem 1rem 1.4rem 1rem;
+        border-radius: var(--radius);
       }
-      .profile-section {
-        max-width: 100vw;
-        margin: 0;
-        border-radius: 0;
+      section {
+        padding: 1.1rem 0.6rem 1rem 0.6rem;
       }
       .ratings-list {
         flex-direction: column;
-        display: block;
+        gap: 1rem;
+        margin-top: 0.7rem;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0.5rem;
+        height: var(--header-height);
+        min-height: var(--header-height);
+      }
+      .branding {
+        margin-bottom: 0.7rem;
+      }
+      .branding img {
+        width: 32px;
+        height: 32px;
+      }
+      nav a {
+        min-width: var(--nav-btn-width);
+        min-height: var(--nav-btn-height);
+        font-size: var(--nav-btn-font-size);
+        margin-left: 0.5rem;
       }
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
-    <div class="profile-header">
-      <img src="/images/avatar.jpg" alt="Avatar" class="profile-avatar">
-      <div>
-        <h2>Micko Deloria</h2>
-        <p>Barangay <span class="verified-badge">Barangay-Verified</span></p>
-        <button class="edit-profile">Edit Profile</button>
-      </div>
+<body class="fade-in">
+  <header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="landing.html">ResiLinked</a></h1>
     </div>
-    <div class="profile-skills">
+    <nav>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
+      <!-- add other links if needed -->
+    </nav>
+  </header>
+  <div class="profile-header">
+    <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
+    <img src="/images/avatar.jpg" alt="Avatar" class="profile-avatar">
+    <div class="profile-header-info">
+      <h2>Micko Deloria</h2>
+      <p>Barangay <span class="verified-badge">Barangay-Verified</span></p>
+      <button class="edit-profile">Edit Profile</button>
+    </div>
+  </div>
+  <main>
+    <section class="profile-skills">
       <h3>Mga Kasanayan At Serbisyo</h3>
       <div class="skills-list">
         <span class="skill-tag">Pintor</span>
@@ -214,12 +395,12 @@
         <span class="skill-tag">Pag Aalaga</span>
         <span class="skill-tag">Paglilinis</span>
       </div>
-    </div>
-    <div class="profile-description">
+    </section>
+    <section class="profile-description">
       <h3>Deskripsyon</h3>
       <p>Empleyado ni Micko for 1 DAY</p>
-    </div>
-    <div class="profile-recommended-jobs">
+    </section>
+    <section class="profile-recommended-jobs">
       <h3>Mga Inirerekomendang Trabaho</h3>
       <div class="recommended-jobs-list">
         <span class="job-tag">Tagalaba</span>
@@ -227,29 +408,29 @@
         <span class="job-tag">Tagapag-alaga ng matanda</span>
         <span class="job-tag">Tagalinis</span>
       </div>
-    </div>
-    <div class="profile-financial-goal">
+    </section>
+    <section class="profile-financial-goal">
       <h3>Layunin Sa Pananalapi</h3>
       <div class="progress-bar-container">
         <div class="progress-bar-label">65,560/100,000</div>
         <div class="progress-bar">
-          <div class="progress-bar-fill" style="width:65%"></div>
+          <div class="progress-bar-fill"></div>
         </div>
         <div class="progress-bar-percent">65%</div>
       </div>
-    </div>
-    <div class="profile-languages">
+    </section>
+    <section class="profile-languages">
       <h3>Mga Wika Na Sinasalita</h3>
       <div class="languages-list">
         <span class="lang-tag">Tagalog</span>
         <span class="lang-tag">English</span>
       </div>
-    </div>
-    <div class="profile-contact">
+    </section>
+    <section class="profile-contact">
       <h3>Impormasyon Sa Pakikipag-Ugnayan</h3>
       <p>mickodeloria@yahoo.com<br>+622345678910</p>
-    </div>
-    <div class="profile-ratings">
+    </section>
+    <section class="profile-ratings">
       <h3>Rating Ng Manggagawa</h3>
       <div class="ratings-list">
         <div class="testimonial-card">
@@ -280,7 +461,8 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
+  <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

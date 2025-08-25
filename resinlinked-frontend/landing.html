@@ -2,10 +2,20 @@
 <html lang="tl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ResiLinked - Landing</title>
-  <link rel="stylesheet" href="/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="fade.css" />
   <style>
+    :root {
+      --header-bg: #2b6cb0;
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
+    }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -13,33 +23,86 @@
       color: #333;
     }
     header {
-      background: #2b6cb0;
+      background: var(--header-bg);
       color: white;
-      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
+    }
+    .branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .branding img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #fff;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
     header h1 a {
       color: white;
       text-decoration: none;
+      transition: color 0.2s;
     }
     header h1 a:hover {
-      color: #cbe6ff; /* lighter on hover */
-  }
+      color: #cbe6ff;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
+    }
     nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
       text-decoration: none;
+      background: var(--header-bg);
       margin-left: 1.5rem;
       font-weight: 500;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
     }
-    nav a:hover {
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
       text-decoration: underline;
     }
     .hero {
       text-align: center;
-      padding: 4rem 1rem;
-      background: url('/images/hero-bg.jpg') center/cover no-repeat;
+      padding: 20rem 1rem;
+      background: url('Informal.jpg') center/cover no-repeat;
       color: white;
       box-shadow: 0 4px 32px rgba(0,0,0,0.10);
     }
@@ -61,7 +124,7 @@
       margin-top: 2rem;
       flex-wrap: wrap;
     }
-    .hero button {
+    .btn, .hero button {
       background: #38a169;
       color: white;
       border: none;
@@ -73,8 +136,10 @@
       font-weight: 600;
       box-shadow: 0 2px 12px rgba(56,161,105,0.15);
       transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
     }
-    .hero button:hover {
+    .btn:hover, .hero button:hover {
       background: #2f855a;
     }
     .how-section {
@@ -214,6 +279,26 @@
       color: white;
     }
     @media(max-width:600px){
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 0.5rem;
+        height: var(--header-height);
+        min-height: var(--header-height);
+      }
+      .branding {
+        margin-bottom: 0.7rem;
+      }
+      .branding img {
+        width: 32px;
+        height: 32px;
+      }
+      nav a {
+        min-width: var(--nav-btn-width);
+        min-height: var(--nav-btn-height);
+        font-size: var(--nav-btn-font-size);
+        margin-left: 0.5rem;
+      }
       .hero h2{
         font-size: 2rem;
       }
@@ -229,15 +314,14 @@
 </head>
 <body class="fade-in">
   <header>
-    <header class="landing-header">
-      <h1>ResiLinked</h1>
-    </header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
+    </div>
     <nav>
-      <a href="profile.html" class="">Profile</a>
-      <a href="settings.html" class="">Settings</a>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
     </nav>
-
-
   </header>
   <section class="hero">
     <h2>Maligayang pagdating sa ResiLinked Dito ay makakakita ka ng trabaho batay sa iyong mga kakayahan!</h2>
@@ -303,7 +387,7 @@
     </div>
   </section>
   <footer>
-    V.1 ResiLinked | +6390 06681 8015 | product.student@pga.edu.ph
+    V.1 ResiLinked | +6390 06681 8015 | ResiLinked@gmail.com
   </footer>
   <script type="module" src="/src/landing.js"></script>
 </body>

@@ -5,18 +5,27 @@
   <title>Hanap ng Trabaho | ResiLinked</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="fade.css" />
   <style>
     :root {
-      --primary: #379aff;
-      --bg: #f3f8fc;
+      --primary: #38a169;            /* green button color from sample */
+      --primary-dark: #2f855a;
+      --header-bg: #2b6cb0;
       --panel: #fff;
-      --header: #379aff;
+      --bg: #f4f6f8;                 /* sample background */
       --border: #a3c5e8;
-      --text-dark: #222d3e;
-      --text-light: #4a6b7a;
-      --radius: 12px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.07);
+      --text-dark: #333;
+      --text-light: #2b6cb0;         /* accent blue for job info */
+      --radius: 10px;
+      --shadow: 0 4px 32px rgba(0,0,0,0.10);
+
+      /* Fixed header/navbar/branding sizes for consistency */
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
     }
     body {
       margin: 0;
@@ -25,27 +34,92 @@
       color: var(--text-dark);
       min-height: 100vh;
     }
-    .header {
-      background: var(--header);
-      color: var(--text-dark);
+    /* --- HEADER AND NAV FROM LANDING PAGE --- */
+    header {
+      background: var(--header-bg);
+      color: white;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 10px 28px;
-      font-size: 1.25rem;
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
       font-weight: 600;
       letter-spacing: 0.5px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
     }
-    .header img {
-      width: 26px;
-      margin-right: 12px;
+    .branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
+    .branding img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #fff;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    header h1 a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    header h1 a:hover {
+      color: #cbe6ff;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      background: var(--header-bg);
+      margin-left: 1.5rem;
+      font-weight: 500;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
+      text-decoration: underline;
+    }
+    /* --- END HEADER/NAV LANDING STYLE --- */
     .container {
       max-width: 1100px;
-      margin: 32px auto;
-      padding: 18px 16px 24px 16px;
-      background: var(--bg);
-      border-radius: 18px;
+      margin: 40px auto 32px auto;
+      padding: 26px 20px 34px 20px;
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       min-width: 290px;
     }
     .tabs {
@@ -53,20 +127,22 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 22px;
+      flex-wrap: wrap;
     }
     .tab-btn {
-      background: #e6f2ff;
+      background: #f9fafb;
       border: none;
-      border-radius: 10px;
-      padding: 8px 28px;
+      border-radius: 7px;
+      padding: 10px 34px;
       font-weight: bold;
       font-size: 1.08em;
       cursor: pointer;
       transition: background 0.18s, color 0.15s;
-      color: var(--text-dark);
+      color: var(--header-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
     .tab-btn.active {
-      background: var(--primary);
+      background: var(--header-bg);
       color: #fff;
     }
     .searchbar {
@@ -77,6 +153,7 @@
       background: #e6f2ff;
       border-radius: 8px;
       padding: 2px 11px 2px 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     .searchbar input {
       background: none;
@@ -90,76 +167,92 @@
     }
     .searchbar .search-icon {
       font-size: 1.1em;
-      color: var(--primary);
+      color: var(--header-bg);
     }
     .jobs-grid, .applied-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
       margin-top: 10px;
     }
     .job-card {
       background: var(--panel);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 18px 13px 14px 13px;
+      padding: 1.1rem 1rem 0.9rem 1rem;
       display: flex;
       flex-direction: column;
       gap: 8px;
       font-size: 1em;
       align-items: flex-start;
       min-height: 94px;
-      border: 1px solid var(--border);
+      border: none;
+      transition: transform 0.13s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+    .job-card:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 4px 16px rgba(56,161,105,0.12);
     }
     .job-title {
-      font-size: 1.15rem;
-      font-weight: bold;
+      font-size: 1.17rem;
+      font-weight: 700;
       margin-bottom: 2px;
+      color: var(--header-bg);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.13);
     }
     .job-positions, .job-salary {
-      font-size: 0.98rem;
+      font-size: 1rem;
       color: var(--text-light);
+      font-weight: 500;
     }
     .apply-btn {
       background: var(--primary);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 6px 16px;
-      font-weight: bold;
+      border-radius: 7px;
+      padding: 0.8rem 2rem;
+      font-weight: 600;
       cursor: pointer;
       margin-top: 6px;
-      font-size: 0.97em;
-      transition: background 0.15s;
+      font-size: 1rem;
+      box-shadow: 0 2px 12px rgba(56,161,105,0.15);
+      transition: background 0.2s;
     }
     .apply-btn:hover {
-      background: #227fd1;
+      background: var(--primary-dark);
     }
     .status-chip {
       background: #b3dbff;
       border-radius: 10px;
       padding: 3px 12px;
       font-size: 0.97em;
-      color: var(--text-dark);
+      color: var(--header-bg);
       margin-top: 8px;
       text-align: center;
-      font-weight: 500;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
     .dropdown-row {
-      margin-top: 14px;
+      margin-top: 22px;
       text-align: left;
+      display: flex;
+      justify-content: flex-end;
     }
     .dropdown {
-      padding: 6px 12px;
+      padding: 10px 16px;
       border-radius: 7px;
       border: 1px solid var(--border);
       background: #f7fbff;
-      font-size: 0.99em;
+      font-size: 1rem;
+      color: var(--header-bg);
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     @media (max-width: 900px) {
       .container {
         max-width: 99vw;
-        padding: 8px 3px 13px 3px;
+        padding: 14px 3px 18px 3px;
       }
     }
     @media (max-width: 600px) {
@@ -174,17 +267,48 @@
         width: 100%;
       }
       .jobs-grid, .applied-grid {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        gap: 11px;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .dropdown-row {
+        margin-top: 18px;
+        justify-content: center;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0.5rem;
+        height: var(--header-height);
+        min-height: var(--header-height);
+      }
+      .branding {
+        margin-bottom: 0.7rem;
+      }
+      .branding img {
+        width: 32px;
+        height: 32px;
+      }
+      nav a {
+        min-width: var(--nav-btn-width);
+        min-height: var(--nav-btn-height);
+        font-size: var(--nav-btn-font-size);
+        margin-left: 0.5rem;
       }
     }
   </style>
 </head>
-<body>
-  <div class="header">
-    <img src="logo.png" alt="ResiLinked Logo" />
-    <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
-  </div>
+<body class="fade-in">
+  <header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
+    </div>
+    <nav>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
+      <!-- Add other links if needed -->
+    </nav>
+  </header>
   <div class="container">
     <div class="tabs">
       <button class="tab-btn active" id="searchTab">HANAP NG TRABAHO</button>
@@ -271,5 +395,6 @@
       // For a real app, move job card to applied list etc.
     }
   </script>
+  <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

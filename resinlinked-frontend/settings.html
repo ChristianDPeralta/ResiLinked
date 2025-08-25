@@ -5,18 +5,28 @@
   <title>Mga Setting | ResiLinked</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="fade.css" />
   <style>
     :root {
-      --primary: #379aff;
-      --bg: #eaf4ff;
-      --panel: #cbe6ff;
-      --header: #379aff;
+      --primary: #38a169;
+      --primary-dark: #2f855a;
+      --header-bg: #2b6cb0;
+      --panel: #fff;
+      --bg: #f4f6f8;
       --border: #a3c5e8;
-      --text-dark: #222d3e;
-      --text-light: #4a6b7a;
-      --radius: 18px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.09);
+      --text-dark: #333;
+      --text-light: #2b6cb0;
+      --radius: 10px;
+      --shadow: 0 4px 32px rgba(0,0,0,0.10);
+      --maxw: 500px;
+
+      /* Fixed header/navbar/branding sizes for consistency */
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
     }
     body {
       margin: 0;
@@ -25,26 +35,90 @@
       color: var(--text-dark);
       min-height: 100vh;
     }
-    .header {
-      background: var(--header);
-      color: var(--text-dark);
+    /* --- HEADER AND NAV FROM LANDING PAGE --- */
+    header {
+      background: var(--header-bg);
+      color: white;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 10px 28px;
-      font-size: 1.25rem;
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
       font-weight: 600;
       letter-spacing: 0.5px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
     }
-    .header img {
-      width: 26px;
-      margin-right: 12px;
+    .branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
+    .branding img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #fff;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    header h1 a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    header h1 a:hover {
+      color: #cbe6ff;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      background: var(--header-bg);
+      margin-left: 1.5rem;
+      font-weight: 500;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
+      text-decoration: underline;
+    }
+    /* --- END HEADER/NAV LANDING STYLE --- */
     .container {
       background: var(--panel);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      max-width: 500px;
+      max-width: var(--maxw);
       margin: 40px auto;
       padding: 34px 30px 28px 30px;
       position: relative;
@@ -64,23 +138,24 @@
       line-height: 1;
     }
     .close-btn:hover {
-      color: var(--primary);
+      color: var(--header-bg);
     }
     .title {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       font-weight: 700;
       margin-bottom: 16px;
       letter-spacing: -1px;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 10px;
+      color: var(--header-bg);
     }
     .title .icon {
-      font-size: 1.25em;
+      font-size: 1.3em;
       color: var(--primary);
     }
     .section {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #f1f1f1;
       padding-bottom: 14px;
       margin-bottom: 16px;
     }
@@ -91,26 +166,43 @@
     }
     .section label {
       display: block;
-      font-size: 1.03em;
+      font-size: 1.08em;
       font-weight: 500;
-      color: var(--text-dark);
+      color: var(--header-bg);
       margin-bottom: 6px;
     }
-    .section input[type="checkbox"] {
-      margin-right: 7px;
+    .section input[type="checkbox"],
+    .section input[type="radio"] {
       accent-color: var(--primary);
+      margin-right: 7px;
     }
     .section .sub {
       color: var(--text-light);
-      font-size: 0.98em;
+      font-size: 0.99em;
       margin-bottom: 7px;
+      display: block;
     }
     .faq-link {
       color: var(--primary);
       text-decoration: underline;
-      font-size: 0.95em;
+      font-size: 0.99em;
       cursor: pointer;
       margin-left: 7px;
+    }
+    .checkbox-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 20px;
+    }
+    .checkbox-label {
+      font-size: 1em;
+      color: var(--header-bg);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
     }
     .btn-row {
       margin-top: 22px;
@@ -118,33 +210,64 @@
     }
     .btn {
       border: none;
-      padding: 9px 22px;
+      padding: 11px 28px;
       border-radius: 7px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 1.5px 6px rgba(56,154,255,0.13);
+      box-shadow: 0 2px 12px rgba(56,161,105,0.12);
       transition: background 0.2s;
-      background: #fff;
-      color: var(--text-dark);
-      border: 1px solid var(--border);
+      background: var(--primary);
+      color: #fff;
+      margin-top: 10px;
     }
     .btn:hover {
-      background: #d7eaff;
+      background: var(--primary-dark);
     }
     @media (max-width: 600px) {
       .container {
         padding: 18px 6px 12px 6px;
         max-width: 99vw;
       }
+      .checkbox-row {
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0.5rem;
+        height: var(--header-height);
+        min-height: var(--header-height);
+      }
+      .branding {
+        margin-bottom: 0.7rem;
+      }
+      .branding img {
+        width: 32px;
+        height: 32px;
+      }
+      nav a {
+        min-width: var(--nav-btn-width);
+        min-height: var(--nav-btn-height);
+        font-size: var(--nav-btn-font-size);
+        margin-left: 0.5rem;
+      }
     }
   </style>
 </head>
-<body>
-  <div class="header">
-    <img src="logo.png" alt="ResiLinked Logo" />
-    <h1><a href="landing.html" class="">ResiLinked</a></h1>
-  </div>
+<body class="fade-in">
+  <header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="landing.html">ResiLinked</a></h1>
+    </div>
+    <nav>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
+      <!-- Add more links as needed -->
+    </nav>
+  </header>
   <div class="container">
     <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
     <div class="title"><span class="icon">&#9881;</span> Mga Setting</div>
@@ -158,15 +281,13 @@
       <span class="sub">Notipikasyon sa Mensahe <span title="Notipikasyon">&#9432;</span></span>
     </div>
     <div class="checkbox-row">
-        <label class="checkbox-label">
-            <input type="radio" name="language" value="tagalog" id="tagalog-lang"> Tagalog
-        </label>
-        <label class="checkbox-label">
-            <input type="radio" name="language" value="english" id="english-lang"> English
-        </label>
+      <label class="checkbox-label">
+        <input type="radio" name="language" value="tagalog" id="tagalog-lang"> Tagalog
+      </label>
+      <label class="checkbox-label">
+        <input type="radio" name="language" value="english" id="english-lang"> English
+      </label>
     </div>
-    <br>
-    <br>
     <div class="section">
       <span class="faq-link" onclick="alert('FAQ at Tulong page (demo).')">Tulong at FAQs &#9432;</span>
     </div>
@@ -174,5 +295,6 @@
       <button class="btn" onclick="alert('Logged out (demo).')">Mag Log Out</button>
     </div>
   </div>
+  <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

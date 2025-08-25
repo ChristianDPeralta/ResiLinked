@@ -25,16 +25,6 @@ body {
   opacity: 1;
   transition: opacity 0.4s ease;
 }
-
-body.fade-in {
-  opacity: 1;
-  transition: opacity 0.4s ease;
-}
-
-body.fade-out {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
 header {
   background: var(--header);
   color: white;
