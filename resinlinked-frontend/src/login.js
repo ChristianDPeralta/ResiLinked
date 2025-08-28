@@ -1,3 +1,5 @@
+import apiService from './api.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const loginError = document.getElementById("loginError");
@@ -13,51 +15,42 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("password").value;
 
       try {
-        console.log("Sending login request:", { email, password });
-
-        const res = await fetch("http://localhost:5000/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-          credentials: 'include' // maintain cookies/session
-        });
-
-        const data = await res.json();
-        console.log("Response from server:", data);
-
-        if (res.ok && data.success) {
-          // Redirect to landing page after successful login
-          window.location.href = "/landing.html";
-        } else if (res.status === 401) {
-          loginError.textContent = "Maling email o password.";
+        const data = await apiService.login({ email, password });
+        
+        if (data.success) {
+          // Store token and user data
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userData', JSON.stringify({
+            userId: data.userId,
+            userType: data.userType,
+            isVerified: data.isVerified
+          }));
+          
+          // Redirect based on user type
+          if (data.userType === 'admin') {
+            window.location.href = "/admin-dashboard.html";
+          } else {
+            window.location.href = "/landing.html";
+          }
         } else {
-          loginError.textContent = data.message || "Hindi matagumpay ang pag-login.";
+          loginError.textContent = data.alert || "Invalid email or password";
         }
-
       } catch (err) {
-        console.error("Login fetch error:", err);
-        loginError.textContent = "May problema sa koneksyon.";
+        console.error("Login error:", err);
+        loginError.textContent = err.message || "Connection error. Please try again.";
       }
     });
   }
 
   if (backHomeBtn) {
     backHomeBtn.onclick = () => {
-      document.body.classList.remove('fade-in');
-      document.body.classList.add('fade-out');
-      setTimeout(() => {
-        window.location.href = '/index.html';
-      }, 300);
+      window.location.href = '/index.html';
     };
   }
 
   if (registerLinkBtn) {
     registerLinkBtn.onclick = () => {
-      document.body.classList.remove('fade-in');
-      document.body.classList.add('fade-out');
-      setTimeout(() => {
-        window.location.href = '/register.html';
-      }, 300);
+      window.location.href = '/register.html';
     };
   }
 });

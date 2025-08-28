@@ -174,8 +174,13 @@
       color: var(--header-bg);
       margin-bottom: 1rem;
     }
+    .form-group label {
+      font-weight: 500;
+      color: var(--header-bg);
+    }
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       border: 1px solid var(--border);
       border-radius: 5px;
       padding: 8px 12px;
@@ -187,7 +192,8 @@
       color: var(--text-dark);
     }
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
       border-color: var(--header-bg);
       outline: none;
     }
@@ -287,26 +293,31 @@
       background: var(--primary-dark);
     }
     .post-method {
-  display: flex;
-  flex-direction: column; /* stack vertically */
-  gap: 0.6rem;
-  align-items: flex-start; /* everything flush left */
-}
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
 
-.radio-label {
-  display: grid;
-  grid-template-columns: auto 1fr; /* radio in column 1, text in column 2 */
-  align-items: start;
-  gap: 0.6rem;
-  cursor: pointer;
-  font-size: 1rem;
-  line-height: 1.4;
-}
+    .radio-label {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
 
-.radio-label input[type="radio"] {
-  margin-top: 0.2rem; /* small vertical alignment tweak */
-}
-
+    .radio-label input[type="radio"] {
+      margin-top: 0.2rem;
+    }
+    
+    .error {
+      color: #e53e3e;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
 
     @media (max-width: 700px) {
       header {
@@ -350,93 +361,66 @@
       <img src="logo.png" alt="ResiLinked Logo" />
       <h1><a href="landing.html">ResiLinked</a></h1>
     </div>
-    <nav>
-      <a href="profile.html">Profile</a>
-      <a href="settings.html">Settings</a>
-      <!-- Add more links as needed -->
+    <nav id="main-nav">
+      <!-- Navigation will be dynamically inserted here -->
     </nav>
   </header>
   <div class="container">
     <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
     <div class="title">Mag-Post ng Trabaho</div>
     <div class="desc">Punan ang mga detalye sa ibaba upang makagawa ng kumpletong listahan ng trabaho.</div>
+    
     <form id="postJobForm" autocomplete="off">
       <div class="form-group">
-        <input type="text" name="jobType" id="jobType" placeholder="Klase ng Trabaho" required>
-        <input type="text" name="location" id="location" placeholder="Lokasyon" required>
-        <input type="text" name="workTime" id="workTime" placeholder="Oras ng Trabaho" required>
-        <input type="text" name="salary" id="salary" placeholder="Sweldo/Bayad" required>
-        <textarea name="description" id="description" placeholder="Paglalarawan ng Trabaho" required></textarea>
+        <label for="title">Pamagat ng Trabaho</label>
+        <input type="text" id="title" name="title" placeholder="Halimbawa: Tagalinis ng Bahay" required>
+        
+        <label for="description">Paglalarawan ng Trabaho</label>
+        <textarea id="description" name="description" placeholder="Ilarawan ang mga tungkulin at responsibilidad..." required></textarea>
+        
+        <label for="price">Presyo (₱)</label>
+        <input type="number" id="price" name="price" placeholder="Halimbawa: 1500" min="1" required>
+        
+        <label for="barangay">Lokasyon (Barangay)</label>
+        <select id="barangay" name="barangay" required>
+          <option value="">Pumili ng Barangay</option>
+          <option value="Barangay 1">Barangay 1</option>
+          <option value="Barangay 2">Barangay 2</option>
+          <option value="Barangay 3">Barangay 3</option>
+          <option value="Barangay 4">Barangay 4</option>
+          <option value="Barangay 5">Barangay 5</option>
+        </select>
       </div>
+      
       <div class="form-group skills-area">
         <label for="skillInput">Mga Kailangan na Kasanayan</label>
         <div class="skill-tags" id="skillTags"></div>
         <input type="text" id="skillInput" class="skill-input" placeholder="I-type ang isang kasanayan at pindutin ang Enter">
-      <div class="post-method">
-        <label class="radio-label">
-          <input type="radio" id="postNow" name="postMethod" value="now">
-          I-post Kaagad
-        </label>
-        <label class="radio-label">
-          <input type="radio" id="postSchedule" name="postMethod" value="schedule">
-          I-schedule ang Pag-post
-        </label>
+        <div id="skillError" class="error"></div>
+        
+        <div class="post-method">
+          <label class="radio-label">
+            <input type="radio" id="postNow" name="postMethod" value="now" checked>
+            I-post Kaagad
+          </label>
+          <label class="radio-label">
+            <input type="radio" id="postSchedule" name="postMethod" value="schedule">
+            I-schedule ang Pag-post
+          </label>
+        </div>
       </div>
-      </div>
+      
       <div class="btn-row">
         <button type="button" class="btn save" id="saveBtn">I-save muna</button>
         <button type="submit" class="btn post" id="postBtn">I-post na ngayon</button>
       </div>
+      <div id="formError" class="error"></div>
     </form>
   </div>
-  <script>
-    // Tag input for skills
-    const skillInput = document.getElementById('skillInput');
-    const skillTags = document.getElementById('skillTags');
-    let skills = [];
 
-    skillInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && skillInput.value.trim()) {
-        e.preventDefault();
-        addSkill(skillInput.value.trim());
-        skillInput.value = '';
-      }
-    });
-
-    function addSkill(skill) {
-      if (!skills.includes(skill)) {
-        skills.push(skill);
-        renderSkills();
-      }
-    }
-    function removeSkill(skill) {
-      skills = skills.filter(s => s !== skill);
-      renderSkills();
-    }
-    function renderSkills() {
-      skillTags.innerHTML = '';
-      skills.forEach(skill => {
-        const tag = document.createElement('span');
-        tag.className = 'skill-tag';
-        tag.innerHTML = `${skill} <span class="remove-skill" title="Tanggalin" onclick="removeSkill('${skill}')">&times;</span>`;
-        skillTags.appendChild(tag);
-      });
-    }
-
-    // Save button demo
-    document.getElementById('saveBtn').onclick = function() {
-      alert('Ang trabaho ay na-save (lokal na demo lamang).');
-    };
-
-    // Submit (Post) demo
-    document.getElementById('postJobForm').onsubmit = function(e) {
-      e.preventDefault();
-      alert('Ang trabaho ay nai-post na! (lokal na demo lamang)');
-      this.reset();
-      skills = [];
-      renderSkills();
-    };
-  </script>
+  <script type="module" src="/src/post-job.js"></script>
+  <script type="module" src="/src/navigation.js"></script>
+  <script type="module" src="/src/api.js"></script>
   <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ const reportRoutes = require("./routes/reportRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
-const passwordResetTokenRoutes = require("./routes/passwordResetTokenRoutes");
+const passwordResetTokenRoutes = require("./routes/passwordResetRoutes");
 
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI =
@@ -34,6 +34,7 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "http://localhost:3000",
       "http://localhost:5173",
       "http://localhost:8080"
     ],

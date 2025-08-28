@@ -316,6 +316,13 @@
       color: var(--header-bg);
       font-size: 0.85rem;
     }
+    .no-data {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-style: italic;
+      width: 100%;
+    }
     @media(max-width:800px){
       main, .profile-header {
         max-width: 99vw;
@@ -371,52 +378,44 @@
       <img src="logo.png" alt="ResiLinked Logo" />
       <h1><a href="landing.html">ResiLinked</a></h1>
     </div>
-    <nav>
-      <a href="profile.html">Profile</a>
-      <a href="settings.html">Settings</a>
-      <!-- add other links if needed -->
+    <nav id="main-nav">
+      <!-- Navigation will be dynamically inserted here -->
     </nav>
   </header>
   <div class="profile-header">
     <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
-    <img src="/images/avatar.jpg" alt="Avatar" class="profile-avatar">
+    <img src="/images/avatar.jpg" alt="Avatar" class="profile-avatar" id="profileAvatar">
     <div class="profile-header-info">
-      <h2>Micko Deloria</h2>
-      <p>Barangay <span class="verified-badge">Barangay-Verified</span></p>
-      <button class="edit-profile">Edit Profile</button>
+      <h2 id="profileName">Loading...</h2>
+      <p id="profileBarangay">Barangay <span class="verified-badge" id="verifiedBadge">Loading...</span></p>
+      <button class="edit-profile" onclick="editProfile()">Edit Profile</button>
     </div>
   </div>
   <main>
     <section class="profile-skills">
       <h3>Mga Kasanayan At Serbisyo</h3>
-      <div class="skills-list">
-        <span class="skill-tag">Pintor</span>
-        <span class="skill-tag">Lipat Bahay</span>
-        <span class="skill-tag">Pag Aalaga</span>
-        <span class="skill-tag">Paglilinis</span>
+      <div class="skills-list" id="skillsList">
+        <div class="no-data">Loading skills...</div>
       </div>
     </section>
     <section class="profile-description">
       <h3>Deskripsyon</h3>
-      <p>Empleyado ni Micko for 1 DAY</p>
+      <p id="profileDescription">Loading description...</p>
     </section>
     <section class="profile-recommended-jobs">
       <h3>Mga Inirerekomendang Trabaho</h3>
-      <div class="recommended-jobs-list">
-        <span class="job-tag">Tagalaba</span>
-        <span class="job-tag">Tagapaglaba</span>
-        <span class="job-tag">Tagapag-alaga ng matanda</span>
-        <span class="job-tag">Tagalinis</span>
+      <div class="recommended-jobs-list" id="recommendedJobs">
+        <div class="no-data">Loading recommended jobs...</div>
       </div>
     </section>
     <section class="profile-financial-goal">
       <h3>Layunin Sa Pananalapi</h3>
       <div class="progress-bar-container">
-        <div class="progress-bar-label">65,560/100,000</div>
+        <div class="progress-bar-label" id="goalLabel">Loading...</div>
         <div class="progress-bar">
-          <div class="progress-bar-fill"></div>
+          <div class="progress-bar-fill" id="progressBar"></div>
         </div>
-        <div class="progress-bar-percent">65%</div>
+        <div class="progress-bar-percent" id="progressPercent">Loading...</div>
       </div>
     </section>
     <section class="profile-languages">
@@ -428,41 +427,26 @@
     </section>
     <section class="profile-contact">
       <h3>Impormasyon Sa Pakikipag-Ugnayan</h3>
-      <p>mickodeloria@yahoo.com<br>+622345678910</p>
+      <p id="contactInfo">Loading contact information...</p>
     </section>
     <section class="profile-ratings">
       <h3>Rating Ng Manggagawa</h3>
-      <div class="ratings-list">
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <div class="testimonial-content">Excellent work! Highly recommended.</div>
-          <div class="testimonial-footer">
-            <span class="testimonial-avatar"></span>
-            <span class="testimonial-name">Robert Fox</span>
-            <span class="testimonial-role">UI/UX Designer</span>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <div class="testimonial-content">Mabilis at mahusay magtrabaho.</div>
-          <div class="testimonial-footer">
-            <span class="testimonial-avatar"></span>
-            <span class="testimonial-name">Resie Cooper</span>
-            <span class="testimonial-role">Senior Analyst</span>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <div class="testimonial-content">Very reliable and professional!</div>
-          <div class="testimonial-footer">
-            <span class="testimonial-avatar"></span>
-            <span class="testimonial-name">Jane Cooper</span>
-            <span class="testimonial-role">Project Manager</span>
-          </div>
-        </div>
+      <div class="ratings-list" id="ratingsList">
+        <div class="no-data">Loading ratings...</div>
       </div>
     </section>
   </main>
+
+  <script type="module" src="/src/profile.js"></script>
+  <script type="module" src="/src/navigation.js"></script>
+  <script type="module" src="/src/api.js"></script>
   <script type="module" src="/src/fade.js"></script>
+  
+  <script>
+    function editProfile() {
+      alert('Edit profile feature would open here');
+      // In a real implementation, this would open a modal or navigate to an edit page
+    }
+  </script>
 </body>
 </html>

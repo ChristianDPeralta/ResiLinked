@@ -331,3 +331,49 @@ exports.resendVerification = async (req, res) => {
         });
     }
 };
+
+
+// Verify Token
+exports.verifyToken = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ valid: false, message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ valid: false, message: "User not found" });
+    }
+
+    res.status(200).json({ valid: true, user });
+  } catch (error) {
+    res.status(401).json({ valid: false, message: "Invalid or expired token" });
+  }
+};
+
+// Delete Unverified
+exports.deleteUnverified = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOneAndDelete({ email, isVerified: false });
+    if (!user) {
+      return res.status(404).json({
+        message: "Unverified user not found",
+        alert: "No unverified user found with that email"
+      });
+    }
+
+    res.status(200).json({
+      message: "Unverified account deleted successfully",
+      alert: "Account deleted"
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting unverified account",
+      error: error.message
+    });
+  }
+};

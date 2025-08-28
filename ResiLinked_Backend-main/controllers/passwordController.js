@@ -1,4 +1,4 @@
-const PasswordResetToken = require('../models/PasswordResetToken');
+const PasswordResetToken = require('../models/Password');
 const User = require('../models/User');
 
 exports.getAllTokens = async (req, res) => {

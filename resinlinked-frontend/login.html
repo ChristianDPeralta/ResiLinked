@@ -8,6 +8,17 @@
   <link rel="stylesheet" href="fade.css" />
 </head>
 <body class="fade-in">
+  <header>
+    <div class="branding">
+      <img src="logo.png" alt="ResiLinked Logo" />
+      <h1><a href="index.html">ResiLinked</a></h1>
+    </div>
+    <nav id="main-nav">
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </nav>
+  </header>
+
   <div class="container">
     <h2>Mag-login</h2>
     <form id="loginForm">
@@ -16,12 +27,20 @@
       <button type="submit" class="btn">Mag-login</button>
     </form>
     <p id="loginError" class="error"></p>
+    
+    <div class="links">
+      <a href="reset-request.html">Nakalimutan ang password?</a>
+    </div>
+    
     <div class="button-row">
       <button id="backHomeBtn" class="btn secondary">Bumalik</button>
       <button id="registerLinkBtn" class="btn secondary">Magrehistro</button>
     </div>
   </div>
+
   <script type="module" src="/src/login.js"></script>
+  <script type="module" src="/src/navigation.js"></script>
+  <script type="module" src="/src/api.js"></script>
   <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

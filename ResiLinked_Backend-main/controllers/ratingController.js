@@ -141,7 +141,7 @@ exports.reportRating = async (req, res) => {
         for (const admin of admins) {
             await createNotification({
                 recipient: admin._id,
-                type: 'rating_reported', // ⚠️ make sure this exists in Notification schema
+                type: 'rating_reported', 
                 message: `Rating ${req.params.ratingId} was reported as inappropriate`
             });
         }
@@ -157,4 +157,51 @@ exports.reportRating = async (req, res) => {
             alert: "Failed to report rating"
         });
     }
+};
+
+exports.getTopRated = async (req, res) => {
+  try {
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: 'ratings',
+          localField: '_id',
+          foreignField: 'ratee',
+          as: 'ratings'
+        }
+      },
+      {
+        $addFields: {
+          averageRating: { $avg: '$ratings.rating' },
+          ratingCount: { $size: '$ratings' }
+        }
+      },
+      {
+        $match: {
+          ratingCount: { $gt: 0 },
+          userType: { $in: ['employee', 'both'] }
+        }
+      },
+      {
+        $sort: { averageRating: -1, ratingCount: -1 }
+      },
+      {
+        $limit: 10
+      },
+      {
+        $project: {
+          password: 0,
+          verificationToken: 0,
+          verificationExpires: 0
+        }
+      }
+    ]);
+    
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching top rated users",
+      error: err.message
+    });
+  }
 };

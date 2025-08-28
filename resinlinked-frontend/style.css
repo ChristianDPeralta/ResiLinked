@@ -12,6 +12,7 @@
   --text-light: #4a6b7a;
   --radius: 18px;
   --shadow: 0 4px 32px rgba(56,154,255,0.09), 0 1.5px 6px rgba(56,154,255,0.11);
+  --danger: #e53e3e;
 }
 
 body {
@@ -249,6 +250,15 @@ input[type="checkbox"] {
   box-shadow: none;
 }
 
+.btn.danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #c53030;
+}
+
 input, textarea, .dropdown, .file-input {
   display: block;
   width: 100%;
@@ -268,6 +278,102 @@ input:focus, textarea:focus, .dropdown:focus, .file-input:focus {
   border: 1.5px solid var(--primary-dark);
   box-shadow: 0 0 8px var(--bg-accent);
   background: #eaf4ff;
+}
+
+.error {
+  color: var(--danger);
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.links {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.links a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(56,154,255,0.1);
+}
+
+.feature h3 {
+  color: var(--primary-dark);
+  margin-top: 0;
+}
+
+.popup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
+
+.popup-content .btn {
+  margin: 0.5rem;
+}
+
+.file-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+}
+
+.file-input {
+  margin-bottom: 1.5rem;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--primary);
 }
 
 @media(max-width:700px){
@@ -302,6 +408,9 @@ input:focus, textarea:focus, .dropdown:focus, .file-input:focus {
     gap: 0.7rem;
     align-items: flex-start;
   }
+  .features {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media(max-width:500px){
@@ -319,13 +428,13 @@ p {
   text-align: center;
   margin-left: auto;
   margin-right: auto;
-  width: fit-content; /* optional, for tighter centering */
+  width: fit-content;
 }
 .landing-header h1 {
   color: white;
 }
 .landing-gray {
-  color: #888; /* or any gray shade you prefer */
+  color: #888;
 }
 .checkbox-row {
   display: flex;
@@ -349,20 +458,20 @@ p {
   font-size: 1rem;
 }
 .container {
-  position: relative; /* important so the button is positioned inside */
+  position: relative;
 }
 
 .close-btn {
   position: absolute;
-  top: 10px;      /* adjust as needed */
-  right: 10px;    /* stick to right side */
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #333;    /* change color if needed */
+  color: #333;
 }
 
 .close-btn:hover {
-  color: red;     /* optional hover effect */
+  color: red;
 }

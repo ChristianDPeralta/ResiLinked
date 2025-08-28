@@ -297,3 +297,39 @@ exports.search = async (req, res) => {
         });
     }
 };
+
+exports.getPopularJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ isOpen: true })
+      .populate('postedBy', 'firstName lastName')
+      .sort({ applicants: -1, datePosted: -1 })
+      .limit(10);
+    
+    res.status(200).json({
+      success: true,
+      jobs
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching popular jobs",
+      error: err.message
+    });
+  }
+};
+
+exports.getMyApplications = async (req, res) => {
+  try {
+    const jobs = await Job.find({
+      'applicants.user': req.user.id
+    })
+    .populate('postedBy', 'firstName lastName')
+    .sort({ datePosted: -1 });
+    
+    res.status(200).json(jobs);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching user applications",
+      error: err.message
+    });
+  }
+};

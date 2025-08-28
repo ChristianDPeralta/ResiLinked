@@ -97,7 +97,7 @@
       margin-left: 1.5rem;
       font-weight: 500;
       font-size: var(--nav-btn-font-size);
-      transition: background 0.2s, color 0.2s;
+      transition: background 极2s, color 0.2s;
       border-radius: 7px;
       width: var(--nav-btn-width);
       height: var(--nav-btn-height);
@@ -224,6 +224,22 @@
     .btn:hover {
       background: var(--primary-dark);
     }
+    .btn.danger {
+      background: #e53e3e;
+    }
+    .btn.danger:hover {
+      background: #c53030;
+    }
+    .error {
+      color: #e53e3e;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .success {
+      color: var(--primary);
+      text-align: center;
+      margin: 10px 0;
+    }
     @media (max-width: 600px) {
       .container {
         padding: 18px 6px 12px 6px;
@@ -262,39 +278,69 @@
       <img src="logo.png" alt="ResiLinked Logo" />
       <h1><a href="landing.html">ResiLinked</a></h1>
     </div>
-    <nav>
-      <a href="profile.html">Profile</a>
-      <a href="settings.html">Settings</a>
-      <!-- Add more links as needed -->
+    <nav id="main-nav">
+      <!-- Navigation will be dynamically inserted here -->
     </nav>
   </header>
   <div class="container">
     <button class="close-btn" title="Isara" onclick="window.history.back();">&times;</button>
     <div class="title"><span class="icon">&#9881;</span> Mga Setting</div>
+    
     <div class="section">
       <label>Mga Setting ng Account</label>
       <span class="sub">I-update ang Profile <span title="Update profile">&#9432;</span></span>
+      <button class="btn" onclick="window.location.href='profile-edit.html'">Edit Profile</button>
     </div>
+    
     <div class="section">
       <label>Notipikasyon</label>
-      <span class="sub">Notipikasyon sa Trabaho <span title="Notipikasyon">&#9432;</span></span>
-      <span class="sub">Notipikasyon sa Mensahe <span title="Notipikasyon">&#9432;</span></span>
+      <span class="sub">Piliin ang mga uri ng notipikasyon na gusto mong matanggap</span>
+      <div class="checkbox-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="notifJob" checked> Notipikasyon sa Trabaho
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="notifMessage" checked> Notipikasyon sa Mensahe
+        </label>
+      </div>
     </div>
-    <div class="checkbox-row">
-      <label class="checkbox-label">
-        <input type="radio" name="language" value="tagalog" id="tagalog-lang"> Tagalog
-      </label>
-      <label class="checkbox-label">
-        <input type="radio" name="language" value="english" id="english-lang"> English
-      </label>
-    </div>
+    
     <div class="section">
-      <span class="faq-link" onclick="alert('FAQ at Tulong page (demo).')">Tulong at FAQs &#9432;</span>
+      <label>Wika</label>
+      <span class="sub">Piliin ang iyong wika ng preference</span>
+      <div class="checkbox-row">
+        <label class="checkbox-label">
+          <input type="radio" name="language" value="tagalog" id="tagalog-lang" checked> Tagalog
+        </label>
+        <label class="checkbox-label">
+          <input type="radio" name="language" value="english" id="english-lang"> English
+        </label>
+      </div>
     </div>
+    
+    <div class="section">
+      <label>Privacy at Security</label>
+      <span class="sub">Manage your privacy settings</span>
+      <button class="btn" onclick="changePassword()">Palitan ang Password</button>
+    </div>
+    
+    <div class="section">
+      <span class="faq-link" onclick="window.location.href='faq.html'">Tulong at FAQs &#9432;</span>
+      <span class="faq-link" onclick="contactSupport()">Makipag-ugnayan sa Suporta &#9432;</span>
+    </div>
+    
+    <div id="settingsError" class="error"></div>
+    <div id="settingsSuccess" class="success"></div>
+    
     <div class="btn-row">
-      <button class="btn" onclick="alert('Logged out (demo).')">Mag Log Out</button>
+      <button class="btn" onclick="saveSettings()">I-save ang mga Setting</button>
+      <button class="btn danger" onclick="logout()">Mag Log Out</button>
     </div>
   </div>
+
+  <script type="module" src="/src/settings.js"></script>
+  <script type="module" src="/src/navigation.js"></script>
+  <script type="module" src="/src/api.js"></script>
   <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

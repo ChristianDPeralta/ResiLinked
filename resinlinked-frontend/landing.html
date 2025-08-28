@@ -278,6 +278,13 @@
       background: #2b6cb0;
       color: white;
     }
+    .no-data {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-style: italic;
+      grid-column: 1 / -1;
+    }
     @media(max-width:600px){
       header {
         flex-direction: column;
@@ -318,9 +325,8 @@
       <img src="logo.png" alt="ResiLinked Logo" />
       <h1><a href="landing.html" class="logo-link">ResiLinked</a></h1>
     </div>
-    <nav>
-      <a href="profile.html">Profile</a>
-      <a href="settings.html">Settings</a>
+    <nav id="main-nav">
+      <!-- Navigation will be dynamically inserted here -->
     </nav>
   </header>
   <section class="hero">
@@ -328,7 +334,8 @@
     <p class="landing-gray">Kontraktwal na serbisyo para sa iyong komunidad.</p>
     <div class="button-row">
       <a href="search-jobs.html" class="btn">Maghanap ng Trabaho</a>
-      <a href="post-job.html" class="btn">Mag-Post ng Trabaho</a>
+      <a href="post-job.html" class="btn auth-only" style="display: none;">Mag-Post ng Trabaho</a>
+      <a href="login.html" class="btn non-auth-only">Mag-Login para Mag-Post</a>
     </div>
   </section>
   <section class="how-section">
@@ -342,53 +349,22 @@
   </section>
   <section class="jobs-section">
     <h2>Sikat na trabaho</h2>
-    <div class="jobs-list">
-      <div class="job-card">Kasambahay<br><span>Lahat around</span></div>
-      <div class="job-card">Tagapag-alaga ng bata<br><span>Child care</span></div>
-      <div class="job-card">Tagalaba<br><span>Laundry services</span></div>
-      <div class="job-card">Tagalinis<br><span>Cleaning services</span></div>
-      <div class="job-card">Tagapagluto<br><span>Cooking services</span></div>
-      <div class="job-card">Tagapaglaba<br><span>Laundry assistant</span></div>
-      <div class="job-card">Tagapag-alaga ng matanda<br><span>Elderly care</span></div>
-      <div class="job-card">Tagalinis ng sasakyan<br><span>Car cleaning</span></div>
-      <div class="job-card">Tagapinta<br><span>Painting services</span></div>
+    <div class="jobs-list" id="popularJobs">
+      <div class="no-data">Loading popular jobs...</div>
     </div>
   </section>
   <section class="testimonials-section">
     <h2>“Mga Sabi ng Kliyente”</h2>
-    <div class="testimonials-list">
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-content">Excellent work! Highly recommended.</div>
-        <div class="testimonial-footer">
-          <span class="testimonial-avatar"></span>
-          <span class="testimonial-name">Robert Fox</span>
-          <span class="testimonial-role">UI/UX Designer</span>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-content">Mabilis at mahusay magtrabaho.</div>
-        <div class="testimonial-footer">
-          <span class="testimonial-avatar"></span>
-          <span class="testimonial-name">Resie Cooper</span>
-          <span class="testimonial-role">Senior Analyst</span>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-content">Very reliable and professional!</div>
-        <div class="testimonial-footer">
-          <span class="testimonial-avatar"></span>
-          <span class="testimonial-name">Jane Cooper</span>
-          <span class="testimonial-role">Project Manager</span>
-        </div>
-      </div>
+    <div class="testimonials-list" id="topRatedUsers">
+      <div class="no-data">Loading top rated users...</div>
     </div>
   </section>
   <footer>
     V.1 ResiLinked | +6390 06681 8015 | ResiLinked@gmail.com
   </footer>
+  
   <script type="module" src="/src/landing.js"></script>
+  <script type="module" src="/src/navigation.js"></script>
+  <script type="module" src="/src/api.js"></script>
 </body>
 </html>

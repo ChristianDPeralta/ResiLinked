@@ -11,9 +11,29 @@
         font-size: 0.9em;
         margin-top: 3px;
       }
+      .file-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #2b6cb0;
+      }
+      .file-input {
+        margin-bottom: 1.5rem;
+      }
     </style>
   </head>
   <body class="fade-in">
+    <header>
+      <div class="branding">
+        <img src="logo.png" alt="ResiLinked Logo" />
+        <h1><a href="index.html">ResiLinked</a></h1>
+      </div>
+      <nav id="main-nav">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </nav>
+    </header>
+
     <div class="container">
       <h2>Magrehistro</h2>
       <form id="registerForm" enctype="multipart/form-data">
@@ -63,10 +83,13 @@
         </select>
 
         <input type="text" id="idNumber" name="idNumber" placeholder="ID Number" required />
+        
         <label for="idFrontImage" class="file-label">I-upload ang Registered ID (Front)</label>
         <input type="file" id="idFrontImage" name="idFrontImage" accept="image/*" class="file-input" required />
+        
         <label for="idBackImage" class="file-label">I-upload ang Registered ID (Back)</label>
         <input type="file" id="idBackImage" name="idBackImage" accept="image/*" class="file-input" required />
+        
         <label for="profilePicture" class="file-label">Profile Picture (optional)</label>
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="file-input" />
 
@@ -77,11 +100,13 @@
 
       <p id="registerError" class="error"></p>
 
-      <div id="successPopup" class="popup-modal" style="display:none;">
+      <div id="verificationPopup" class="popup-modal" style="display:none;">
         <div class="popup-content">
-          <h3>Registered!</h3>
-          <p>Matagumpay ang iyong pagrehistro.</p>
-          <button onclick="closePopup()" class="btn">OK</button>
+          <h3>Verify Your Email</h3>
+          <p>We've sent a verification email to <span id="verificationEmail"></span>. Please check your inbox and click the verification link.</p>
+          <p>If you didn't request this account, you can delete it:</p>
+          <button onclick="deleteUnverifiedAccount()" class="btn danger">Delete Account</button>
+          <button onclick="closeVerificationPopup()" class="btn">OK</button>
         </div>
       </div>
 
@@ -92,6 +117,8 @@
     </div>
 
     <script type="module" src="/src/register.js"></script>
+    <script type="module" src="/src/navigation.js"></script>
+    <script type="module" src="/src/api.js"></script>
     <script type="module" src="/src/fade.js"></script>
   </body>
 </html>
