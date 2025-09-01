@@ -16,6 +16,10 @@ const adminRoutes = require("./routes/adminRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const passwordResetTokenRoutes = require("./routes/passwordResetRoutes");
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const exportRoutes = require('./routes/exportRoutes');
+
 
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI =
@@ -59,6 +63,9 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reset-tokens", passwordResetTokenRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/export", exportRoutes);
 
 // ✅ Health check
 app.get("/health", (req, res) => {

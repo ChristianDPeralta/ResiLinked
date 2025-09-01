@@ -2,101 +2,100 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Generate a simple PDF report of users.
- * @param {Array} users - Array of User objects
- * @param {string} filename - Output file path
- * @returns {string} Path to the PDF file
- */
-function generateUserReport(users, filename = 'users-report.pdf') {
-    const doc = new PDFDocument();
-    const filepath = path.join(__dirname, '..', filename);
-    doc.pipe(fs.createWriteStream(filepath));
-    doc.fontSize(18).text('ResiLinked User Report', { align: 'center' });
-    doc.moveDown();
+function generateUserReport(users) {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument();
+      const filename = `user-report-${Date.now()}.pdf`;
+      const filepath = path.join(__dirname, '..', 'temp', filename);
+      
+      // Ensure temp directory exists
+      const tempDir = path.join(__dirname, '..', 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+      
+      const stream = fs.createWriteStream(filepath);
+      doc.pipe(stream);
 
-    users.forEach(u => {
-        doc.fontSize(12).text(
-            `Name: ${u.firstName} ${u.lastName}\nEmail: ${u.email}\nBarangay: ${u.barangay}\nSkills: ${u.skills.join(', ')}\nUserType: ${u.userType}\nGender: ${u.gender}\n`
-        );
-        doc.moveDown();
-    });
-    doc.end();
-    return filepath;
+      // Add title
+      doc.fontSize(20).text('ResiLinked User Report', 100, 100);
+      doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, 100, 130);
+      doc.moveDown(2);
+
+      // Summary statistics
+      doc.fontSize(16).text('Summary Statistics', 100, doc.y);
+      doc.moveDown();
+
+      const totalUsers = users.length;
+      const verifiedUsers = users.filter(u => u.isVerified).length;
+      const employeeUsers = users.filter(u => u.userType === 'employee').length;
+      const employerUsers = users.filter(u => u.userType === 'employer').length;
+      const bothUsers = users.filter(u => u.userType === 'both').length;
+
+      doc.fontSize(12).text(`Total Users: ${totalUsers}`, 100, doc.y);
+      doc.text(`Verified Users: ${verifiedUsers} (${Math.round((verifiedUsers / totalUsers) * 100)}%)`, 100, doc.y + 20);
+      doc.text(`Employees: ${employeeUsers}`, 100, doc.y + 40);
+      doc.text(`Employers: ${employerUsers}`, 100, doc.y + 60);
+      doc.text(`Both: ${bothUsers}`, 100, doc.y + 80);
+      doc.moveDown(2);
+
+      // User details table
+      doc.fontSize(16).text('User Details', 100, doc.y);
+      doc.moveDown();
+
+      let y = doc.y;
+      const leftMargin = 100;
+      const colWidths = [150, 150, 120, 100, 80];
+
+      // Table headers
+      doc.fontSize(10).font('Helvetica-Bold');
+      doc.text('Name', leftMargin, y);
+      doc.text('Email', leftMargin + colWidths[0], y);
+      doc.text('User Type', leftMargin + colWidths[0] + colWidths[1], y);
+      doc.text('Barangay', leftMargin + colWidths[0] + colWidths[1] + colWidths[2], y);
+      doc.text('Status', leftMargin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y);
+
+      y += 20;
+      doc.moveTo(leftMargin, y).lineTo(leftMargin + colWidths.reduce((a, b) => a + b, 0), y).stroke();
+      y += 10;
+
+      // Table rows
+      doc.font('Helvetica');
+      users.forEach(user => {
+        if (y > 700) {
+          doc.addPage();
+          y = 100;
+          doc.font('Helvetica-Bold');
+          doc.text('Name', leftMargin, y);
+          doc.text('Email', leftMargin + colWidths[0], y);
+          doc.text('User Type', leftMargin + colWidths[0] + colWidths[1], y);
+          doc.text('Barangay', leftMargin + colWidths[0] + colWidths[1] + colWidths[2], y);
+          doc.text('Status', leftMargin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y);
+          y += 30;
+          doc.font('Helvetica');
+        }
+
+        doc.fontSize(8).text(`${user.firstName} ${user.lastName}`, leftMargin, y);
+        doc.text(user.email, leftMargin + colWidths[0], y);
+        doc.text(user.userType, leftMargin + colWidths[0] + colWidths[1], y);
+        doc.text(user.barangay || 'N/A', leftMargin + colWidths[0] + colWidths[1] + colWidths[2], y);
+        doc.text(user.isVerified ? 'Verified' : 'Unverified', leftMargin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y);
+
+        y += 15;
+      });
+
+      doc.end();
+
+      // Resolve when PDF is finished
+      stream.on('finish', () => resolve(filepath));
+      doc.on('error', reject);
+      stream.on('error', reject);
+
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
-/**
- * Generate a simple PDF report of jobs.
- * @param {Array} jobs - Array of Job objects
- * @param {string} filename - Output file path
- * @returns {string} Path to the PDF file
- */
-function generateJobReport(jobs, filename = 'jobs-report.pdf') {
-    const doc = new PDFDocument();
-    const filepath = path.join(__dirname, '..', filename);
-    doc.pipe(fs.createWriteStream(filepath));
-    doc.fontSize(18).text('ResiLinked Job Report', { align: 'center' });
-    doc.moveDown();
-
-    jobs.forEach(j => {
-        doc.fontSize(12).text(
-            `Title: ${j.title}\nDescription: ${j.description}\nBarangay: ${j.barangay}\nSkills Required: ${j.skillsRequired.join(', ')}\nEmployer: ${j.employer?.email || j.employer}\nStatus: ${j.isOpen ? 'Open' : 'Closed'}\n`
-        );
-        doc.moveDown();
-    });
-    doc.end();
-    return filepath;
-}
-
-/**
- * Generate a simple PDF report of ratings.
- * @param {Array} ratings - Array of Rating objects
- * @param {string} filename - Output file path
- * @returns {string} Path to the PDF file
- */
-function generateRatingReport(ratings, filename = 'ratings-report.pdf') {
-    const doc = new PDFDocument();
-    const filepath = path.join(__dirname, '..', filename);
-    doc.pipe(fs.createWriteStream(filepath));
-    doc.fontSize(18).text('ResiLinked Ratings Report', { align: 'center' });
-    doc.moveDown();
-
-    ratings.forEach(r => {
-        doc.fontSize(12).text(
-            `Rated User: ${r.ratedUser?.email || r.ratedUser}\nRater: ${r.rater?.email || r.rater}\nJob: ${r.job?.title || r.job}\nScore: ${r.score}\nComment: ${r.comment}\nDate: ${r.createdAt?.toLocaleString() || r.createdAt}\n`
-        );
-        doc.moveDown();
-    });
-    doc.end();
-    return filepath;
-}
-
-/**
- * Generate a simple PDF report of reports (user reports/complaints).
- * @param {Array} reports - Array of Report objects
- * @param {string} filename - Output file path
- * @returns {string} Path to the PDF file
- */
-function generateUserReportReports(reports, filename = 'user-reports-report.pdf') {
-    const doc = new PDFDocument();
-    const filepath = path.join(__dirname, '..', filename);
-    doc.pipe(fs.createWriteStream(filepath));
-    doc.fontSize(18).text('ResiLinked User Reports', { align: 'center' });
-    doc.moveDown();
-
-    reports.forEach(rep => {
-        doc.fontSize(12).text(
-            `Reported User: ${rep.reportedUser?.email || rep.reportedUser}\nReporter: ${rep.reporter?.email || rep.reporter}\nReason: ${rep.reason}\nStatus: ${rep.status}\nDate: ${rep.createdAt?.toLocaleString() || rep.createdAt}\n`
-        );
-        doc.moveDown();
-    });
-    doc.end();
-    return filepath;
-}
-
-module.exports = {
-    generateUserReport,
-    generateJobReport,
-    generateRatingReport,
-    generateUserReportReports
-};
+module.exports = { generateUserReport };

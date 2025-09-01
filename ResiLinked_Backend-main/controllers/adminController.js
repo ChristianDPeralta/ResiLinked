@@ -188,11 +188,11 @@ exports.editJob = async (req, res) => {
     }
 };
 
-// Download users as PDF
+// ✅ Fixed: Download users as PDF
 exports.downloadUsersPdf = async (req, res) => {
     try {
         const users = await User.find().select('-password');
-        const filename = generateUserReport(users);
+        const filename = await generateUserReport(users); // FIX: added await
 
         await createNotification({
             recipient: req.user.id,
@@ -202,7 +202,7 @@ exports.downloadUsersPdf = async (req, res) => {
 
         res.download(filename, `ResiLinked-Users-${new Date().toISOString().split('T')[0]}.pdf`, (err) => {
             if (err) console.error('Download error:', err);
-            fs.unlinkSync(filename);
+            if (fs.existsSync(filename)) fs.unlinkSync(filename); // cleanup safely
         });
     } catch (err) {
         res.status(500).json({ message: "Error generating PDF", error: err.message, alert: "Failed to generate user report" });
@@ -230,6 +230,56 @@ exports.getUserById = async (req, res) => {
             message: "Error fetching user",
             error: err.message,
             alert: "Failed to fetch user"
+        });
+    }
+};
+
+// Get user activity
+exports.getUserActivity = async (req, res) => {
+    try {
+        const { id } = req.params;
+        // If you have an Activity model, query it here. Otherwise stub it.
+        // Example with a hypothetical Activity model:
+        // const activities = await Activity.find({ user: id }).sort({ createdAt: -1 });
+
+        const activities = []; // <-- replace with real query when you have Activity model
+
+        res.status(200).json({
+            success: true,
+            data: activities,
+            alert: activities.length
+                ? `Found ${activities.length} activities`
+                : "No activities for this user"
+        });
+    } catch (err) {
+        console.error("Error fetching user activity:", err);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching user activity",
+            error: err.message
+        });
+    }
+};
+
+// Get jobs posted by a user
+exports.getUserJobs = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const jobs = await Job.find({ postedBy: id }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: jobs,
+            alert: jobs.length
+                ? `Found ${jobs.length} jobs`
+                : "No jobs for this user"
+        });
+    } catch (err) {
+        console.error("Error fetching user jobs:", err);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching user jobs",
+            error: err.message
         });
     }
 };

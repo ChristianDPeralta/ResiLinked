@@ -18,7 +18,7 @@ async function loadEmployeeData() {
   try {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const response = await apiService.getProfile(userData.userId);
-
+    
     if (response.user) {
       document.getElementById('applicationsCount').textContent = response.user.applicationCount || 0;
       document.getElementById('offersCount').textContent = response.user.offersCount || 0;
@@ -48,23 +48,19 @@ async function loadRecommendedJobs() {
 
 function renderRecommendedJobs(jobs) {
   const jobsContainer = document.getElementById('jobsContainer');
-
+  
   if (!jobs || jobs.length === 0) {
     jobsContainer.innerHTML = '<div class="no-data">No recommended jobs found</div>';
     return;
   }
-
+  
   jobsContainer.innerHTML = jobs.map(job => `
     <div class="job-card">
-      <h3 class="job-title">${job.title}</h3>
-      <div class="job-price">₱${job.price}</div>
+      <h3 class="job-title">${job.title || 'Untitled Job'}</h3>
+      <div class="job-price">₱${job.price || 0}</div>
       <div class="job-meta">
-        <div class="meta-item">
-          <i>📍</i> ${job.barangay}
-        </div>
-        <div class="meta-item">
-          <i>👤</i> ${job.applicants ? job.applicants.length : 0} applicants
-        </div>
+        <div class="meta-item"><i>📍</i> ${job.barangay || 'N/A'}</div>
+        <div class="meta-item"><i>👤</i> ${job.applicants ? job.applicants.length : 0} applicants</div>
       </div>
       <p>${job.description ? job.description.substring(0, 100) + '...' : 'No description available'}</p>
       <div class="action-buttons">
@@ -79,7 +75,7 @@ async function loadApplications() {
   try {
     const applicationsContainer = document.getElementById('applicationsContainer');
     applicationsContainer.innerHTML = '<div class="no-data">Loading your applications...</div>';
-
+    
     const token = localStorage.getItem('token');
     const response = await fetch('http://localhost:5000/api/jobs/my-applications', {
       headers: {
@@ -87,7 +83,7 @@ async function loadApplications() {
         'Content-Type': 'application/json'
       }
     });
-
+    
     if (response.ok) {
       const applications = await response.json();
       renderApplications(applications);
@@ -104,40 +100,26 @@ async function loadApplications() {
 
 function renderApplications(applications) {
   const applicationsContainer = document.getElementById('applicationsContainer');
-
+  
   if (!applications || applications.length === 0) {
     applicationsContainer.innerHTML = '<div class="no-data">You haven\'t applied to any jobs yet</div>';
     return;
   }
-
+  
   applicationsContainer.innerHTML = applications.map(app => {
-    // Support both response shapes
-    const job = app.jobId || app;
-
-    const title = job?.title || "Untitled Job";
-    const price = job?.price ? `₱${job.price}` : "N/A";
-    const barangay = job?.barangay || "Unknown";
-    const status = app?.status || "Pending";
-    const appliedAt = app?.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : "N/A";
-
+    const job = app.jobId || {}; // ✅ fallback if jobId is not populated
     return `
       <div class="job-card">
-        <h3 class="job-title">${title}</h3>
-        <div class="job-price">${price}</div>
+        <h3 class="job-title">${job.title || 'Unknown Job'}</h3>
+        <div class="job-price">₱${job.price || 0}</div>
         <div class="job-meta">
-          <div class="meta-item">
-            <i>📍</i> ${barangay}
-          </div>
-          <div class="meta-item">
-            Status: ${status}
-          </div>
-          <div class="meta-item">
-            Applied: ${appliedAt}
-          </div>
+          <div class="meta-item"><i>📍</i> ${job.barangay || 'N/A'}</div>
+          <div class="meta-item">Status: ${app.status || 'Pending'}</div>
+          <div class="meta-item">Applied: ${app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}</div>
         </div>
         <div class="action-buttons">
-          <button class="btn" onclick="viewJob('${job?._id || ''}')">View Job</button>
-          ${status === 'accepted' ? 
+          <button class="btn" onclick="viewJob('${job._id || ''}')">View Job</button>
+          ${app.status === 'accepted' ? 
             `<button class="btn primary" onclick="acceptOffer('${app._id}')">Accept Offer</button>` : ''}
         </div>
       </div>
@@ -145,7 +127,7 @@ function renderApplications(applications) {
   }).join('');
 }
 
-// Global functions
+// Global functions for button clicks
 window.applyForJob = async function(jobId) {
   try {
     const result = await apiService.applyToJob(jobId);
@@ -163,7 +145,7 @@ window.applyForJob = async function(jobId) {
 
 window.viewJob = function(jobId) {
   if (!jobId) {
-    alert("Job details unavailable.");
+    alert('Job details unavailable.');
     return;
   }
   window.location.href = `/job-details.html?id=${jobId}`;
@@ -171,5 +153,4 @@ window.viewJob = function(jobId) {
 
 window.acceptOffer = function(applicationId) {
   alert(`Would accept offer for application ${applicationId}`);
-  // TODO: API call to accept job offer
 };
