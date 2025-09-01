@@ -283,3 +283,33 @@ exports.getUserJobs = async (req, res) => {
         });
     }
 };
+
+// Export all users as JSON (can be extended to CSV/PDF)
+exports.exportUsers = async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        res.status(200).json({ success: true, data: users });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Error exporting users", error: err.message });
+    }
+};
+
+// Export all jobs
+exports.exportJobs = async (req, res) => {
+    try {
+        const jobs = await Job.find().populate('postedBy', 'email firstName lastName');
+        res.status(200).json({ success: true, data: jobs });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Error exporting jobs", error: err.message });
+    }
+};
+
+// Export all ratings
+exports.exportRatings = async (req, res) => {
+    try {
+        const ratings = await Rating.find().populate('user', 'email firstName lastName');
+        res.status(200).json({ success: true, data: ratings });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Error exporting ratings", error: err.message });
+    }
+};

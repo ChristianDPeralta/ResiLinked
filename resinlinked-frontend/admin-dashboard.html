@@ -19,8 +19,6 @@
       --radius: 10px;
       --shadow: 0 4px 32px rgba(0,0,0,0.10);
       --danger: #e53e3e;
-
-      /* Fixed header/navbar/branding sizes for consistency */
       --header-height: 70px;
       --header-padding-x: 2rem;
       --logo-size: 38px;
@@ -35,7 +33,6 @@
       color: var(--text-dark);
       min-height: 100vh;
     }
-    /* --- HEADER AND NAV FROM LANDING PAGE --- */
     header {
       background: var(--header-bg);
       color: white;
@@ -97,12 +94,12 @@
       margin-left: 1.5rem;
       font-weight: 500;
       font-size: var(--nav-btn-font-size);
-      transition: background 0.2极, color 0.2s;
+      transition: background 0.2s, color 0.2s;
       border-radius: 7px;
       width: var(--nav-btn-width);
       height: var(--nav-btn-height);
       min-width: var(--nav-btn-width);
-      min-height:极(--nav-btn-height);
+      min-height: var(--nav-btn-height);
       box-sizing: border-box;
       border: none;
       outline: none;
@@ -113,7 +110,6 @@
       color: #cbe6ff;
       text-decoration: underline;
     }
-    /* --- END HEADER/NAV LANDING STYLE --- */
     .dashboard {
       max-width: 1200px;
       margin: 20px auto;
@@ -350,11 +346,28 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
-    .filter-select {
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 160px;
+    }
+    .filter-group label {
+      margin-bottom: 4px;
+      font-size: 0.97em;
+      color: var(--header-bg);
+      font-weight: 500;
+    }
+    .filter-input, .filter-select, .filter-date {
       border: 1px solid var(--border);
       border-radius: 5px;
       padding: 8px 12px;
       background: white;
+      font-size: 1em;
+    }
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .export-options {
       display: flex;
@@ -383,6 +396,9 @@
       }
       .filter-section {
         flex-direction: column;
+      }
+      .filter-group {
+        min-width: unset;
       }
     }
   </style>
@@ -476,33 +492,57 @@
       <div class="section-header">
         <h2 class="section-title">User Management</h2>
         <div class="search-box">
-          <input type="text" id="userSearch" class="search-input" placeholder="Search users...">
+          <input type="text" id="userSearch" class="search-input" name="userSearch" placeholder="Search users...">
           <button class="btn primary" id="searchBtn">Search</button>
         </div>
       </div>
 
       <div class="filter-section">
-        <select class="filter-select" id="userTypeFilter">
-          <option value="">All Types</option>
-          <option value="employee">Employees</option>
-          <option value="employer">Employers</option>
-          <option value="both">Both</option>
-        </select>
-        <select class="filter-select" id="verificationFilter">
-          <option value="">All Status</option>
-          <option value="verified">Verified</option>
-          <option value="unverified">Unverified</option>
-        </select>
-        <select class="filter-select" id="dateFilter">
-          <option value="">All Time</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
-        </select>
+        <div class="filter-group">
+          <label for="searchFilter">Search:</label>
+          <input type="text" id="searchFilter" name="search" class="filter-input" placeholder="Search...">
+        </div>
+        <div class="filter-group">
+          <label for="userTypeFilter">User Type:</label>
+          <select id="userTypeFilter" name="userType" class="filter-select">
+            <option value="">All Types</option>
+            <option value="employee">Employees</option>
+            <option value="employer">Employers</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="barangayFilter">Barangay:</label>
+          <select id="barangayFilter" name="barangay" class="filter-select">
+            <option value="">All Barangays</option>
+            <option value="Barangay 1">Barangay 1</option>
+            <option value="Barangay 2">Barangay 2</option>
+            <option value="Barangay 3">Barangay 3</option>
+            <option value="Barangay 4">Barangay 4</option>
+            <option value="Barangay 5">Barangay 5</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="verificationFilter">Verification:</label>
+          <select id="verificationFilter" name="verification" class="filter-select">
+            <option value="">All Status</option>
+            <option value="true">Verified</option>
+            <option value="false">Unverified</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="startDateFilter">Date Range:</label>
+          <div class="date-range">
+            <input type="date" id="startDateFilter" name="startDate" class="filter-date">
+            <span>to</span>
+            <input type="date" id="endDateFilter" name="endDate" class="filter-date">
+          </div>
+        </div>
+        <button class="btn primary" id="applyFiltersBtn">Apply Filters</button>
+        <button class="btn secondary" id="clearFiltersBtn">Clear Filters</button>
       </div>
 
       <div id="usersLoading" class="loading">Loading users...</div>
-      
       <div id="usersContainer" style="display: none;">
         <table>
           <thead>
@@ -520,7 +560,6 @@
             <!-- Users will be populated here -->
           </tbody>
         </table>
-
         <div class="pagination" id="pagination">
           <!-- Pagination will be populated here -->
         </div>
@@ -545,13 +584,13 @@
         <h2 class="section-title">Export Data</h2>
       </div>
       <div class="export-options">
-        <button class="btn secondary" onclick="exportData('users')">
+        <button class="btn secondary" id="exportUsersCsvBtn">
           <i>📊</i> Export Users CSV
         </button>
-        <button class="btn secondary" onclick="exportData('jobs')">
+        <button class="btn secondary" id="exportJobsCsvBtn">
           <i>📊</i> Export Jobs CSV
         </button>
-        <button class="btn secondary" onclick="exportData('ratings')">
+        <button class="btn secondary" id="exportRatingsCsvBtn">
           <i>📊</i> Export Ratings CSV
         </button>
       </div>

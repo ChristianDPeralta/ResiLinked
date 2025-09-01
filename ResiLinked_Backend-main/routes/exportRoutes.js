@@ -8,7 +8,10 @@ const verifyAdmin = require('../middleware/verifyAdmin');
 router.use(auth.verify);
 router.use(verifyAdmin);
 
-// Export data
+// Export data with query parameter filters
 router.get('/:type', exportController.exportData);
+
+// Export filtered data with POST request (for complex filters)
+router.post('/:type/filtered', exportController.exportFilteredData);
 
 module.exports = router;

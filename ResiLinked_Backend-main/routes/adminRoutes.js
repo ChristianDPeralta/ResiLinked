@@ -26,6 +26,9 @@ router.put('/jobs/:id', adminController.editJob);
 
 // Reports
 router.get('/users/download/pdf', adminController.downloadUsersPdf);
+router.get('/export/users', adminController.exportUsers);
+router.get('/export/jobs', adminController.exportJobs);
+router.get('/export/ratings', adminController.exportRatings);
 
 // Local error handler
 router.use((err, req, res, next) => {
