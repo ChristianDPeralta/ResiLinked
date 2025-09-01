@@ -21,7 +21,11 @@ class ApiService {
       ...options,
     };
 
-    if (config.body && typeof config.body === 'object' && config.headers['Content-Type'] === 'application/json') {
+    if (
+      config.body &&
+      typeof config.body === 'object' &&
+      config.headers['Content-Type'] === 'application/json'
+    ) {
       config.body = JSON.stringify(config.body);
     }
 
@@ -40,21 +44,21 @@ class ApiService {
     }
   }
 
-  // Auth endpoints
+  // ================= Auth =================
   async login(credentials) {
     return this.request('/auth/login', {
       method: 'POST',
-      body: credentials
+      body: credentials,
     });
   }
 
   async register(userData) {
     const token = localStorage.getItem('token');
     const formData = new FormData();
-    
-    Object.keys(userData).forEach(key => {
+
+    Object.keys(userData).forEach((key) => {
       if (key === 'skills' && Array.isArray(userData[key])) {
-        userData[key].forEach(skill => formData.append('skills', skill));
+        userData[key].forEach((skill) => formData.append('skills', skill));
       } else if (userData[key] !== null && userData[key] !== undefined) {
         formData.append(key, userData[key]);
       }
@@ -62,8 +66,8 @@ class ApiService {
 
     const response = await fetch(`${this.baseURL}/auth/register`, {
       method: 'POST',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      body: formData
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
     });
 
     return response.json();
@@ -72,25 +76,25 @@ class ApiService {
   async verifyEmail(token) {
     return this.request('/auth/verify', {
       method: 'POST',
-      body: { token }
+      body: { token },
     });
   }
 
   async requestPasswordReset(email) {
     return this.request('/auth/reset/request', {
       method: 'POST',
-      body: { email }
+      body: { email },
     });
   }
 
   async resetPassword(token, newPassword) {
     return this.request('/auth/reset', {
       method: 'POST',
-      body: { token, newPassword }
+      body: { token, newPassword },
     });
   }
 
-  // User endpoints
+  // ================= User =================
   async getProfile() {
     return this.request('/users/me');
   }
@@ -98,11 +102,11 @@ class ApiService {
   async updateProfile(updates) {
     return this.request('/users/me', {
       method: 'PUT',
-      body: updates
+      body: updates,
     });
   }
 
-  // Job endpoints
+  // ================= Jobs =================
   async getJobs(filters = {}) {
     const queryParams = new URLSearchParams(filters).toString();
     return this.request(`/jobs?${queryParams}`);
@@ -115,13 +119,13 @@ class ApiService {
   async createJob(jobData) {
     return this.request('/jobs', {
       method: 'POST',
-      body: jobData
+      body: jobData,
     });
   }
 
   async applyToJob(jobId) {
     return this.request(`/jobs/${jobId}/apply`, {
-      method: 'POST'
+      method: 'POST',
     });
   }
 
@@ -129,11 +133,11 @@ class ApiService {
     return this.request('/jobs/my-matches');
   }
 
-  // Rating endpoints
+  // ================= Ratings =================
   async rateUser(ratingData) {
     return this.request('/ratings', {
       method: 'POST',
-      body: ratingData
+      body: ratingData,
     });
   }
 
@@ -141,7 +145,7 @@ class ApiService {
     return this.request(`/ratings/${userId}`);
   }
 
-  // Admin endpoints
+  // ================= Admin =================
   async getDashboardStats() {
     return this.request('/admin/dashboard');
   }
@@ -154,13 +158,13 @@ class ApiService {
   async updateUser(userId, updates) {
     return this.request(`/admin/users/${userId}`, {
       method: 'PUT',
-      body: updates
+      body: updates,
     });
   }
 
   async deleteUser(userId) {
     return this.request(`/admin/users/${userId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
   }
 
@@ -168,8 +172,8 @@ class ApiService {
     const token = localStorage.getItem('token');
     const response = await fetch(`${this.baseURL}/admin/users/download/pdf`, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (response.ok) {
@@ -178,7 +182,51 @@ class ApiService {
       throw new Error('Failed to export PDF');
     }
   }
+
+  // ================= Employees =================
+  async getEmployeeStats(userId) {
+    return this.request(`/employees/${userId}/stats`);
+  }
+
+  async getEmployeeApplications(userId) {
+    return this.request(`/employees/${userId}/applications`);
+  }
+
+  async getEmployeeProfile(userId) {
+    return this.request(`/employees/${userId}/profile`);
+  }
+
+  async updateEmployeeProfile(userId, profileData) {
+    return this.request(`/employees/${userId}/profile`, {
+      method: 'PUT',
+      body: profileData,
+    });
+  }
+
+  async searchEmployees(filters = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    return this.request(`/employees/search?${queryParams}`);
+  }
+
+  async sendJobRequest(employeeId, jobData) {
+    return this.request(`/employees/${employeeId}/job-request`, {
+      method: 'POST',
+      body: jobData,
+    });
+  }
+
+  async getJobRequests(userId) {
+    return this.request(`/users/${userId}/job-requests`);
+  }
+
+  async respondToJobRequest(requestId, response) {
+    return this.request(`/job-requests/${requestId}/respond`, {
+      method: 'POST',
+      body: { response },
+    });
+  }
 }
 
+// ✅ Only one instance exported
 const apiService = new ApiService();
 export default apiService;

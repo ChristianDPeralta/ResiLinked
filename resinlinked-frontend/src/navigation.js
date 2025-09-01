@@ -55,19 +55,32 @@ class Navigation {
     let navHTML = '';
     
     if (this.isLoggedIn) {
+      // Common links for all logged-in users
       navHTML = `
         <a href="profile.html">Profile</a>
         <a href="search-jobs.html">Find Jobs</a>
-        <a href="post-job.html">Post Job</a>
         <a href="settings.html">Settings</a>
       `;
+      
+      // Role-specific links
+      if (this.userType === 'employee' || this.userType === 'both') {
+        navHTML += `<a href="employee-dashboard.html">Employee Dashboard</a>`;
+        navHTML += `<a href="post-profile.html">Post Profile</a>`;
+      }
+      
+      if (this.userType === 'employer' || this.userType === 'both') {
+        navHTML += `<a href="employer-dashboard.html">Employer Dashboard</a>`;
+        navHTML += `<a href="post-job.html">Post Job</a>`;
+      }
       
       if (this.userType === 'admin') {
         navHTML += `<a href="admin-dashboard.html">Admin Dashboard</a>`;
       }
       
+      // Logout button
       navHTML += `<a href="#" id="logoutBtn">Logout</a>`;
     } else {
+      // Links for non-logged-in users
       navHTML = `
         <a href="search-jobs.html">Find Jobs</a>
         <a href="login.html">Login</a>
@@ -120,6 +133,18 @@ class Navigation {
     
     nonAuthElements.forEach(el => {
       el.style.display = this.isLoggedIn ? 'none' : 'block';
+    });
+
+    // Show/hide role-specific elements
+    const employeeElements = document.querySelectorAll('.employee-only');
+    const employerElements = document.querySelectorAll('.employer-only');
+    
+    employeeElements.forEach(el => {
+      el.style.display = (this.isLoggedIn && (this.userType === 'employee' || this.userType === 'both')) ? 'block' : 'none';
+    });
+    
+    employerElements.forEach(el => {
+      el.style.display = (this.isLoggedIn && (this.userType === 'employer' || this.userType === 'both')) ? 'block' : 'none';
     });
   }
 

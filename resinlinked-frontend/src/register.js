@@ -1,8 +1,9 @@
-// src/register.js - Updated
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 const passwordError = document.getElementById("passwordError");
 const registerError = document.getElementById("registerError");
+const loadingElement = document.getElementById("loading");
+const submitBtn = document.getElementById("submitBtn");
 
 // Real-time password match check
 function checkPasswordsMatch() {
@@ -27,14 +28,18 @@ passwordInput.addEventListener("input", checkPasswordsMatch);
 confirmPasswordInput.addEventListener("input", checkPasswordsMatch);
 
 // Form submission
-
 document.getElementById("registerForm").addEventListener("submit", async function(event) {
   event.preventDefault();
 
   if (passwordInput.value !== confirmPasswordInput.value) {
-    alert("Passwords do not match!");
+    alert("Password do not match!");
     return;
   }
+
+  // Show loading, hide button
+  submitBtn.style.display = "none";
+  loadingElement.style.display = "block";
+  registerError.textContent = "";
 
   const formData = new FormData();
   formData.append("firstName", document.getElementById("firstName").value);
@@ -64,24 +69,27 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     skillsArray.forEach(skill => formData.append("skills", skill));
   }
 
-  registerError.textContent = "";
-
   try {
-    const res = await fetch("http://localhost:5000/api/auth/register", {
+    const response = await fetch("http://localhost:5000/api/auth/register", {
       method: "POST",
       body: formData
     });
 
-    const data = await res.json();
+    const data = await response.json();
+    console.log("Registration response:", data);
 
-    if (res.ok && data.success) {
+    if (response.ok && data.success) {
       showVerificationPopup(data.data.email);
     } else {
-      registerError.textContent = data.alert || "Registration failed";
+      registerError.textContent = data.message || data.alert || "Registration failed. Please try again.";
     }
   } catch (err) {
+    console.error("Registration error:", err);
     registerError.textContent = "Connection error. Please try again.";
-    console.error(err);
+  } finally {
+    // Hide loading, show button
+    submitBtn.style.display = "block";
+    loadingElement.style.display = "none";
   }
 });
 
@@ -102,14 +110,14 @@ window.closeVerificationPopup = function() {
 window.deleteUnverifiedAccount = async function() {
   try {
     const email = document.getElementById("verificationEmail").textContent;
-    const res = await fetch("http://localhost:5000/api/auth/delete-unverified", {
+    const response = await fetch("http://localhost:5000/api/auth/delete-unverified", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
     
-    const data = await res.json();
-    if (res.ok) {
+    const data = await response.json();
+    if (response.ok) {
       alert("Account deleted successfully.");
       window.location.href = "/register.html";
     } else {
@@ -121,12 +129,10 @@ window.deleteUnverifiedAccount = async function() {
   }
 };
 
-<div id="verificationPopup" class="popup-modal" style="display:none;">
-  <div class="popup-content">
-    <h3>Verify Your Email</h3>
-    <p>We've sent a verification email to <span id="verificationEmail"></span>. Please check your inbox and click the verification link.</p>
-    <p>If you didn't request this account, you can delete it:</p>
-    <button onclick="deleteUnverifiedAccount()" class="btn danger">Delete Account</button>
-    <button onclick="closeVerificationPopup()" class="btn">OK</button>
-  </div>
-</div>
+document.getElementById('backHomeBtn').onclick = () => {
+  window.location.href = '/index.html';
+};
+
+document.getElementById('loginLinkBtn').onclick = () => {
+  window.location.href = '/login.html';
+};

@@ -5,6 +5,9 @@ class AdminDashboard {
     this.currentPage = 1;
     this.limit = 10;
     this.searchQuery = '';
+    this.userTypeFilter = '';
+    this.verificationFilter = '';
+    this.dateFilter = '';
     this.init();
   }
 
@@ -19,23 +22,62 @@ class AdminDashboard {
 
     await this.loadDashboardData();
     await this.loadUsers();
+    await this.loadRecentJobs();
+    await this.loadAnalyticsData();
     this.setupEventListeners();
   }
 
   async loadDashboardData() {
     try {
       const data = await apiService.getDashboardStats();
-      this.updateDashboardSummary(data);
+      this.updateDashboardStats(data);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      document.getElementById('errorMessage').textContent = 'Failed to load dashboard statistics';
     }
   }
 
-  updateDashboardSummary(data) {
+  updateDashboardStats(data) {
     document.getElementById('totalUsers').textContent = data.totalUsers || 0;
     document.getElementById('totalJobs').textContent = data.totalJobs || 0;
     document.getElementById('totalRatings').textContent = data.totalRatings || 0;
     document.getElementById('totalReports').textContent = data.totalReports || 0;
+  }
+
+  async loadAnalyticsData() {
+    try {
+      // Load user growth data
+      const growthFilter = document.getElementById('userGrowthFilter').value;
+      const growthResponse = await fetch(`http://localhost:5000/api/analytics/user-growth?days=${growthFilter}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (growthResponse.ok) {
+        const growthData = await growthResponse.json();
+        document.getElementById('userGrowthData').textContent = 
+          `${growthData.length} data points loaded`;
+      }
+      
+      // Load job statistics
+      const statsFilter = document.getElementById('jobStatsFilter').value;
+      const statsResponse = await fetch(`http://localhost:5000/api/analytics/job-stats?by=${statsFilter}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        document.getElementById('jobStatsData').textContent = 
+          `${Object.keys(statsData).length} categories loaded`;
+      }
+    } catch (error) {
+      console.error('Error loading analytics data:', error);
+    }
   }
 
   async loadUsers(page = 1, limit = 10, search = '') {
@@ -44,25 +86,39 @@ class AdminDashboard {
       this.limit = limit;
       this.searchQuery = search;
 
+      document.getElementById('usersLoading').style.display = 'block';
+      document.getElementById('usersContainer').style.display = 'none';
+
       const filters = {
         page,
         limit,
-        q: search
+        q: search,
+        userType: this.userTypeFilter,
+        verified: this.verificationFilter,
+        days: this.dateFilter
       };
+
+      // Remove empty filters
+      Object.keys(filters).forEach(key => {
+        if (filters[key] === '') delete filters[key];
+      });
 
       const data = await apiService.getUsers(filters);
       this.renderUsersTable(data.data, data.pagination);
     } catch (error) {
       console.error('Error loading users:', error);
+      document.getElementById('usersLoading').textContent = 'Error loading users';
     }
   }
 
   renderUsersTable(users, pagination) {
     const tbody = document.getElementById('usersTableBody');
-    if (!tbody) return;
+    const usersContainer = document.getElementById('usersContainer');
+    const usersLoading = document.getElementById('usersLoading');
     
     if (!users || users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="no-data">No users found</td></tr>';
+      usersLoading.textContent = 'No users found';
+      usersContainer.style.display = 'none';
       return;
     }
     
@@ -75,22 +131,69 @@ class AdminDashboard {
         <td>${user.isVerified ? 'Verified' : 'Unverified'}</td>
         <td>${new Date(user.createdAt).toLocaleDateString()}</td>
         <td class="actions">
-          <button class="btn-edit" data-id="${user._id}">Edit</button>
-          <button class="btn-toggle-verify" data-id="${user._id}" data-verified="${user.isVerified}">
+          <button class="action-btn view-btn" data-id="${user._id}">View</button>
+          <button class="action-btn edit-btn" data-id="${user._id}">Edit</button>
+          <button class="action-btn toggle-btn" data-id="${user._id}" data-verified="${user.isVerified}">
             ${user.isVerified ? 'Disable' : 'Verify'}
           </button>
-          <button class="btn-delete" data-id="${user._id}">Delete</button>
+          <button class="action-btn delete-btn" data-id="${user._id}">Delete</button>
         </td>
       </tr>
     `).join('');
     
-    this.setupUserActionListeners();
     this.renderPagination(pagination);
+    this.setupUserActionListeners();
+    
+    usersLoading.style.display = 'none';
+    usersContainer.style.display = 'block';
+  }
+
+  async loadRecentJobs() {
+    try {
+      const response = await apiService.getJobs({ limit: 5, sortBy: 'datePosted', order: 'desc' });
+      this.renderRecentJobs(response.jobs || []);
+    } catch (error) {
+      console.error('Error loading recent jobs:', error);
+      document.getElementById('jobsLoading').textContent = 'Error loading jobs';
+    } finally {
+      document.getElementById('jobsLoading').style.display = 'none';
+    }
+  }
+
+  renderRecentJobs(jobs) {
+    const jobsContainer = document.getElementById('jobsContainer');
+    
+    if (!jobs || jobs.length === 0) {
+      jobsContainer.innerHTML = '<div class="no-data">No jobs found</div>';
+      return;
+    }
+    
+    jobsContainer.innerHTML = jobs.map(job => `
+      <div class="job-card" style="margin-bottom: 15px; padding: 15px;">
+        <h3 style="margin: 0 0 10px 0; color: var(--header-bg);">${job.title}</h3>
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div>₱${job.price} • ${job.barangay}</div>
+          <div>${job.applicants ? job.applicants.length : 0} applicants</div>
+        </div>
+        <div style="margin-top: 10px;">
+          <button class="action-btn view-btn" onclick="viewJob('${job._id}')">View Job</button>
+          <button class="action-btn edit-btn" onclick="editJob('${job._id}')">Edit</button>
+        </div>
+      </div>
+    `).join('');
   }
 
   setupUserActionListeners() {
+    // View user
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const userId = e.target.dataset.id;
+        this.viewUser(userId);
+      });
+    });
+    
     // Edit user
-    document.querySelectorAll('.btn-edit').forEach(btn => {
+    document.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const userId = e.target.dataset.id;
         this.editUser(userId);
@@ -98,7 +201,7 @@ class AdminDashboard {
     });
     
     // Toggle verification
-    document.querySelectorAll('.btn-toggle-verify').forEach(btn => {
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const userId = e.target.dataset.id;
         const isVerified = e.target.dataset.verified === 'true';
@@ -115,7 +218,7 @@ class AdminDashboard {
     });
     
     // Delete user
-    document.querySelectorAll('.btn-delete').forEach(btn => {
+    document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         if (!confirm('Are you sure you want to delete this user?')) return;
         
@@ -166,44 +269,71 @@ class AdminDashboard {
   setupEventListeners() {
     // Search functionality
     const searchInput = document.getElementById('userSearch');
-    if (searchInput) {
-      searchInput.addEventListener('input', this.debounce(() => {
+    const searchBtn = document.getElementById('searchBtn');
+    
+    searchBtn.addEventListener('click', () => {
+      this.loadUsers(1, this.limit, searchInput.value);
+    });
+    
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
         this.loadUsers(1, this.limit, searchInput.value);
-      }, 300));
-    }
+      }
+    });
+    
+    // Filter functionality
+    document.getElementById('userTypeFilter').addEventListener('change', (e) => {
+      this.userTypeFilter = e.target.value;
+      this.loadUsers(1, this.limit, this.searchQuery);
+    });
+    
+    document.getElementById('verificationFilter').addEventListener('change', (e) => {
+      this.verificationFilter = e.target.value;
+      this.loadUsers(1, this.limit, this.searchQuery);
+    });
+    
+    document.getElementById('dateFilter').addEventListener('change', (e) => {
+      this.dateFilter = e.target.value;
+      this.loadUsers(1, this.limit, this.searchQuery);
+    });
+    
+    // Analytics filter functionality
+    document.getElementById('userGrowthFilter').addEventListener('change', () => {
+      this.loadAnalyticsData();
+    });
+    
+    document.getElementById('jobStatsFilter').addEventListener('change', () => {
+      this.loadAnalyticsData();
+    });
     
     // PDF export
-    const exportBtn = document.getElementById('exportPdf');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', async () => {
-        try {
-          const blob = await apiService.exportUsersPDF();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `ResiLinked-Users-${new Date().toISOString().split('T')[0]}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        } catch (error) {
-          console.error('PDF export error:', error);
-          alert('Error generating PDF');
-        }
-      });
-    }
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    exportPdfBtn.addEventListener('click', async () => {
+      try {
+        exportPdfBtn.disabled = true;
+        exportPdfBtn.innerHTML = '<i>⏳</i> Generating PDF...';
+        
+        const blob = await apiService.exportUsersPDF();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ResiLinked-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('PDF export error:', error);
+        alert('Error generating PDF');
+      } finally {
+        exportPdfBtn.disabled = false;
+        exportPdfBtn.innerHTML = '<i>📄</i> Export PDF Report';
+      }
+    });
   }
 
-  debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
+  viewUser(userId) {
+    window.location.href = `/user-details.html?id=${userId}`;
   }
 
   editUser(userId) {
@@ -211,6 +341,61 @@ class AdminDashboard {
     alert(`Edit user ${userId} - This feature would open an edit form`);
   }
 }
+
+// Global functions for navigation
+window.viewDetail = function(type) {
+  switch(type) {
+    case 'users':
+      window.location.href = 'users-management.html';
+      break;
+    case 'jobs':
+      window.location.href = 'jobs-management.html';
+      break;
+    case 'ratings':
+      window.location.href = 'ratings-management.html';
+      break;
+    case 'reports':
+      window.location.href = 'reports-management.html';
+      break;
+  }
+};
+
+window.viewJob = function(jobId) {
+  window.location.href = `/job-details.html?id=${jobId}`;
+};
+
+window.editJob = function(jobId) {
+  alert(`Edit job ${jobId} - This would open job edit form`);
+};
+
+window.exportData = async function(type) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/admin/export/${type}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ResiLinked-${type}-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } else {
+      alert('Error exporting data');
+    }
+  } catch (error) {
+    console.error('Export error:', error);
+    alert('Error exporting data');
+  }
+};
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
