@@ -8,18 +8,16 @@
   <link rel="stylesheet" href="fade.css" />
   <style>
     :root {
-      --primary: #38a169;            /* green button color from sample */
+      --primary: #38a169;
       --primary-dark: #2f855a;
       --header-bg: #2b6cb0;
       --panel: #fff;
-      --bg: #f4f6f8;                 /* sample background */
+      --bg: #f4f6f8;
       --border: #a3c5e8;
       --text-dark: #333;
-      --text-light: #2b6cb0;         /* accent blue for job info */
+      --text-light: #2b6cb0;
       --radius: 10px;
       --shadow: 0 4px 32px rgba(0,0,0,0.10);
-
-      /* Fixed header/navbar/branding sizes for consistency */
       --header-height: 70px;
       --header-padding-x: 2rem;
       --logo-size: 38px;
@@ -34,7 +32,6 @@
       color: var(--text-dark);
       min-height: 100vh;
     }
-    /* --- HEADER AND NAV FROM LANDING PAGE --- */
     header {
       background: var(--header-bg);
       color: white;
@@ -110,9 +107,8 @@
     nav a:hover, nav a.active {
       background: #2460aa;
       color: #cbe6ff;
-      text-decoration: underline;
+      text-decoration: none;
     }
-    /* --- END HEADER/NAV LANDING STYLE --- */
     .container {
       max-width: 1100px;
       margin: 40px auto 32px auto;
@@ -305,8 +301,11 @@
     </div>
     <nav>
       <a href="profile.html">Profile</a>
+      <a href="search-jobs.html" class="active">Find Jobs</a>
       <a href="settings.html">Settings</a>
-      <!-- Add other links if needed -->
+      <a href="employee-dashboard.html">Employee Dashboard</a>
+      <a href="postprofile.html">Post Profile</a>
+      <a href="logout.html">Logout</a>
     </nav>
   </header>
   <div class="container">
@@ -324,25 +323,25 @@
         <div class="job-title">Kasambahay (all-around)</div>
         <div class="job-positions">64 mga posisyon</div>
         <div class="job-salary">₱15,000/mo</div>
-        <button class="apply-btn" onclick="applyJob(this)">MAG-APPLY</button>
+        <button class="apply-btn">MAG-APPLY</button>
       </div>
       <div class="job-card">
         <div class="job-title">Tagalinis</div>
         <div class="job-positions">28 mga posisyon</div>
         <div class="job-salary">₱12,000/mo</div>
-        <button class="apply-btn" onclick="applyJob(this)">MAG-APPLY</button>
+        <button class="apply-btn">MAG-APPLY</button>
       </div>
       <div class="job-card">
         <div class="job-title">Tagapagluto</div>
         <div class="job-positions">15 mga posisyon</div>
         <div class="job-salary">₱17,000/mo</div>
-        <button class="apply-btn" onclick="applyJob(this)">MAG-APPLY</button>
+        <button class="apply-btn">MAG-APPLY</button>
       </div>
       <div class="job-card">
         <div class="job-title">Tagapinta</div>
         <div class="job-positions">12 mga posisyon</div>
         <div class="job-salary">₱13,000/mo</div>
-        <button class="apply-btn" onclick="applyJob(this)">MAG-APPLY</button>
+        <button class="apply-btn">MAG-APPLY</button>
       </div>
       <!-- Add more sample jobs as needed -->
     </div>
@@ -365,36 +364,5 @@
       </select>
     </div>
   </div>
-  <script>
-    // Tab switcher logic
-    document.getElementById('searchTab').onclick = function() {
-      document.getElementById('jobsList').style.display = 'grid';
-      document.getElementById('appliedList').style.display = 'none';
-      this.classList.add('active');
-      document.getElementById('appliedTab').classList.remove('active');
-    };
-    document.getElementById('appliedTab').onclick = function() {
-      document.getElementById('jobsList').style.display = 'none';
-      document.getElementById('appliedList').style.display = 'grid';
-      this.classList.add('active');
-      document.getElementById('searchTab').classList.remove('active');
-    };
-
-    // Search filter demo (filters job cards by title)
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const query = this.value.toLowerCase();
-      document.querySelectorAll('#jobsList .job-card').forEach(card => {
-        const title = card.querySelector('.job-title').textContent.toLowerCase();
-        card.style.display = title.includes(query) ? 'flex' : 'none';
-      });
-    });
-
-    // Apply button demo
-    function applyJob(btn) {
-      alert('Nai-applyan mo na ang trabahong ito! (demo lamang)');
-      // For a real app, move job card to applied list etc.
-    }
-  </script>
-  <script type="module" src="/src/fade.js"></script>
 </body>
 </html>

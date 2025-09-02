@@ -79,7 +79,9 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     console.log("Registration response:", data);
 
     if (response.ok && data.success) {
-      showVerificationPopup(data.data.email);
+      // Show the success message, hide the form
+      document.getElementById("registerForm").style.display = "none";
+      document.getElementById("verificationSent").style.display = "block";
     } else {
       registerError.textContent = data.message || data.alert || "Registration failed. Please try again.";
     }
@@ -92,42 +94,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     loadingElement.style.display = "none";
   }
 });
-
-// Add these new functions for verification
-window.showVerificationPopup = function(email) {
-  const popup = document.getElementById("verificationPopup");
-  const emailSpan = document.getElementById("verificationEmail");
-  emailSpan.textContent = email;
-  popup.style.display = "block";
-};
-
-window.closeVerificationPopup = function() {
-  const popup = document.getElementById("verificationPopup");
-  popup.style.display = "none";
-  window.location.href = "/login.html";
-};
-
-window.deleteUnverifiedAccount = async function() {
-  try {
-    const email = document.getElementById("verificationEmail").textContent;
-    const response = await fetch("http://localhost:5000/api/auth/delete-unverified", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
-    
-    const data = await response.json();
-    if (response.ok) {
-      alert("Account deleted successfully.");
-      window.location.href = "/register.html";
-    } else {
-      alert("Error: " + data.message);
-    }
-  } catch (err) {
-    console.error("Delete error:", err);
-    alert("Error deleting account.");
-  }
-};
 
 document.getElementById('backHomeBtn').onclick = () => {
   window.location.href = '/index.html';

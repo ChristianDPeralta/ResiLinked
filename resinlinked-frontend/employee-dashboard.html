@@ -15,9 +15,15 @@
       --bg: #f4f6f8;
       --border: #a3c5e8;
       --text-dark: #333;
-      --text-light: #4a6b7a;
+      --text-light: #2b6cb0;
       --radius: 10px;
       --shadow: 0 4px 32px rgba(0,0,0,0.10);
+      --header-height: 70px;
+      --header-padding-x: 2rem;
+      --logo-size: 38px;
+      --nav-btn-width: 110px;
+      --nav-btn-height: 38px;
+      --nav-btn-font-size: 1.08em;
     }
     body {
       margin: 0;
@@ -29,11 +35,20 @@
     header {
       background: var(--header-bg);
       color: white;
-      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 12px rgba(56,154,255,0.12);
+      width: 100%;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding: 0 var(--header-padding-x);
+      box-sizing: border-box;
+      font-size: var(--nav-btn-font-size);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 10;
     }
     .branding {
       display: flex;
@@ -59,17 +74,34 @@
     nav {
       display: flex;
       align-items: center;
+      height: var(--header-height);
+      gap: 0.5rem;
     }
     nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
       text-decoration: none;
+      background: var(--header-bg);
       margin-left: 1.5rem;
       font-weight: 500;
-      padding: 0.3rem 0.6rem;
+      font-size: var(--nav-btn-font-size);
+      transition: background 0.2s, color 0.2s;
       border-radius: 7px;
+      width: var(--nav-btn-width);
+      height: var(--nav-btn-height);
+      min-width: var(--nav-btn-width);
+      min-height: var(--nav-btn-height);
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      text-align: center;
     }
-    nav a:hover {
-      background: var(--header-bg);
+    nav a:hover, nav a.active {
+      background: #2460aa;
+      color: #cbe6ff;
+      text-decoration: none;
     }
     .dashboard {
       max-width: 1200px;
