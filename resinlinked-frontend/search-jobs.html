@@ -364,5 +364,121 @@
       </select>
     </div>
   </div>
+<script>
+// --- Improved job search logic ---
+const API_BASE = 'http://localhost:5000/api';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Tab switching
+  const searchTab = document.getElementById('searchTab');
+  const appliedTab = document.getElementById('appliedTab');
+  const jobsList = document.getElementById('jobsList');
+  const appliedList = document.getElementById('appliedList');
+
+  searchTab.addEventListener('click', () => {
+    searchTab.classList.add('active');
+    appliedTab.classList.remove('active');
+    jobsList.style.display = 'grid';
+    appliedList.style.display = 'none';
+    loadJobs();
+  });
+  appliedTab.addEventListener('click', () => {
+    searchTab.classList.remove('active');
+    appliedTab.classList.add('active');
+    jobsList.style.display = 'none';
+    appliedList.style.display = 'grid';
+    loadAppliedJobs();
+  });
+
+  // Initial load
+  loadJobs();
+
+  // --- Load jobs from backend ---
+  async function loadJobs() {
+    jobsList.innerHTML = '<div>Loading jobs...</div>';
+    try {
+      const response = await fetch(`${API_BASE}/jobs?isOpen=true`);
+      const data = await response.json();
+      renderJobs(data.jobs || []);
+    } catch (err) {
+      jobsList.innerHTML = '<div class="no-data">Failed to load jobs</div>';
+    }
+  }
+
+  function renderJobs(jobs) {
+    // If no jobs from backend, show sample jobs for all informal types
+    if (!jobs || jobs.length === 0) {
+      const sampleJobs = [
+        { title: 'Kasambahay (all-around)', positions: 64, price: 15000 },
+        { title: 'Tagalinis', positions: 28, price: 12000 },
+        { title: 'Tagapagluto', positions: 15, price: 17000 },
+        { title: 'Tagapinta', positions: 12, price: 13000 },
+        { title: 'Tagapag-alaga ng bata', positions: 20, price: 14000 },
+        { title: 'Tagatinda', positions: 18, price: 11000 },
+        { title: 'Tagatanim', positions: 10, price: 12500 },
+        { title: 'Layout artist', positions: 8, price: 16000 }
+      ];
+      jobsList.innerHTML = sampleJobs.map(job => `
+        <div class="job-card">
+          <div class="job-title">${job.title}</div>
+          <div class="job-positions">${job.positions} mga posisyon</div>
+          <div class="job-salary">₱${job.price}/job</div>
+          <button class="apply-btn">MAG-APPLY</button>
+        </div>
+      `).join('');
+      return;
+    }
+    jobsList.innerHTML = jobs.map(job => `
+      <div class="job-card" data-id="${job._id}">
+        <div class="job-title">${job.title}</div>
+        <div class="job-positions">${job.applicants ? job.applicants.length : 0} mga posisyon</div>
+        <div class="job-salary">₱${job.price}/job</div>
+        <button class="apply-btn" data-id="${job._id}">MAG-APPLY</button>
+      </div>
+    `).join('');
+    // (Apply button logic will be added later)
+  }
+
+  // --- Load applied jobs from backend ---
+  async function loadAppliedJobs() {
+    appliedList.innerHTML = '<div>Loading your applications...</div>';
+    const token = localStorage.getItem('token');
+    if (!token) {
+      appliedList.innerHTML = '<div class="no-data">Please login to view your applications</div>';
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/jobs/my-applications`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const applications = await response.json();
+        renderAppliedJobs(applications);
+      } else {
+        appliedList.innerHTML = '<div class="no-data">Error loading applications</div>';
+      }
+    } catch (err) {
+      appliedList.innerHTML = '<div class="no-data">Error loading applications</div>';
+    }
+  }
+
+  function renderAppliedJobs(applications) {
+    if (!applications || applications.length === 0) {
+      appliedList.innerHTML = '<div class="no-data">You haven\'t applied to any jobs yet</div>';
+      return;
+    }
+    appliedList.innerHTML = applications.map(app => `
+      <div class="job-card">
+        <div class="job-title">${app.jobId.title}</div>
+        <div class="job-salary">₱${app.jobId.price}</div>
+        <div class="status-chip">${app.status || 'Pending'}</div>
+      </div>
+    `).join('');
+  }
+});
+</script>
 </body>
 </html>

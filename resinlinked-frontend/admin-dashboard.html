@@ -490,56 +490,31 @@
 
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">User Management</h2>
+        <h2 class="section-title">User & Job Management</h2>
         <div class="search-box">
-          <input type="text" id="userSearch" class="search-input" name="userSearch" placeholder="Search users...">
-          <button class="btn primary" id="searchBtn">Search</button>
+          <input type="text" id="mainSearch" class="search-input" name="mainSearch" placeholder="Search users or jobs...">
+          <button class="btn primary" id="mainSearchBtn">Search</button>
+          <select id="mainSortDropdown" class="filter-select" style="margin-left:10px;">
+            <option value="createdAt-desc">Date Created (Newest)</option>
+            <option value="createdAt-asc">Date Created (Oldest)</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="type-asc">Type A-Z</option>
+            <option value="type-desc">Type Z-A</option>
+            <option value="price-desc">Price High-Low (Jobs)</option>
+            <option value="price-asc">Price Low-High (Jobs)</option>
+            <option value="applicants-desc">Applicants High-Low (Jobs)</option>
+            <option value="applicants-asc">Applicants Low-High (Jobs)</option>
+          </select>
+          <label for="mainStartDate" style="margin-left:10px; font-size:0.97em; color:var(--header-bg); font-weight:500;">Start Date:</label>
+          <input type="date" id="mainStartDate" class="filter-date" style="margin-left:5px;" placeholder="Start date">
+          <label for="mainEndDate" style="margin-left:10px; font-size:0.97em; color:var(--header-bg); font-weight:500;">End Date:</label>
+          <input type="date" id="mainEndDate" class="filter-date" style="margin-left:5px;" placeholder="End date">
         </div>
       </div>
 
       <div class="filter-section">
-        <div class="filter-group">
-          <label for="searchFilter">Search:</label>
-          <input type="text" id="searchFilter" name="search" class="filter-input" placeholder="Search...">
-        </div>
-        <div class="filter-group">
-          <label for="userTypeFilter">User Type:</label>
-          <select id="userTypeFilter" name="userType" class="filter-select">
-            <option value="">All Types</option>
-            <option value="employee">Employees</option>
-            <option value="employer">Employers</option>
-            <option value="both">Both</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="barangayFilter">Barangay:</label>
-          <select id="barangayFilter" name="barangay" class="filter-select">
-            <option value="">All Barangays</option>
-            <option value="Barangay 1">Barangay 1</option>
-            <option value="Barangay 2">Barangay 2</option>
-            <option value="Barangay 3">Barangay 3</option>
-            <option value="Barangay 4">Barangay 4</option>
-            <option value="Barangay 5">Barangay 5</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="verificationFilter">Verification:</label>
-          <select id="verificationFilter" name="verification" class="filter-select">
-            <option value="">All Status</option>
-            <option value="true">Verified</option>
-            <option value="false">Unverified</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="startDateFilter">Date Range:</label>
-          <div class="date-range">
-            <input type="date" id="startDateFilter" name="startDate" class="filter-date">
-            <span>to</span>
-            <input type="date" id="endDateFilter" name="endDate" class="filter-date">
-          </div>
-        </div>
-        <button class="btn primary" id="applyFiltersBtn">Apply Filters</button>
-        <button class="btn secondary" id="clearFiltersBtn">Clear Filters</button>
+    <!-- Unified filter section is now handled by the main sorting/filter dropdown above -->
       </div>
 
       <div id="usersLoading" class="loading">Loading users...</div>
@@ -572,6 +547,14 @@
         <button class="btn primary" onclick="window.location.href='jobs-management.html'">
           View All Jobs
         </button>
+        <select id="jobSortDropdown" class="filter-select" style="margin-left:10px;">
+          <option value="datePosted-desc">Newest</option>
+          <option value="datePosted-asc">Oldest</option>
+          <option value="price-desc">Highest Price</option>
+          <option value="price-asc">Lowest Price</option>
+          <option value="applicants-desc">Most Applicants</option>
+          <option value="applicants-asc">Least Applicants</option>
+        </select>
       </div>
       <div id="jobsLoading" class="loading">Loading recent jobs...</div>
       <div id="jobsContainer">

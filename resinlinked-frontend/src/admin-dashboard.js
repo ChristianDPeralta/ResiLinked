@@ -5,9 +5,10 @@ class AdminDashboard {
     this.currentPage = 1;
     this.limit = 10;
     this.searchQuery = '';
-    this.userTypeFilter = '';
-    this.verificationFilter = '';
-    this.dateFilter = '';
+    this.sortField = 'createdAt';
+    this.sortOrder = 'desc';
+    this.startDate = '';
+    this.endDate = '';
     this.init();
   }
 
@@ -19,11 +20,11 @@ class AdminDashboard {
       return;
     }
 
-    await this.loadDashboardData();
-    await this.loadUsers();
-    await this.loadRecentJobs();
-    await this.loadAnalyticsData();
-    this.setupEventListeners();
+  await this.loadDashboardData();
+  await this.loadUsers();
+  await this.loadRecentJobs();
+  await this.loadAnalyticsData();
+  this.setupEventListeners();
   }
 
   // ---------------- EXPORT METHOD ----------------
@@ -149,11 +150,14 @@ class AdminDashboard {
       if (loadingEl) loadingEl.style.display = 'block';
       if (containerEl) containerEl.style.display = 'none';
 
-      const filters = { page, limit, q: search, userType: this.userTypeFilter, verified: this.verificationFilter, days: this.dateFilter };
-      Object.keys(filters).forEach(key => { if (filters[key] === '') delete filters[key]; });
-
-      const data = await apiService.getUsers(filters);
-      this.renderUsersTable(data.data, data.pagination);
+  const filters = { page, limit, q: search };
+  // Unified sorting and date filter
+  if (this.sortField) filters.sortBy = this.sortField;
+  if (this.sortOrder) filters.order = this.sortOrder;
+  if (this.startDate) filters.startDate = this.startDate;
+  if (this.endDate) filters.endDate = this.endDate;
+  const data = await apiService.getUsers(filters);
+  this.renderUsersTable(data.data, data.pagination);
     } catch (error) {
       console.error('Error loading users:', error);
       const loadingEl = document.getElementById('usersLoading');
@@ -202,8 +206,14 @@ class AdminDashboard {
 
   async loadRecentJobs() {
     try {
-      const response = await apiService.getJobs({ limit: 5, sortBy: 'datePosted', order: 'desc' });
-      this.renderRecentJobs(response.jobs || []);
+  // Unified sorting and date filter
+  let jobsFilters = { limit: 5 };
+  if (this.sortField) jobsFilters.sortBy = this.sortField;
+  if (this.sortOrder) jobsFilters.order = this.sortOrder;
+  if (this.startDate) jobsFilters.startDate = this.startDate;
+  if (this.endDate) jobsFilters.endDate = this.endDate;
+  const response = await apiService.getJobs(jobsFilters);
+  this.renderRecentJobs(response.jobs || []);
     } catch (error) {
       console.error('Error loading recent jobs:', error);
       const jobsLoading = document.getElementById('jobsLoading');
@@ -305,13 +315,48 @@ class AdminDashboard {
   }
 
   setupEventListeners() {
-    // Search
-    const searchInput = document.getElementById('userSearch');
-    const searchBtn = document.getElementById('searchBtn');
-    if (searchInput && searchBtn) {
-      searchBtn.addEventListener('click', () => this.loadUsers(1, this.limit, searchInput.value));
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.loadUsers(1, this.limit, searchInput.value);
+    // Unified search, sort, and date filter
+    const mainSearchInput = document.getElementById('mainSearch');
+    const mainSearchBtn = document.getElementById('mainSearchBtn');
+    const mainSortDropdown = document.getElementById('mainSortDropdown');
+    const mainStartDate = document.getElementById('mainStartDate');
+    const mainEndDate = document.getElementById('mainEndDate');
+    if (mainSearchInput && mainSearchBtn) {
+      mainSearchBtn.addEventListener('click', () => {
+        this.searchQuery = mainSearchInput.value;
+        this.loadUsers(1, this.limit, this.searchQuery);
+        this.loadRecentJobs();
+      });
+      mainSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.searchQuery = mainSearchInput.value;
+          this.loadUsers(1, this.limit, this.searchQuery);
+          this.loadRecentJobs();
+        }
+      });
+    }
+    if (mainSortDropdown) {
+      mainSortDropdown.addEventListener('change', (e) => {
+        const val = e.target.value;
+        const [field, order] = val.split('-');
+        this.sortField = field;
+        this.sortOrder = order;
+        this.loadUsers(1, this.limit, this.searchQuery);
+        this.loadRecentJobs();
+      });
+    }
+    if (mainStartDate) {
+      mainStartDate.addEventListener('change', (e) => {
+        this.startDate = e.target.value;
+        this.loadUsers(1, this.limit, this.searchQuery);
+        this.loadRecentJobs();
+      });
+    }
+    if (mainEndDate) {
+      mainEndDate.addEventListener('change', (e) => {
+        this.endDate = e.target.value;
+        this.loadUsers(1, this.limit, this.searchQuery);
+        this.loadRecentJobs();
       });
     }
 

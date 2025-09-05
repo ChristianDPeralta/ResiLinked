@@ -410,13 +410,48 @@
     </section>
     <section class="profile-financial-goal">
       <h3>Layunin Sa Pananalapi</h3>
-      <div class="progress-bar-container">
-        <div class="progress-bar-label" id="goalLabel">Loading...</div>
-        <div class="progress-bar">
-          <div class="progress-bar-fill" id="progressBar"></div>
-        </div>
-        <div class="progress-bar-percent" id="progressPercent">Loading...</div>
+      <div class="financial-goal-form" style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:18px;">
+        <label for="goalAmount" style="font-weight:500;color:#2b6cb0;">Goal (PHP):</label>
+        <input type="number" id="goalAmount" min="0" step="100" style="width:120px;padding:7px 10px;border-radius:7px;border:1px solid #a3c5e8;">
+        <label for="currentSavings" style="font-weight:500;color:#2b6cb0;">Current Savings (PHP):</label>
+        <input type="number" id="currentSavings" min="0" step="100" style="width:120px;padding:7px 10px;border-radius:7px;border:1px solid #a3c5e8;">
+        <button id="saveGoalBtn" style="background:#38a169;color:#fff;border:none;padding:7px 18px;border-radius:7px;cursor:pointer;font-weight:600;">Save Goal</button>
       </div>
+      <div class="progress-bar-container" style="margin-top:10px;">
+        <div class="progress-bar-label" id="goalLabel" style="font-size:1rem;color:#2b6cb0;font-weight:700;margin-bottom:0.25rem;">Progress</div>
+        <div class="progress-bar" style="background:#eee;border-radius:12px;height:20px;width:100%;overflow:hidden;margin-bottom:0.3rem;">
+          <div class="progress-bar-fill" id="progressBar" style="background:#38a169;height:100%;border-radius:12px;transition:width 0.2s;width:0%;"></div>
+        </div>
+        <div class="progress-bar-percent" id="progressPercent" style="font-size:0.98rem;color:#38a169;font-weight:600;">0%</div>
+      </div>
+      <script>
+        function updateGoalProgress() {
+          const goal = parseFloat(document.getElementById('goalAmount').value) || 0;
+          const current = parseFloat(document.getElementById('currentSavings').value) || 0;
+          const percent = goal > 0 ? Math.min(100, Math.round((current / goal) * 100)) : 0;
+          document.getElementById('progressBar').style.width = percent + '%';
+          document.getElementById('progressPercent').textContent =
+            `PHP ${current.toLocaleString()} / PHP ${goal.toLocaleString()} (${percent}%)`;
+        }
+        document.getElementById('goalAmount').addEventListener('input', updateGoalProgress);
+        document.getElementById('currentSavings').addEventListener('input', updateGoalProgress);
+        document.getElementById('saveGoalBtn').addEventListener('click', function() {
+          const goal = parseFloat(document.getElementById('goalAmount').value) || 0;
+          const current = parseFloat(document.getElementById('currentSavings').value) || 0;
+          localStorage.setItem('financialGoal', goal);
+          localStorage.setItem('financialCurrent', current);
+          updateGoalProgress();
+          alert('Financial goal saved!');
+        });
+        // Load from localStorage on page load
+        window.addEventListener('DOMContentLoaded', function() {
+          const savedGoal = localStorage.getItem('financialGoal');
+          const savedCurrent = localStorage.getItem('financialCurrent');
+          if (savedGoal) document.getElementById('goalAmount').value = savedGoal;
+          if (savedCurrent) document.getElementById('currentSavings').value = savedCurrent;
+          updateGoalProgress();
+        });
+      </script>
     </section>
     <section class="profile-languages">
       <h3>Mga Wika Na Sinasalita</h3>
