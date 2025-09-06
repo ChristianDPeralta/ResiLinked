@@ -166,6 +166,40 @@ exports.login = async (req, res) => {
     }
 };
 
+// Validate token
+exports.validateToken = async (req, res) => {
+    try {
+        // If we reach here, the auth middleware has already validated the token
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+                alert: "User account no longer exists"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                userType: user.userType
+            },
+            message: "Token is valid"
+        });
+    } catch (error) {
+        console.error("Token validation error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Token validation error",
+            error: error.message
+        });
+    }
+};
+
 // Request Password Reset
 exports.resetRequest = async (req, res) => {
     try {

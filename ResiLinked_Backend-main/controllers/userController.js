@@ -130,3 +130,52 @@ exports.setGoal = async (req, res) => {
         });
     }
 };
+
+// GET /api/users/workers → Get all workers
+exports.getWorkers = async (req, res) => {
+    try {
+        const { barangay, skill, search, page = 1, limit = 20 } = req.query;
+        
+        let query = { 
+            userType: { $in: ['employee', 'both'] },
+            isVerified: true
+        };
+        
+        if (barangay) query.barangay = barangay;
+        if (skill) query.skills = { $in: skill.split(',') };
+        if (search) {
+            query.$or = [
+                { firstName: { $regex: search, $options: 'i' } },
+                { lastName: { $regex: search, $options: 'i' } },
+                { skills: { $in: [new RegExp(search, 'i')] } }
+            ];
+        }
+
+        const [users, total] = await Promise.all([
+            User.find(query)
+                .select('-password -idNumber -idFrontImage -idBackImage')
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit),
+            User.countDocuments(query)
+        ]);
+
+        res.status(200).json({
+            success: true,
+            users,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            },
+            alert: users.length ? `Found ${total} workers` : "No workers found matching your criteria"
+        });
+    } catch (err) {
+        res.status(500).json({ 
+            message: "Error fetching workers", 
+            error: err.message,
+            alert: "Failed to load workers"
+        });
+    }
+};

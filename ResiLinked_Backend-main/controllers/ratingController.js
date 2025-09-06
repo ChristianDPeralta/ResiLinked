@@ -205,3 +205,20 @@ exports.getTopRated = async (req, res) => {
     });
   }
 };
+
+// GET /api/ratings/given → Get ratings given by current user
+exports.getGiven = async (req, res) => {
+  try {
+    const ratings = await Rating.find({ rater: req.user.id })
+      .populate('ratee', 'firstName lastName')
+      .populate('job', 'title')
+      .sort({ createdAt: -1 });
+    
+    res.status(200).json(ratings);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching given ratings",
+      error: err.message
+    });
+  }
+};

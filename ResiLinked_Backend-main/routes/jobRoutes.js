@@ -7,10 +7,16 @@ const auth = require('../middleware/auth');
 router.post('/', auth.verify, jobController.postJob);
 router.get('/', jobController.getAll);
 router.get('/my-matches', auth.verify, jobController.getMyMatches);
+router.get('/my-jobs', auth.verify, jobController.getMyJobs);
+router.get('/my-applications', auth.verify, jobController.getMyApplications);
+router.get('/my-applications-received', auth.verify, jobController.getMyApplicationsReceived);
 router.post('/:id/apply', auth.verify, jobController.applyJob);
+router.delete('/:id/cancel-application', auth.verify, jobController.cancelApplication);
 router.post('/:id/assign', auth.verify, jobController.assignWorker);
+router.post('/:id/reject', auth.verify, jobController.rejectApplication);
+router.put('/:id/close', auth.verify, jobController.closeJob);
+router.delete('/:id', auth.verify, jobController.deleteJob);
 router.get('/search', jobController.search);
 router.get('/popular', jobController.getPopularJobs);
-router.get('/my-applications', auth.verify, jobController.getMyApplications);
 
 module.exports = router;

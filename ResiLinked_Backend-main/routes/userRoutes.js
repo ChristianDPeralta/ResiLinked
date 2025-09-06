@@ -12,6 +12,9 @@ router.put('/me',
     userController.editProfile
 );
 
+// Workers
+router.get('/workers', userController.getWorkers);
+
 // Goals (Legacy)
 router.post('/goals', auth.verify, userController.setGoal);
 

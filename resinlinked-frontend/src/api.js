@@ -112,6 +112,11 @@ class ApiService {
     return this.request(`/jobs?${queryParams}`);
   }
 
+  async searchJobs(filters = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    return this.request(`/jobs/search?${queryParams}`);
+  }
+
   async getJob(id) {
     return this.request(`/jobs/${id}`);
   }
@@ -131,6 +136,21 @@ class ApiService {
 
   async getMyJobMatches() {
     return this.request('/jobs/my-matches');
+  }
+
+  async getMyApplications() {
+    return this.request('/jobs/my-applications');
+  }
+
+  async assignWorker(jobId, userId) {
+    return this.request(`/jobs/${jobId}/assign`, {
+      method: 'POST',
+      body: { userId }
+    });
+  }
+
+  async getPopularJobs() {
+    return this.request('/jobs/popular');
   }
 
   // ================= Ratings =================
@@ -229,4 +249,16 @@ class ApiService {
 
 // ✅ Only one instance exported
 const apiService = new ApiService();
+
+// Create a simple apiCall function for backward compatibility
+export const apiCall = async (endpoint, method = 'GET', data = null) => {
+  const options = { method };
+  
+  if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+    options.body = data;
+  }
+  
+  return await apiService.request(endpoint, options);
+};
+
 export default apiService;

@@ -1,17 +1,32 @@
 import apiService from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Check if user is employee
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-  if (userData.userType !== 'employee' && userData.userType !== 'both') {
-    alert('Employee access required');
-    window.location.href = '/landing.html';
-    return;
-  }
+  // Wait for navigation to initialize
+  setTimeout(async () => {
+    // Check authentication through navigation
+    if (window.navigation && !window.navigation.validateDashboardAccess('employee')) {
+      return;
+    }
+    
+    // Legacy fallback check
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      window.location.href = '/login.html';
+      return;
+    }
+    
+    if (userData.userType !== 'employee' && userData.userType !== 'both') {
+      alert('Employee access required');
+      window.location.href = '/landing.html';
+      return;
+    }
 
-  await loadEmployeeData();
-  await loadRecommendedJobs();
-  await loadApplications();
+    await loadEmployeeData();
+    await loadRecommendedJobs();
+    await loadApplications();
+  }, 500); // Wait for navigation to initialize
 });
 
 async function loadEmployeeData() {
