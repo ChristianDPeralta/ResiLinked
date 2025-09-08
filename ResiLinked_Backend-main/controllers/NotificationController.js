@@ -1,6 +1,43 @@
 const Notification = require('../models/Notification');
 const { createNotification } = require('../utils/notificationHelper');
 
+exports.createNotification = async (req, res) => {
+    try {
+        const { recipient, type, title, message } = req.body;
+        
+        if (!recipient || !type || !message) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields",
+                alert: "Recipient, type, and message are required"
+            });
+        }
+
+        const notification = await createNotification({
+            recipient,
+            type,
+            title: title || 'Admin Message',
+            message,
+            sender: req.user.id
+        });
+
+        res.status(201).json({
+            success: true,
+            data: notification,
+            message: "Notification sent successfully",
+            alert: "Message sent to user successfully"
+        });
+    } catch (err) {
+        console.error('Error creating notification:', err);
+        res.status(500).json({
+            success: false,
+            message: "Error creating notification",
+            error: err.message,
+            alert: "Failed to send notification"
+        });
+    }
+};
+
 exports.getMyNotifications = async (req, res) => {
     try {
         const { type, isRead, page = 1, limit = 10 } = req.query;

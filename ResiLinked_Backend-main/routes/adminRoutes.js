@@ -21,6 +21,7 @@ router.get('/users/:id/activity', adminController.getUserActivity);
 router.get('/users/:id/jobs', adminController.getUserJobs);
 
 // Job management
+router.get('/jobs', adminController.getAllJobs);
 router.delete('/jobs/:id', adminController.deleteJob);
 router.put('/jobs/:id', adminController.editJob);
 

@@ -63,19 +63,125 @@ exports.postJob = async (req, res) => {
 //  GET /api/jobs → Get all open jobs
 exports.getAll = async (req, res) => {
     try {
-        const jobs = await Job.find({ isOpen: true })
+        console.log('getAll jobs - Query params:', req.query);
+        
+        const { 
+            sortBy = 'datePosted', 
+            order = 'desc',
+            limit,
+            startDate,
+            endDate,
+            status
+        } = req.query;
+
+        console.log('Parsed params - sortBy:', sortBy, 'order:', order, 'limit:', limit);
+
+        // Build query
+        let query = { isOpen: true };
+        
+        // Add date filtering if provided
+        if (startDate || endDate) {
+            query.datePosted = {};
+            if (startDate) query.datePosted.$gte = new Date(startDate);
+            if (endDate) query.datePosted.$lte = new Date(endDate);
+        }
+
+        // Add status filtering if provided
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+
+        // Build sort object
+        const sortObj = {};
+        const sortOrder = order === 'asc' ? 1 : -1;
+        
+        // Handle different sort fields
+        switch (sortBy) {
+            case 'datePosted':
+                sortObj.datePosted = sortOrder;
+                break;
+            case 'price':
+                sortObj.price = sortOrder;
+                break;
+            case 'applicants':
+                // For applicants count, we'll need to use aggregation
+                const pipeline = [
+                    { $match: query },
+                    {
+                        $addFields: {
+                            applicantCount: { $size: "$applicants" }
+                        }
+                    },
+                    { $sort: { applicantCount: sortOrder } },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'postedBy',
+                            foreignField: '_id',
+                            as: 'postedBy',
+                            pipeline: [{ $project: { firstName: 1, lastName: 1, profilePicture: 1 } }]
+                        }
+                    },
+                    { $unwind: '$postedBy' }
+                ];
+                
+                if (limit) pipeline.push({ $limit: parseInt(limit) });
+                
+                const aggregatedJobs = await Job.aggregate(pipeline);
+                return res.status(200).json({
+                    jobs: aggregatedJobs,
+                    alert: `Found ${aggregatedJobs.length} open jobs`
+                });
+                
+            default:
+                sortObj.datePosted = -1; // Default to newest first
+        }
+
+        let jobQuery = Job.find(query)
             .populate('postedBy', 'firstName lastName profilePicture')
-            .sort({ datePosted: -1 });
+            .sort(sortObj);
+
+        if (limit) {
+            jobQuery = jobQuery.limit(parseInt(limit));
+        }
+
+        const jobs = await jobQuery;
 
         res.status(200).json({
             jobs,
             alert: `Found ${jobs.length} open jobs`
         });
     } catch (err) {
+        console.error('Error in getAll jobs:', err);
         res.status(500).json({ 
             message: "Error fetching jobs", 
             error: err.message,
             alert: "Failed to load jobs"
+        });
+    }
+};
+
+//  GET /api/jobs/:id → Get a specific job by ID
+exports.getJob = async (req, res) => {
+    try {
+        const job = await Job.findById(req.params.id)
+            .populate('postedBy', 'firstName lastName profilePicture email')
+            .populate('applicants.user', 'firstName lastName profilePicture email')
+            .populate('assignedTo', 'firstName lastName profilePicture email');
+
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found",
+                alert: "The requested job does not exist"
+            });
+        }
+
+        res.status(200).json(job);
+    } catch (err) {
+        res.status(500).json({ 
+            message: "Error fetching job", 
+            error: err.message,
+            alert: "Failed to load job details"
         });
     }
 };
@@ -614,4 +720,164 @@ exports.rejectApplication = async (req, res) => {
       alert: "Failed to reject application"
     });
   }
+};
+
+// PUT /api/jobs/:jobId/applicants/:userId → Update applicant status (for admin use)
+exports.updateApplicantStatus = async (req, res) => {
+    try {
+        const { jobId, userId } = req.params;
+        const { status } = req.body;
+
+        if (!['pending', 'accepted', 'rejected'].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status",
+                alert: "Status must be pending, accepted, or rejected"
+            });
+        }
+
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found",
+                alert: "This job is no longer available"
+            });
+        }
+
+        // Allow admin or job poster to update applicant status
+        if (job.postedBy.toString() !== req.user.id && req.user.userType !== 'admin') {
+            return res.status(403).json({
+                message: "Not authorized",
+                alert: "You can only manage applicants for your own jobs"
+            });
+        }
+
+        // Find and update the applicant
+        const applicantIndex = job.applicants.findIndex(a => a.user.toString() === userId);
+        if (applicantIndex === -1) {
+            return res.status(404).json({
+                message: "Applicant not found",
+                alert: "This user did not apply to this job"
+            });
+        }
+
+        job.applicants[applicantIndex].status = status;
+
+        // If accepting, assign the job and reject others
+        if (status === 'accepted') {
+            job.assignedTo = userId;
+            job.isOpen = false;
+            job.status = 'assigned';
+            
+            // Reject all other applicants
+            job.applicants = job.applicants.map(a => ({
+                ...a.toObject(),
+                status: a.user.toString() === userId ? 'accepted' : 'rejected'
+            }));
+        }
+
+        await job.save();
+
+        // Create notification for the applicant
+        await createNotification({
+            recipient: userId,
+            type: 'application_update',
+            message: `Your application for "${job.title}" has been ${status}`,
+            relatedJob: job._id
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Applicant ${status} successfully`,
+            job,
+            alert: `Application ${status} successfully`
+        });
+    } catch (err) {
+        console.error('Error updating applicant status:', err);
+        res.status(500).json({
+            success: false,
+            message: "Error updating applicant status",
+            error: err.message,
+            alert: "Failed to update applicant status"
+        });
+    }
+};
+
+// PUT /api/jobs/:jobId/applicants/:userId → Update applicant status (for admin use)
+exports.updateApplicantStatus = async (req, res) => {
+    try {
+        const { jobId, userId } = req.params;
+        const { status } = req.body;
+
+        if (!['pending', 'accepted', 'rejected'].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status",
+                alert: "Status must be pending, accepted, or rejected"
+            });
+        }
+
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found",
+                alert: "This job is no longer available"
+            });
+        }
+
+        // Allow admin or job poster to update applicant status
+        if (job.postedBy.toString() !== req.user.id && req.user.userType !== 'admin') {
+            return res.status(403).json({
+                message: "Not authorized",
+                alert: "You can only manage applicants for your own jobs"
+            });
+        }
+
+        // Find and update the applicant
+        const applicantIndex = job.applicants.findIndex(a => a.user.toString() === userId);
+        if (applicantIndex === -1) {
+            return res.status(404).json({
+                message: "Applicant not found",
+                alert: "This user did not apply to this job"
+            });
+        }
+
+        job.applicants[applicantIndex].status = status;
+
+        // If accepting, assign the job and reject others
+        if (status === 'accepted') {
+            job.assignedTo = userId;
+            job.isOpen = false;
+            job.status = 'assigned';
+            
+            // Reject all other applicants
+            job.applicants = job.applicants.map(a => ({
+                ...a.toObject(),
+                status: a.user.toString() === userId ? 'accepted' : 'rejected'
+            }));
+        }
+
+        await job.save();
+
+        // Create notification for the applicant
+        await createNotification({
+            recipient: userId,
+            type: 'application_update',
+            message: `Your application for "${job.title}" has been ${status}`,
+            relatedJob: job._id
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Applicant ${status} successfully`,
+            job,
+            alert: `Application ${status} successfully`
+        });
+    } catch (err) {
+        console.error('Error updating applicant status:', err);
+        res.status(500).json({
+            success: false,
+            message: "Error updating applicant status",
+            error: err.message,
+            alert: "Failed to update applicant status"
+        });
+    }
 };

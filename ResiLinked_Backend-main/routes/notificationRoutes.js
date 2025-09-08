@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 
 // Notifications
 router.get('/', auth.verify, notificationController.getMyNotifications);
+router.post('/', auth.verify, notificationController.createNotification);
 router.patch('/:id/read', auth.verify, notificationController.markAsRead);
 router.delete('/:id', auth.verify, notificationController.deleteNotification);
 
