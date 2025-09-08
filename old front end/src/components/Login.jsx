@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAlert } from '../context/AlertContext'
 import apiService from '../api'
@@ -13,11 +13,13 @@ function Login() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
   
   const { login, isAuthenticated } = useAuth()
   const { success, error: showError } = useAlert()
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     // Redirect if already authenticated
@@ -36,7 +38,15 @@ function Login() {
         }))
       }
     }
-  }, [isAuthenticated, navigate])
+    
+    // Check if redirected from verification page
+    if (location.state?.verificationSuccess) {
+      setSuccessMessage(location.state.message || 'Email verified successfully!')
+      
+      // Clear the state after displaying the message
+      window.history.replaceState({}, document.title)
+    }
+  }, [isAuthenticated, navigate, location.state])
 
   const validateField = (name, value) => {
     switch (name) {
@@ -62,8 +72,9 @@ function Login() {
       [name]: newValue
     }))
     
-    // Clear errors when user starts typing
+    // Clear messages when user starts typing
     if (error) setError('')
+    if (successMessage) setSuccessMessage('')
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
         ...prev,
@@ -147,9 +158,38 @@ function Login() {
       }
     } catch (err) {
       console.error('Login error:', err)
-      const errorMessage = err.message || 'Connection error. Please try again.'
-      setError(errorMessage)
-      showError(errorMessage)
+      
+      // Debug output for troubleshooting
+      if (err.response) {
+        console.log('Error status:', err.response.status)
+        console.log('Error data:', err.response.data)
+      }
+      
+      // Handle specific verification errors
+      if (err.response?.status === 403) {
+        const responseData = err.response.data;
+        
+        if (responseData.needsEmailVerification) {
+          setError('Your email address has not been verified yet. Please check your inbox for the verification email or request a new one using the button below.')
+          setFieldErrors(prev => ({ ...prev, verificationNeeded: true, email: formData.email }))
+        } else if (responseData.needsAdminVerification) {
+          setError('ACCOUNT NOT ACTIVATED: Your email has been verified, but you cannot log in because your account either (1) is still awaiting administrator approval or (2) has been deactivated by an administrator. If your account is new, please allow 1-2 business days for review.')
+          setFieldErrors(prev => ({ ...prev, adminVerificationNeeded: true }))
+        } else {
+          // Fall back to the alert message from the server
+          setError(responseData.alert || 'Access denied: ' + responseData.message)
+        }
+      } else if (err.response?.data) {
+        // Use the server's error message if available
+        const errorMessage = err.response.data.alert || err.response.data.message || 'An error occurred during login'
+        setError(errorMessage)
+        showError(errorMessage)
+      } else {
+        // Fall back to a generic error if no response data
+        const errorMessage = err.message || 'Connection error. Please try again.'
+        setError(errorMessage)
+        showError(errorMessage)
+      }
     } finally {
       setLoading(false)
     }
@@ -175,9 +215,26 @@ function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
+          {successMessage && (
+            <div className="success-message" id="loginSuccess">
+              <div className="success-icon">✓</div>
+              {successMessage}
+            </div>
+          )}
+          
           {error && (
-            <div className="error-message" id="loginError">
+            <div className={`error-message ${fieldErrors.adminVerificationNeeded ? 'admin-verification-error' : ''}`} id="loginError">
               {error}
+              {fieldErrors.verificationNeeded && (
+                <Link to={`/resend-verification?email=${encodeURIComponent(fieldErrors.email)}`} className="resend-verification-btn">
+                  Resend Verification Email
+                </Link>
+              )}
+              {fieldErrors.adminVerificationNeeded && (
+                <div className="admin-verification-note">
+                  <strong>Note:</strong> If you believe your account should be active, please contact support for assistance.
+                </div>
+              )}
             </div>
           )}
 
@@ -303,7 +360,7 @@ function Login() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .login-container {
           min-height: 100vh;
           display: flex;
@@ -675,14 +732,97 @@ function Login() {
           border: 1px solid rgba(220, 38, 38, 0.2);
           backdrop-filter: blur(10px);
           display: flex;
-          align-items: center;
-          gap: 0.75rem;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
         .error-message::before {
           content: '⚠';
           font-size: 1.1rem;
+          margin-right: 0.75rem;
+          display: inline-block;
+        }
+        
+        .success-message {
+          background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+          color: #166534;
+          padding: 1rem 1.25rem;
+          border-radius: 16px;
+          margin-bottom: 1.5rem;
+          font-size: 0.95rem;
+          font-weight: 500;
+          border: 1px solid rgba(22, 101, 52, 0.2);
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          animation: fadeInDown 0.5s ease;
+        }
+        
+        @keyframes fadeInDown {
+          from { 
+            opacity: 0; 
+            transform: translateY(-10px);
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0);
+          }
+        }
+        
+        .success-message .success-icon {
+          background-color: #16a34a;
+          color: white;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
           flex-shrink: 0;
+        }
+        
+        .resend-verification-btn {
+          background-color: #ffffff;
+          color: #8a3ffc;
+          border: 1px solid #8a3ffc;
+          border-radius: 8px;
+          padding: 0.5rem 1rem;
+          margin-top: 0.75rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+        }
+        
+        .resend-verification-btn:hover {
+          background-color: rgba(138, 63, 252, 0.1);
+          transform: translateY(-1px);
+        }
+        
+        .resend-verification-btn::before {
+          content: '↻';
+          margin-right: 8px;
+          font-size: 1.1rem;
+        }
+        
+        .admin-verification-error {
+          background: linear-gradient(135deg, #fff5f5, #fed7d7);
+          border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+        
+        .admin-verification-note {
+          margin-top: 12px;
+          padding: 8px 10px;
+          background-color: rgba(255, 255, 255, 0.7);
+          border-radius: 8px;
+          font-size: 0.9rem;
+          color: #c53030;
         }
 
         .fade-in {

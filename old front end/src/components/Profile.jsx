@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAlert } from '../context/AlertContext'
 import apiService from '../api'
+import GoalMeter from './GoalMeter'
 
 function Profile() {
   const [profile, setProfile] = useState(null)
@@ -115,9 +116,14 @@ function Profile() {
         updates.skills = updates.skills.split(',').map(skill => skill.trim()).filter(skill => skill)
       }
       
+      console.log('Sending profile updates:', updates);
+      console.log('Gender value being sent:', updates.gender);
+      
       const response = await apiService.updateProfile(updates)
       
       if (response.user) {
+        console.log('Profile update successful:', response.user);
+        console.log('Gender value received back:', response.user.gender);
         setProfile(response.user)
         updateUser(response.user)
         setShowEditModal(false)
@@ -251,6 +257,11 @@ function Profile() {
             </Link>
           </div>
         </div>
+        
+        {/* Financial Goal Meter Section */}
+        {profile?.userType === 'employee' && (
+          <GoalMeter userId={user?.userId} />
+        )}
 
         {/* Edit Profile Modal */}
         {showEditModal && (
@@ -344,6 +355,7 @@ function Profile() {
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
+                      <option value="others">Others</option>
                     </select>
                   </div>
                 </div>
@@ -386,7 +398,7 @@ function Profile() {
         )}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .container {
           max-width: 800px;
           margin: 0 auto;

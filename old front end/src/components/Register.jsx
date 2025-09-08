@@ -19,6 +19,7 @@ function Register() {
     idNumber: '',
     userType: 'employee',
     skills: '',
+    bio: '',
     idFrontImage: null,
     idBackImage: null,
     profilePicture: null
@@ -61,12 +62,14 @@ function Register() {
     }
   }
 
-  const checkPasswordsMatch = () => {
+  const validatePassword = () => {
+    // If confirm password field is empty, don't check match yet
     if (formData.confirmPassword === "") {
       setPasswordError("")
       return
     }
-
+    
+    // Only check if passwords match when user has entered a confirm password
     if (formData.password === formData.confirmPassword) {
       setPasswordError("Passwords match!")
     } else {
@@ -75,7 +78,7 @@ function Register() {
   }
 
   useEffect(() => {
-    checkPasswordsMatch()
+    validatePassword()
   }, [formData.password, formData.confirmPassword])
 
   const handleSubmit = async (e) => {
@@ -86,6 +89,12 @@ function Register() {
       return
     }
 
+    // Check password length first before setting loading state
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters!")
+      return
+    }
+    
     setLoading(true)
     setError('')
 
@@ -98,7 +107,12 @@ function Register() {
         const skillsArray = formData[key].split(",").map(s => s.trim()).filter(s => s.length > 0)
         skillsArray.forEach(skill => submitFormData.append("skills", skill))
       } else if (key !== 'confirmPassword' && key !== 'idFrontImage' && key !== 'idBackImage' && key !== 'profilePicture' && key !== 'skills') {
-        submitFormData.append(key, formData[key])
+        // Only append non-empty values for optional fields like bio
+        if (key === 'bio' && !formData[key]) {
+          // Skip empty bio
+        } else {
+          submitFormData.append(key, formData[key])
+        }
       }
     })
 
@@ -144,11 +158,48 @@ function Register() {
       <div className="register-container">
         <div className="register-card">
           <div className="success-message">
+            <div className="success-icon">✓</div>
             <h2>Registration Successful!</h2>
-            <p>A verification email has been sent to your email address. Please check your email and click the verification link to activate your account.</p>
-            <Link to="/login" className="login-link">
-              Go to Login
-            </Link>
+            
+            <div className="verification-process">
+              <div className="verification-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <h3>Email Verification</h3>
+                  <p>A verification email has been sent to your email address. Please check your inbox and click the verification link to verify your email.</p>
+                </div>
+              </div>
+              
+              <div className="verification-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <h3>Admin Review</h3>
+                  <p>After verifying your email, an administrator will review your account information. This process typically takes 1-2 business days.</p>
+                </div>
+              </div>
+              
+              <div className="verification-step">
+                <div className="step-number">3</div>
+                <div className="step-content">
+                  <h3>Account Access</h3>
+                  <p>Once approved by an administrator, you will receive a confirmation email and will be able to log in to your account.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="verification-note">
+              <div className="note-icon">ⓘ</div>
+              <p>If you don't see the verification email in your inbox, please check your spam folder or request another verification email.</p>
+            </div>
+            
+            <div className="verification-actions">
+              <Link to="/resend-verification" className="resend-link">
+                Resend Verification Email
+              </Link>
+              <Link to="/login" className="login-link">
+                Go to Login
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -214,34 +265,65 @@ function Register() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                placeholder="Gumawa ng password"
-              />
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Gumawa ng password (at least 8 characters)"
+                  style={{
+                    borderColor: formData.password.length >= 8 ? '#059669' : 
+                               formData.password.length > 0 ? '#dc2626' : ''
+                  }}
+                />
+                {formData.password && (
+                  <div className="input-status">
+                    {formData.password.length >= 8 ? (
+                      <span className="success-icon" title="Valid password length">✓</span>
+                    ) : (
+                      <span className="error-icon" title="Password too short">✗</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              {formData.password.length > 0 && formData.password.length < 8 && (
+                <div className="password-feedback error">
+                  Password must be at least 8 characters
+                </div>
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                placeholder="Ulitin ang password"
-                style={{
-                  borderColor: passwordError.includes('match!') ? 'green' : 
-                             passwordError.includes('not match') ? 'red' : ''
-                }}
-              />
-              {passwordError && (
-                <div className={`password-feedback ${passwordError.includes('match!') ? 'success' : 'error'}`}>
-                  {passwordError}
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Ulitin ang password"
+                  style={{
+                    borderColor: passwordError === "Passwords match!" ? '#059669' : 
+                              formData.confirmPassword ? '#dc2626' : ''
+                  }}
+                />
+                {formData.confirmPassword && (
+                  <div className="input-status">
+                    {passwordError === "Passwords match!" ? (
+                      <span className="success-icon" title="Passwords match">✓</span>
+                    ) : (
+                      <span className="error-icon" title="Passwords do not match">✗</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              {formData.confirmPassword && passwordError !== "Passwords match!" && (
+                <div className="password-feedback error">
+                  Passwords do not match
                 </div>
               )}
             </div>
@@ -386,6 +468,19 @@ function Register() {
               accept="image/*"
             />
           </div>
+          
+          <div className="form-group">
+            <label htmlFor="bio">Bio/Description (Optional)</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              placeholder="Tell us a bit about yourself, your experience, and what you're looking for..."
+              rows="4"
+            />
+            <small>A brief description about yourself will help others get to know you better</small>
+          </div>
 
           {formData.userType === 'employee' && (
             <div className="form-group">
@@ -432,7 +527,7 @@ function Register() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .register-container {
           min-height: 100vh;
           display: flex;
@@ -566,7 +661,8 @@ function Register() {
         input[type="password"],
         input[type="tel"],
         input[type="file"],
-        select {
+        select,
+        textarea {
           width: 100%;
           padding: 1rem 1.25rem;
           border: 2px solid rgba(147, 51, 234, 0.1);
@@ -578,9 +674,16 @@ function Register() {
           backdrop-filter: blur(10px);
           font-family: inherit;
         }
+        
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+          line-height: 1.6;
+        }
 
         input:focus,
-        select:focus {
+        select:focus,
+        textarea:focus {
           outline: none;
           border-color: #9333ea;
           background: rgba(255, 255, 255, 0.95);
@@ -589,7 +692,8 @@ function Register() {
         }
 
         input:hover,
-        select:hover {
+        select:hover,
+        textarea:hover {
           border-color: rgba(147, 51, 234, 0.2);
           background: rgba(255, 255, 255, 0.9);
         }
@@ -668,6 +772,40 @@ function Register() {
         .password-feedback.error::before {
           content: '✗';
           font-weight: bold;
+        }
+        
+        .input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        
+        .input-status {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          pointer-events: none;
+          z-index: 1;
+        }
+        
+        .error-icon {
+          color: #dc2626;
+          display: flex;
+          align-items: center;
+          font-weight: bold;
+          font-size: 16px;
+        }
+        
+        .success-icon {
+          color: #059669;
+          display: flex;
+          align-items: center;
+          font-weight: bold;
+          font-size: 16px;
         }
 
         .register-btn {
@@ -820,26 +958,149 @@ function Register() {
         .success-message {
           text-align: center;
           padding: 3rem 2rem;
-          background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+          background: white;
           border-radius: 20px;
-          border: 1px solid rgba(5, 150, 105, 0.2);
+          border: 1px solid rgba(138, 63, 252, 0.2);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .success-icon {
+          background: linear-gradient(135deg, #8a3ffc, #6b21a8);
+          color: white;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          font-size: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.5rem;
+          box-shadow: 0 10px 20px rgba(138, 63, 252, 0.3);
         }
 
         .success-message h2 {
-          background: linear-gradient(135deg, #059669, #047857);
+          background: linear-gradient(135deg, #8a3ffc, #6b21a8);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
           font-size: 2rem;
           font-weight: 700;
         }
 
         .success-message p {
           color: #374151;
+          margin-bottom: 0.5rem;
+          line-height: 1.6;
+          font-size: 1rem;
+        }
+        
+        .verification-process {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
           margin-bottom: 2rem;
-          line-height: 1.7;
+        }
+        
+        .verification-step {
+          display: flex;
+          gap: 1.5rem;
+          text-align: left;
+          background-color: #f9f9f9;
+          padding: 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .verification-step:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+          background: linear-gradient(135deg, #8a3ffc, #6b21a8);
+          color: white;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          font-size: 20px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        
+        .step-content {
+          flex: 1;
+        }
+        
+        .step-content h3 {
+          margin: 0 0 0.5rem;
           font-size: 1.1rem;
+          color: #333;
+          font-weight: 600;
+        }
+        
+        .verification-note {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          background-color: #fff8e6;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          margin-bottom: 2rem;
+          text-align: left;
+          border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .note-icon {
+          color: #f59e0b;
+          font-size: 1.5rem;
+          flex-shrink: 0;
+          margin-top: 0.2rem;
+        }
+        
+        .verification-actions {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          justify-content: center;
+          margin-top: 2rem;
+        }
+        
+        .resend-link, .login-link {
+          display: inline-block;
+          padding: 0.875rem 1.75rem;
+          border-radius: 50px;
+          text-decoration: none;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          min-width: 200px;
+        }
+        
+        .resend-link {
+          background-color: white;
+          color: #8a3ffc;
+          border: 2px solid #8a3ffc;
+        }
+        
+        .resend-link:hover {
+          background-color: rgba(138, 63, 252, 0.1);
+          transform: translateY(-2px);
+        }
+        
+        .login-link {
+          background: linear-gradient(135deg, #8a3ffc, #6b21a8);
+          color: white;
+          border: none;
+          box-shadow: 0 4px 12px rgba(138, 63, 252, 0.3);
+        }
+        
+        .login-link:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(138, 63, 252, 0.4);
         }
 
         .fade-in {

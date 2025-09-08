@@ -1,6 +1,7 @@
 class ApiService {
   constructor() {
     this.baseURL = 'http://localhost:5000/api';
+    this.DEBUG = true; // Set this to true to enable debug logging
   }
 
   async request(endpoint, options = {}) {
@@ -30,40 +31,77 @@ class ApiService {
     }
 
     try {
-      console.log(`Making API request to: ${this.baseURL}${endpoint}`);
-      console.log('Request config:', config);
+      if (this.DEBUG) {
+        console.log(`Making API request to: ${this.baseURL}${endpoint}`);
+        console.log('Request config:', config);
+      }
       
       const response = await fetch(`${this.baseURL}${endpoint}`, config);
       const data = await response.json();
 
-      console.log('API response:', response.status, data);
+      if (this.DEBUG) {
+        console.log('API response:', response.status, data);
+      }
 
       if (!response.ok) {
-        // Handle specific HTTP status codes
-        if (response.status === 401) {
-          // Unauthorized - but don't automatically clear auth data
-          console.warn('401 Unauthorized response received');
-          throw new Error('Unauthorized: Authentication required');
-        } else if (response.status === 403) {
-          throw new Error('Forbidden: You don\'t have permission to perform this action');
-        } else {
-          throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        // For all error responses, preserve the full response data and status
+        if (this.DEBUG) {
+          console.warn(`HTTP error ${response.status} received:`, data);
         }
+        
+        // Create an error object that includes the response
+        const error = new Error(data.message || data.alert || `HTTP error! status: ${response.status}`);
+        error.response = { 
+          status: response.status, 
+          data: data,
+          statusText: response.statusText
+        };
+        throw error;
       }
 
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      if (this.DEBUG) console.error('API request failed:', error);
       throw error;
     }
   }
 
   // ================= Auth =================
   async login(credentials) {
-    return this.request('/auth/login', {
-      method: 'POST',
-      body: credentials,
-    });
+    try {
+      if (this.DEBUG) {
+        console.log('Login attempt with credentials:', { email: credentials.email, hasPassword: !!credentials.password });
+      }
+      
+      // Make a direct fetch call for login to ensure proper error handling
+      const response = await fetch(`${this.baseURL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+      });
+      
+      const data = await response.json();
+      
+      if (this.DEBUG) {
+        console.log('Login response:', response.status, data);
+      }
+      
+      if (!response.ok) {
+        // Create a custom error with the response data
+        const error = new Error(data.message || data.alert || `Login failed: ${response.status}`);
+        error.response = {
+          status: response.status,
+          data: data,
+          statusText: response.statusText
+        };
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      if (this.DEBUG) console.error('Login error details:', error);
+      throw error; // Re-throw to be handled by the login component
+    }
   }
 
   async register(userData) {
@@ -88,9 +126,36 @@ class ApiService {
   }
 
   async verifyEmail(token) {
-    return this.request('/auth/verify', {
+    console.log('API verifyEmail - token:', token);
+    
+    // Directly use fetch to bypass any default headers/configs that might cause issues
+    try {
+      const response = await fetch(`${this.baseURL}/auth/verify-email/${token}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      console.log('API verifyEmail - response:', response.status, data);
+      
+      if (!response.ok) {
+        throw new Error(data.message || data.alert || `HTTP error! status: ${response.status}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Email verification failed:', error);
+      throw error;
+    }
+  }
+  
+  async resendVerificationEmail(email) {
+    return this.request('/auth/verify/resend', {
       method: 'POST',
-      body: { token },
+      body: { email }
     });
   }
 
@@ -311,6 +376,81 @@ class ApiService {
     return this.request(`/job-requests/${requestId}/respond`, {
       method: 'POST',
       body: { response },
+    });
+  }
+
+  // ================= Goals =================
+  async getMyGoals(filters = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    return this.request(`/goals?${queryParams}`);
+  }
+
+  async createGoal(goalData) {
+    return this.request('/goals', {
+      method: 'POST',
+      body: goalData,
+    });
+  }
+
+  async updateGoal(goalId, updates) {
+    return this.request(`/goals/${goalId}`, {
+      method: 'PUT',
+      body: updates,
+    });
+  }
+
+  async deleteGoal(goalId) {
+    return this.request(`/goals/${goalId}`, {
+      method: 'DELETE',
+    });
+  }
+  
+  // ================= Notifications =================
+  async getNotifications(filters = {}) {
+    // Add a timestamp to prevent browser caching
+    const updatedFilters = { 
+      ...filters, 
+      _t: Date.now() 
+    };
+    const queryParams = new URLSearchParams(updatedFilters).toString();
+    return this.request(`/notifications?${queryParams}`);
+  }
+  
+  async markNotificationAsRead(notificationId) {
+    if (this.DEBUG) console.log('Marking notification as read:', notificationId);
+    return this.request(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+      body: {} // Ensure we're sending an empty body object
+    });
+  }
+  
+  async markAllNotificationsAsRead() {
+    if (this.DEBUG) console.log('Marking all notifications as read');
+    return this.request(`/notifications/all/read`, {
+      method: 'PATCH',
+      body: { all: true }
+    });
+  }
+  
+  async markNotificationAsSeen(notificationId) {
+    if (this.DEBUG) console.log('Marking notification as seen:', notificationId);
+    return this.request(`/notifications/${notificationId}/seen`, {
+      method: 'PATCH',
+      body: {} 
+    });
+  }
+  
+  async markAllNotificationsAsSeen() {
+    if (this.DEBUG) console.log('Marking all notifications as seen');
+    return this.request(`/notifications/all/seen`, {
+      method: 'PATCH',
+      body: { all: true }
+    });
+  }
+  
+  async deleteNotification(notificationId) {
+    return this.request(`/notifications/${notificationId}`, {
+      method: 'DELETE'
     });
   }
 }

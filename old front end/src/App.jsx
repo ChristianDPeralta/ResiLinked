@@ -20,26 +20,65 @@ import Help from './components/Help'
 import UserDetails from './components/UserDetails'
 import ResetRequest from './components/ResetRequest'
 import ResetPassword from './components/ResetPassword'
+import VerifyEmail from './components/VerifyEmail'
+import ResendVerification from './components/ResendVerification'
 
 // Layout component
 import Layout from './components/Layout'
 
-// Auth context for managing user state
+// Context providers
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AlertProvider } from './context/AlertContext'
+import { NotificationProvider } from './context/NotificationContext'
 
 // Protected Route component
 function ProtectedRoute({ children, requiredUserType = null }) {
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, loading } = useAuth()
   
+  // Show loading indicator while checking authentication
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div className="spinner" style={{
+          width: '40px',
+          height: '40px',
+          border: '4px solid rgba(147, 51, 234, 0.2)',
+          borderTop: '4px solid #9333ea',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p>Loading your session...</p>
+        
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+  
+  // Redirect if not authenticated
   if (!isAuthenticated) {
+    console.log('Not authenticated, redirecting to login');
     return <Navigate to="/login" replace />
   }
   
+  // Redirect if wrong user type
   if (requiredUserType && user?.userType !== requiredUserType) {
+    console.log('Wrong user type, redirecting to landing');
     return <Navigate to="/landing" replace />
   }
   
+  // User is authenticated and has correct role
   return children
 }
 
@@ -56,15 +95,18 @@ function App() {
   return (
     <AlertProvider>
       <AuthProvider>
-        <Router>
-          <Layout>
-            <Routes>
+        <NotificationProvider>
+          <Router>
+            <Layout>
+              <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/reset-request" element={<ResetRequest />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <Route path="/resend-verification" element={<ResendVerification />} />
             <Route path="/help" element={<Help />} />
             
             {/* Protected routes */}
@@ -140,6 +182,7 @@ function App() {
             </Routes>
           </Layout>
         </Router>
+        </NotificationProvider>
       </AuthProvider>
     </AlertProvider>
   )

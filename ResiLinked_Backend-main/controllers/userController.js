@@ -31,17 +31,52 @@ exports.editProfile = async (req, res) => {
     try {
         const updates = req.body;
         
+        console.log('Profile update received:', updates);
+        
         // Handle profile picture upload if present
         if (req.file) {
             updates.profilePicture = req.file.buffer.toString('base64');
         }
 
         const originalUser = await User.findById(req.user.id);
-        const user = await User.findByIdAndUpdate(
-            req.user.id, 
-            updates, 
-            { new: true, runValidators: true }
-        ).select('-password');
+        
+        // Filter updates to only include fields that exist in the schema
+        const validUpdates = {};
+        Object.keys(updates).forEach(key => {
+            if (key in originalUser._doc) {
+                // Special handling for gender field to ensure valid values
+                if (key === 'gender') {
+                    console.log(`Processing gender value: "${updates[key]}"`, typeof updates[key]);
+                    if (updates[key] === '') {
+                        console.log('Empty gender provided, allowing empty string');
+                    }
+                }
+                validUpdates[key] = updates[key];
+            } else {
+                console.log(`Ignoring unknown field: ${key}`);
+            }
+        });
+        
+        console.log('Applying updates:', validUpdates);
+        
+        let user;
+        try {
+            user = await User.findByIdAndUpdate(
+                req.user.id, 
+                validUpdates, 
+                { new: true, runValidators: true }
+            ).select('-password');
+            
+            // The update succeeded
+            console.log('User updated successfully:', user.gender);
+        } catch (validationError) {
+            console.error('Validation error during update:', validationError);
+            return res.status(400).json({ 
+                message: "Error updating profile", 
+                error: validationError.message,
+                alert: "Profile update failed: " + validationError.message
+            });
+        }
 
         if (!user) {
             return res.status(404).json({ 
@@ -75,6 +110,8 @@ exports.editProfile = async (req, res) => {
             alert: "Profile updated successfully"
         });
     } catch (err) {
+        console.error('Profile update error:', err);
+        
         res.status(500).json({ 
             message: "Error updating profile", 
             error: err.message,

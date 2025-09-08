@@ -79,7 +79,7 @@ function AlertContainer({ alerts, removeAlert }) {
         />
       ))}
       
-      <style jsx>{`
+      <style>{`
         .alert-container {
           position: fixed;
           top: 20px;
@@ -155,7 +155,7 @@ function Alert({ alert, onClose }) {
         <button onClick={onClose} className="alert-close">×</button>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .alert-box {
           background: ${getBackgroundColor(alert.type)};
           color: ${getTextColor(alert.type)};

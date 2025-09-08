@@ -71,7 +71,7 @@ function Landing() {
         )}
       </section>
 
-      <style jsx>{`
+      <style>{`
         .landing-page {
           max-width: 1400px;
           margin: 0 auto;

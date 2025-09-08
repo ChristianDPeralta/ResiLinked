@@ -61,11 +61,16 @@ export function AuthProvider({ children }) {
         setIsAuthenticated(true)
         return true
       } else {
-        console.log('Token verification failed')
+        // Set DEBUG_AUTH to true to show authentication-related logs
+        const DEBUG_AUTH = false;
+        if (DEBUG_AUTH) {
+          console.log('Token verification failed')
+        }
         clearAuthData()
         return false
       }
     } catch (error) {
+      // Keep error logging for debugging
       console.error('Token verification error:', error)
       // Don't clear auth data on network errors
       return null
@@ -74,29 +79,40 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const initAuth = async () => {
+      // Set DEBUG_AUTH to true to show authentication-related logs
+      const DEBUG_AUTH = true;
       const token = localStorage.getItem('token')
       const userData = localStorage.getItem('userData')
       
-      console.log('AuthContext initialization:', { token: !!token, userData })
+      if (DEBUG_AUTH) {
+        console.log('AuthContext initialization:', { token: !!token, userData })
+      }
       
       if (token && userData) {
         try {
           const parsedUserData = JSON.parse(userData)
-          console.log('Parsed user data:', parsedUserData)
+          if (DEBUG_AUTH) {
+            console.log('Parsed user data:', parsedUserData)
+          }
           setUser(parsedUserData)
           setIsAuthenticated(true)
-          console.log('✅ Authentication state set to true')
+          if (DEBUG_AUTH) {
+            console.log('✅ Authentication state set to true')
+          }
           
-          // Verify token in background
-          verifyToken()
+          // Verify token in background but don't wait for it
+          verifyToken().catch(err => {
+            console.error('Background token verification failed:', err);
+          });
         } catch (error) {
           console.error('Error parsing user data:', error)
           clearAuthData()
         }
-      } else {
+      } else if (DEBUG_AUTH) {
         console.log('No token or userData found in localStorage')
       }
       
+      // Set loading to false whether we have auth data or not
       setLoading(false)
     }
 
@@ -113,12 +129,18 @@ export function AuthProvider({ children }) {
   }, [isAuthenticated, verifyToken, clearAuthData])
 
   const login = (token, userData) => {
-    console.log('Login called with:', { token: !!token, userData })
+    // Set DEBUG_AUTH to true to show authentication-related logs
+    const DEBUG_AUTH = false;
+    if (DEBUG_AUTH) {
+      console.log('Login called with:', { token: !!token, userData })
+    }
     localStorage.setItem('token', token)
     localStorage.setItem('userData', JSON.stringify(userData))
     setUser(userData)
     setIsAuthenticated(true)
-    console.log('Login completed, auth state:', { isAuthenticated: true, user: userData })
+    if (DEBUG_AUTH) {
+      console.log('Login completed, auth state:', { isAuthenticated: true, user: userData })
+    }
   }
 
   const logout = useCallback(() => {
@@ -133,33 +155,47 @@ export function AuthProvider({ children }) {
 
   // Check if user has access to specific dashboard types
   const hasAccessTo = useCallback((dashboardType) => {
-    console.log('hasAccessTo check:', {
-      dashboardType,
-      isAuthenticated,
-      user,
-      userType: user?.userType
-    })
+    // Set DEBUG_ACCESS to true to show permission-related logs
+    const DEBUG_ACCESS = false;
+    if (DEBUG_ACCESS) {
+      console.log('hasAccessTo check:', {
+        dashboardType,
+        isAuthenticated,
+        user,
+        userType: user?.userType
+      })
+    }
     
     if (!isAuthenticated || !user) {
-      console.log('Access denied: not authenticated or no user data')
+      if (DEBUG_ACCESS) {
+        console.log('Access denied: not authenticated or no user data')
+      }
       return false
     }
     
     switch (dashboardType) {
       case 'employee':
         const hasEmployeeAccess = user.userType === 'employee' || user.userType === 'both'
-        console.log('Employee access check:', hasEmployeeAccess)
+        if (DEBUG_ACCESS) {
+          console.log('Employee access check:', hasEmployeeAccess)
+        }
         return hasEmployeeAccess
       case 'employer':
         const hasEmployerAccess = user.userType === 'employer' || user.userType === 'both'
-        console.log('Employer access check:', hasEmployerAccess)
+        if (DEBUG_ACCESS) {
+          console.log('Employer access check:', hasEmployerAccess)
+        }
         return hasEmployerAccess
       case 'admin':
         const hasAdminAccess = user.userType === 'admin'
-        console.log('Admin access check:', hasAdminAccess)
+        if (DEBUG_ACCESS) {
+          console.log('Admin access check:', hasAdminAccess)
+        }
         return hasAdminAccess
       default:
-        console.log('Unknown dashboard type:', dashboardType)
+        if (DEBUG_ACCESS) {
+          console.log('Unknown dashboard type:', dashboardType)
+        }
         return false
     }
   }, [isAuthenticated, user])

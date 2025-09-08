@@ -1,18 +1,30 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import NotificationDropdown from './NotificationDropdown';
 
 function Navigation() {
-  const { user, logout, hasAccessTo, isAuthenticated } = useContext(AuthContext);
+  const { user, logout, hasAccessTo, isAuthenticated, loading } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const userMenuRef = useRef(null);
-
-  // Debug logging
-  console.log('🧭 Navigation render:', { isAuthenticated, user: !!user, userType: user?.userType });
+  
+  // Set to false to disable debug logging
+  const DEBUG = false;
+  
+  // Debug logging only if DEBUG is true
+  if (DEBUG) {
+    console.log('🧭 Navigation render:', { 
+      isAuthenticated, 
+      user: !!user, 
+      userType: user?.userType,
+      loading,
+      currentPath: location.pathname
+    });
+  }
 
   const handleLogout = () => {
     logout();
@@ -98,6 +110,10 @@ function Navigation() {
                 )}
               </div>
 
+              {/* User Menu */}
+              {/* Notification Dropdown */}
+              <NotificationDropdown />
+              
               {/* User Menu */}
               <div className="user-menu" ref={userMenuRef}>
                 <button 
@@ -252,7 +268,7 @@ function Navigation() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .main-navigation {
           display: flex;
           align-items: center;

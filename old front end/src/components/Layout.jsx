@@ -71,7 +71,7 @@ function Layout({ children }) {
         </div>
       </footer>
 
-      <style jsx>{`
+      <style>{`
         .layout-container {
           min-height: 100vh;
           display: flex;

@@ -26,6 +26,7 @@ const notificationSchema = new mongoose.Schema({
     message: { type: String, required: true },
     relatedJob: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
     isRead: { type: Boolean, default: false },
+    isSeen: { type: Boolean, default: false }, // New field to track if notification was seen in dropdown
     createdAt: { type: Date, default: Date.now }
 });
 
