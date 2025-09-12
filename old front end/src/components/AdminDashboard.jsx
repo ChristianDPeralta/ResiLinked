@@ -1036,41 +1036,6 @@ function AdminDashboard() {
                     )}
                   </div>
                 </div>
-
-                {/* Quick Actions */}
-                <div className="overview-section">
-                  <h3>Quick Actions</h3>
-                  <div className="quick-actions-grid">
-                    <button 
-                      className="quick-action-btn"
-                      onClick={() => setCurrentTab('users')}
-                    >
-                      <span className="action-icon">👥</span>
-                      <span className="action-text">Manage Users</span>
-                    </button>
-                    <button 
-                      className="quick-action-btn"
-                      onClick={() => setCurrentTab('jobs')}
-                    >
-                      <span className="action-icon">💼</span>
-                      <span className="action-text">Manage Jobs</span>
-                    </button>
-                    <button 
-                      className="quick-action-btn"
-                      onClick={() => setCurrentTab('analytics')}
-                    >
-                      <span className="action-icon">📊</span>
-                      <span className="action-text">View Analytics</span>
-                    </button>
-                    <button 
-                      className="quick-action-btn"
-                      onClick={() => exportData('users', 'csv')}
-                    >
-                      <span className="action-icon">📥</span>
-                      <span className="action-text">Export Data</span>
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -1902,8 +1867,14 @@ function AdminDashboard() {
 
         .user-mobile-actions {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.375rem;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+        }
+        
+        .user-mobile-actions .action-btn {
+          width: 100%;
+          min-width: unset;
+          padding: 0.4rem 0.5rem;
         }
 
         .users-table-container {
@@ -2012,7 +1983,7 @@ function AdminDashboard() {
 
         .actions {
           display: flex;
-          gap: 0.25rem;
+          gap: 0.5rem;
           flex-wrap: wrap;
           min-width: 240px;
           justify-content: flex-start;
@@ -2026,14 +1997,16 @@ function AdminDashboard() {
           cursor: pointer;
           transition: all 0.2s;
           font-weight: 500;
-          min-width: 50px;
+          width: 60px;
           text-align: center;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .action-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
         }
 
         .action-btn.view-btn {
@@ -2511,8 +2484,8 @@ function AdminDashboard() {
         }
 
         .stat-row {
-          display: flex;
-          justify-content: space-between;
+          display: grid;
+          grid-template-columns: 1fr 100px 100px;
           align-items: center;
           padding: 0.75rem 0;
           border-bottom: 1px solid #e2e8f0;
@@ -2521,13 +2494,18 @@ function AdminDashboard() {
         .stat-row:last-child {
           border-bottom: none;
         }
-
-        .stat-percentage {
-          background: #e2e8f0;
-          padding: 0.25rem 0.5rem;
-          border-radius: 12px;
-          font-size: 0.8rem;
+        
+        .stat-label {
+          font-weight: 500;
           color: #4a5568;
+          text-align: left;
+        }
+        
+        .stat-value {
+          color: #2d3748;
+          font-weight: bold;
+          text-align: right;
+          padding-right: 15px;
         }
 
         .job-stats-grid {
@@ -2760,18 +2738,27 @@ function AdminDashboard() {
         }
 
         .modal-close {
-          background: none;
-          border: none;
+          background: #fff;
+          border: 1.5px solid #e5e7eb;
           font-size: 1.5rem;
           cursor: pointer;
-          color: #666;
-          padding: 0.5rem;
+          color: #7c3aed;
+          padding: 0.25rem 0.5rem 0.35rem 0.5rem;
           border-radius: 50%;
-          transition: background-color 0.2s;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(80,0,120,0.06);
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
         }
 
-        .modal-close:hover {
-          background: #f7fafc;
+        .modal-close:hover, .modal-close:focus {
+          background: #ede9fe;
+          color: #4c1d95;
+          box-shadow: 0 4px 16px rgba(80,0,120,0.10);
+          outline: none;
         }
 
         .modal-body {
@@ -3024,206 +3011,8 @@ function AdminDashboard() {
           border-top: 1px solid #e2e8f0;
         }
 
-        @media (max-width: 1024px) {
-          .users-table {
-            font-size: 0.9rem;
-          }
-
-          .users-table th,
-          .users-table td {
-            padding: 0.75rem;
-          }
-
-          .actions {
-            min-width: 260px;
-          }
-
-          .action-btn {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.75rem;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .dashboard-container {
-            padding: 1rem;
-          }
-
-          .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          }
-
-          .controls-section {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 1rem;
-            padding: 1rem;
-          }
-
-          .search-controls {
-            min-width: auto;
-          }
-
-          /* Mobile Overview Styles */
-          .stat-card {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.75rem;
-          }
-
-          .stat-icon {
-            font-size: 2rem;
-          }
-
-          .stat-info h3 {
-            font-size: 1.5rem;
-          }
-
-          .section-header {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-          }
-
-          .quick-actions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-          }
-
-          .quick-action-btn {
-            padding: 1rem;
-          }
-
-          .action-icon {
-            font-size: 1.5rem;
-          }
-
-          .action-text {
-            font-size: 0.9rem;
-          }
-
-          /* Mobile Jobs Styles */
-          .jobs-controls {
-            flex-direction: column;
-            gap: 0.75rem;
-          }
-
-          .jobs-filters {
-            width: 100%;
-            justify-content: space-between;
-          }
-
-          .filter-select {
-            flex: 1;
-          }
-
-          .job-stats {
-            padding: 0.75rem;
-          }
-
-          .stat-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.25rem;
-          }
-
-          /* Mobile Analytics Styles */
-          .analytics-row {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-          }
-
-          .analytics-card.large {
-            grid-column: span 1;
-          }
-
-          .job-stats-grid {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-          }
-
-          .job-stat-item {
-            padding: 0.75rem;
-          }
-
-          .job-stat-number {
-            font-size: 1.25rem;
-          }
-
-          .analytics-actions {
-            padding: 1rem;
-          }
-
-          .export-buttons {
-            flex-direction: column;
-          }
-
-          .export-buttons button {
-            width: 100%;
-          }
-
-          .export-controls {
-            justify-content: center;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-          }
-
-          .tab-navigation {
-            flex-direction: column;
-            background: white;
-          }
-
-          .tab-btn {
-            border-radius: 0;
-            color: #4a5568;
-            font-weight: 500;
-            padding: 0.75rem 1rem;
-          }
-
-          .tab-btn.active {
-            background: #2b6cb0;
-            color: white;
-            font-weight: 600;
-          }
-
-          .tab-btn:not(.active):hover {
-            background: #f7fafc;
-            color: #2d3748;
-          }
-
-          .tab-btn:first-child {
-            border-radius: 12px 12px 0 0;
-          }
-
-          .tab-btn:last-child {
-            border-radius: 0;
-          }
-
-          .jobs-grid {
-            grid-template-columns: 1fr;
-          }
-
-          /* Show mobile view, hide table view */
-          .users-mobile-view {
-            display: block;
-          }
-
-          .users-table-container {
-            display: none;
-          }
-
-          .detail-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .form-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .checkbox-group {
-            grid-column: span 1;
-          }
+        .job-details {
+          /* No centering or sizing changes, just a placeholder for future styles if needed */
         }
       `}</style>
     </div>

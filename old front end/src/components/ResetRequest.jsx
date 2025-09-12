@@ -326,6 +326,8 @@ function ResetRequest() {
           background: rgba(255, 255, 255, 0.8);
           backdrop-filter: blur(10px);
           font-family: inherit;
+          text-align: left;
+          vertical-align: middle;
         }
         
         .form-group input:focus {
@@ -361,6 +363,14 @@ function ResetRequest() {
           box-shadow: 
             0 0 0 4px rgba(220, 38, 38, 0.1),
             0 8px 24px rgba(220, 38, 38, 0.15);
+        }
+        
+        /* Add placeholder styles to ensure alignment */
+        .form-group input::placeholder {
+          color: #9CA3AF;
+          opacity: 0.7;
+          text-align: left;
+          vertical-align: middle;
         }
 
         .input-status {
@@ -398,6 +408,7 @@ function ResetRequest() {
           color: #dc2626;
           font-weight: 500;
           animation: slideIn 0.2s ease;
+          text-align: left;
         }
 
         @keyframes slideIn {

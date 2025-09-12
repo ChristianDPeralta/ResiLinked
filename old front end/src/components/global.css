@@ -435,3 +435,14 @@ button:disabled {
     padding: var(--spacing-4);
   }
 }
+
+/* Fade Transition Styles */
+.fade-transition {
+  opacity: 1;
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8f9fa; /* Match your app's background color */
+}
+
+.fade-exit {
+  opacity: 0;
+}

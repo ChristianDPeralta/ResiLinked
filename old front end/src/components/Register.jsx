@@ -156,7 +156,7 @@ function Register() {
   if (verificationSent) {
     return (
       <div className="register-container">
-        <div className="register-card">
+        <div className="register-card" style={{ maxWidth: "700px" }}>
           <div className="success-message">
             <div className="success-icon">✓</div>
             <h2>Registration Successful!</h2>
@@ -314,9 +314,9 @@ function Register() {
                 {formData.confirmPassword && (
                   <div className="input-status">
                     {passwordError === "Passwords match!" ? (
-                      <span className="success-icon" title="Passwords match">✓</span>
+                      <span className="success-icon" title="Passwords match" style={{fontSize: "12px"}}>✓</span>
                     ) : (
-                      <span className="error-icon" title="Passwords do not match">✗</span>
+                      <span className="error-icon" title="Passwords do not match" style={{fontSize: "12px"}}>✗</span>
                     )}
                   </div>
                 )}
@@ -792,12 +792,24 @@ function Register() {
           z-index: 1;
         }
         
+        .input-status .success-icon,
+        .input-status .error-icon {
+          font-size: 14px;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background-color: transparent;
+        }
+        
         .error-icon {
           color: #dc2626;
           display: flex;
           align-items: center;
           font-weight: bold;
-          font-size: 16px;
+          font-size: 14px;
         }
         
         .success-icon {
@@ -805,7 +817,7 @@ function Register() {
           display: flex;
           align-items: center;
           font-weight: bold;
-          font-size: 16px;
+          font-size: 14px;
         }
 
         .register-btn {
@@ -957,14 +969,14 @@ function Register() {
 
         .success-message {
           text-align: center;
-          padding: 3rem 2rem;
+          padding: 3rem 3.5rem;
           background: white;
           border-radius: 20px;
           border: 1px solid rgba(138, 63, 252, 0.2);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
         
-        .success-icon {
+        .success-message .success-icon {
           background: linear-gradient(135deg, #8a3ffc, #6b21a8);
           color: white;
           width: 80px;
@@ -1000,6 +1012,7 @@ function Register() {
           flex-direction: column;
           gap: 1.5rem;
           margin-bottom: 2rem;
+          padding: 0.5rem 1rem;
         }
         
         .verification-step {
@@ -1007,10 +1020,12 @@ function Register() {
           gap: 1.5rem;
           text-align: left;
           background-color: #f9f9f9;
-          padding: 1.5rem;
+          padding: 1.5rem 2rem;
           border-radius: 12px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          margin-left: 0.5rem;
+          margin-right: 0.5rem;
         }
         
         .verification-step:hover {
@@ -1038,9 +1053,15 @@ function Register() {
         
         .step-content h3 {
           margin: 0 0 0.5rem;
-          font-size: 1.1rem;
+          font-size: 1.2rem;
           color: #333;
           font-weight: 600;
+        }
+        
+        .step-content p {
+          font-size: 0.95rem;
+          line-height: 1.6;
+          color: #4b5563;
         }
         
         .verification-note {
@@ -1048,9 +1069,9 @@ function Register() {
           align-items: flex-start;
           gap: 1rem;
           background-color: #fff8e6;
-          padding: 1rem 1.5rem;
+          padding: 1.25rem 2rem;
           border-radius: 12px;
-          margin-bottom: 2rem;
+          margin: 0 1.5rem 2rem 1.5rem;
           text-align: left;
           border: 1px solid rgba(245, 158, 11, 0.3);
         }

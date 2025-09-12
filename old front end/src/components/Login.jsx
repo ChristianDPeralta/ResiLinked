@@ -15,6 +15,7 @@ function Login() {
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false)
   
   const { login, isAuthenticated } = useAuth()
   const { success, error: showError } = useAlert()
@@ -277,7 +278,7 @@ function Login() {
             <label htmlFor="password">Password</label>
             <div className="input-wrapper">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 value={formData.password}
@@ -288,6 +289,20 @@ function Login() {
                 placeholder="Ilagay ang inyong password"
                 className={fieldErrors.password ? 'error' : formData.password && !fieldErrors.password ? 'valid' : ''}
               />
+              <div 
+                className="password-toggle"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowPassword(!showPassword);
+                }}
+                role="button"
+                tabIndex="-1"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? '👁️' : '👁️'}
+              </div>
               <div className="input-status">
                 {fieldErrors.password && (
                   <span className="error-icon" title={fieldErrors.password}>
@@ -315,8 +330,8 @@ function Login() {
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
+                style={{ marginRight: "5px" }}
               />
-              <span className="checkmark"></span>
               Remember me
             </label>
           </div>
@@ -393,7 +408,7 @@ function Login() {
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
           padding: 3rem 2.5rem;
           width: 100%;
-          max-width: 440px;
+          max-width: 500px; /* Increased width from 440px to 500px */
           position: relative;
           border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -444,26 +459,31 @@ function Login() {
         }
 
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
           width: 100%;
-          padding: 1rem 3rem 1rem 1.25rem;
+          padding: 1rem 4.5rem 1rem 1.25rem;
           border: 2px solid rgba(147, 51, 234, 0.1);
           border-radius: 16px;
           font-size: 1rem;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
           background: rgba(255, 255, 255, 0.8);
           backdrop-filter: blur(10px);
           font-family: inherit;
+          text-align: left;
+          vertical-align: middle;
+          position: relative;
         }
 
         input[type="email"]:focus,
-        input[type="password"]:focus {
+        input[type="password"]:focus,
+        input[type="text"]:focus {
           outline: none;
           border-color: #9333ea;
           background: rgba(255, 255, 255, 0.95);
           box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-          transform: translateY(-1px);
+          /* Remove the transform to prevent movement */
         }
 
         input[type="email"]:hover,
@@ -490,10 +510,65 @@ function Login() {
           box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
 
+        /* Add placeholder styles to ensure alignment */
+        input::placeholder {
+          color: #9CA3AF;
+          opacity: 0.7;
+          text-align: left;
+          vertical-align: middle;
+        }
+
         .input-wrapper {
           position: relative;
           display: flex;
           align-items: center;
+          width: 100%;
+        }
+        
+        .password-toggle {
+          position: absolute;
+          right: 2.8rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #64748b;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.1rem;
+          width: 30px;
+          height: 30px;
+          min-width: 30px;
+          min-height: 30px;
+          padding: 0;
+          margin: 0;
+          z-index: 2;
+          opacity: 0.7;
+          transition: opacity 0.2s ease;
+          user-select: none;
+          box-shadow: none;
+          pointer-events: auto;
+        }
+        
+        .password-toggle:hover {
+          opacity: 1;
+        }
+        
+        .password-toggle:focus {
+          outline: none;
+          opacity: 1;
+          box-shadow: none;
+          transform: translateY(-50%);
+        }
+        
+        /* Prevent layout shift when clicking */
+        .password-toggle:active {
+          transform: translateY(-50%);
+          outline: none;
+          box-shadow: none;
+          border: none;
         }
 
         .input-status {
@@ -533,6 +608,7 @@ function Login() {
           color: #dc2626;
           font-weight: 500;
           animation: slideIn 0.2s ease;
+          text-align: left;
         }
 
         @keyframes slideIn {
@@ -550,16 +626,19 @@ function Login() {
 
         .checkbox-group {
           margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          user-select: none;
         }
 
         .checkbox-label {
-          display: flex;
+          display: inline-flex;
           align-items: center;
           cursor: pointer;
           font-size: 0.95rem;
           color: #64748b;
           font-weight: 500;
-          gap: 0.75rem;
+          gap: 0.5rem;
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -568,6 +647,9 @@ function Login() {
           margin: 0;
           accent-color: #9333ea;
           border-radius: 4px;
+          vertical-align: middle;
+          position: relative;
+          top: -1px;
         }
 
         .login-btn {

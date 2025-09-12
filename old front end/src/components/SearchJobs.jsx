@@ -16,6 +16,7 @@ function SearchJobs() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [expandedJobs, setExpandedJobs] = useState({})
   
   const { user, isLoggedIn } = useContext(AuthContext)
   const { success, error: showError } = useContext(AlertContext)
@@ -73,7 +74,17 @@ function SearchJobs() {
     }
   }
 
-  const applyToJob = async (jobId) => {
+  const toggleJobExpansion = (jobId) => {
+    setExpandedJobs(prev => ({
+      ...prev,
+      [jobId]: !prev[jobId]
+    }))
+  }
+
+  const applyToJob = async (jobId, e) => {
+    // Prevent the click from toggling the job expansion
+    e.stopPropagation()
+    
     if (!isLoggedIn) {
       showError('Please login to apply for jobs.')
       return
@@ -221,57 +232,86 @@ function SearchJobs() {
 
         <div className="jobs-grid">
           {jobs.map((job) => (
-            <div key={job._id} className="job-card">
+            <div 
+              key={job._id} 
+              className={`job-card ${expandedJobs[job._id] ? 'expanded' : ''}`}
+              onClick={() => toggleJobExpansion(job._id)}
+            >
               <div className="job-header">
                 <h3>{job.title}</h3>
                 <div className="job-price">₱{job.price?.toLocaleString()}</div>
               </div>
 
-              <div className="job-content">
-                <p className="job-description">
-                  <strong>Description:</strong> {job.description || 'No description available'}
-                </p>
-
-                <div className="job-details">
-                  <div className="job-detail">
-                    <strong>Location:</strong> {job.barangay}
+              <div className="job-preview">
+                <div className="job-preview-detail">
+                  <span className="preview-icon">📍</span> {job.barangay}
+                </div>
+                
+                {job.skillsRequired && job.skillsRequired.length > 0 && (
+                  <div className="job-preview-detail">
+                    <span className="preview-icon">🛠️</span> {job.skillsRequired.slice(0, 2).join(', ')}
+                    {job.skillsRequired.length > 2 && ` +${job.skillsRequired.length - 2} more`}
                   </div>
-                  
-                  {job.skillsRequired && job.skillsRequired.length > 0 && (
-                    <div className="job-detail">
-                      <strong>Skills Required:</strong>
-                      <div className="skills-list">
-                        {job.skillsRequired.map((skill, index) => (
-                          <span key={index} className="skill-badge">{skill}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="job-detail">
-                    <strong>Posted by:</strong> {
-                      job.postedBy 
-                        ? `${job.postedBy.firstName} ${job.postedBy.lastName}` 
-                        : 'Anonymous'
-                    }
-                  </div>
-
-                  <div className="job-detail">
-                    <strong>Applicants:</strong> {job.applicants ? job.applicants.length : 0}
-                  </div>
+                )}
+                
+                <div className="job-preview-detail">
+                  <span className="preview-icon">👥</span> {job.applicants ? job.applicants.length : 0} applicant(s)
                 </div>
               </div>
-
-              <div className="job-actions">
-                <button 
-                  className="apply-btn"
-                  onClick={() => applyToJob(job._id)}
-                  disabled={!isLoggedIn}
-                  title={!isLoggedIn ? "Please login to apply" : "Apply for this job"}
-                >
-                  {!isLoggedIn ? 'Login to Apply' : 'Apply Now'}
-                </button>
+              
+              <div className="expansion-indicator">
+                {expandedJobs[job._id] ? '▲' : '▼'} 
+                <span className="indicator-text">{expandedJobs[job._id] ? 'Show less' : 'Show more'}</span>
               </div>
+
+              {expandedJobs[job._id] && (
+                <div className="job-content">
+                  <hr className="content-divider" />
+                  <p className="job-description">
+                    <strong>Description:</strong> {job.description || 'No description available'}
+                  </p>
+
+                  <div className="job-details">
+                    <div className="job-detail">
+                      <strong>Location:</strong> {job.barangay}
+                    </div>
+                    
+                    {job.skillsRequired && job.skillsRequired.length > 0 && (
+                      <div className="job-detail">
+                        <strong>Skills Required:</strong>
+                        <div className="skills-list">
+                          {job.skillsRequired.map((skill, index) => (
+                            <span key={index} className="skill-badge">{skill}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="job-detail">
+                      <strong>Posted by:</strong> {
+                        job.postedBy 
+                          ? `${job.postedBy.firstName} ${job.postedBy.lastName}` 
+                          : 'Anonymous'
+                      }
+                    </div>
+
+                    <div className="job-detail">
+                      <strong>Applicants:</strong> {job.applicants ? job.applicants.length : 0}
+                    </div>
+                    
+                    <div className="job-actions">
+                      <button 
+                        className="apply-btn"
+                        onClick={(e) => applyToJob(job._id, e)}
+                        disabled={!isLoggedIn}
+                        title={!isLoggedIn ? "Please login to apply" : "Apply for this job"}
+                      >
+                        {!isLoggedIn ? 'Login to Apply' : 'Apply Now'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -411,12 +451,63 @@ function SearchJobs() {
           border-radius: 12px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
           padding: 1.5rem;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          position: relative;
         }
 
         .job-card:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .job-card.expanded {
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .job-preview {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin: 0.75rem 0;
+        }
+        
+        .job-preview-detail {
+          display: flex;
+          align-items: center;
+          color: #4a5568;
+          font-size: 0.9rem;
+          background: #f7fafc;
+          padding: 0.35rem 0.75rem;
+          border-radius: 20px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .preview-icon {
+          margin-right: 0.35rem;
+        }
+        
+        .expansion-indicator {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #718096;
+          font-size: 0.85rem;
+          margin-top: 0.5rem;
+        }
+        
+        .indicator-text {
+          margin-left: 0.25rem;
+          font-size: 0.8rem;
+        }
+        
+        .content-divider {
+          border: 0;
+          height: 1px;
+          background-color: #e2e8f0;
+          margin: 1rem 0;
         }
 
         .job-header {
@@ -483,6 +574,7 @@ function SearchJobs() {
         .job-actions {
           display: flex;
           justify-content: flex-end;
+          margin-top: 1rem;
         }
 
         .apply-btn {
@@ -494,6 +586,8 @@ function SearchJobs() {
           font-size: 1rem;
           cursor: pointer;
           transition: background-color 0.2s;
+          position: relative;
+          z-index: 5; /* Ensure button is clickable */
         }
 
         .apply-btn:hover:not(:disabled) {

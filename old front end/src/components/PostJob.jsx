@@ -256,6 +256,7 @@ function PostJob() {
                   value="public"
                   checked={formData.postMethod === 'public'}
                   onChange={handleInputChange}
+                  style={{ marginRight: "5px" }}
                 />
                 <span className="radio-text">Public (visible to everyone)</span>
               </label>
@@ -266,6 +267,7 @@ function PostJob() {
                   value="private"
                   checked={formData.postMethod === 'private'}
                   onChange={handleInputChange}
+                  style={{ marginRight: "5px" }}
                 />
                 <span className="radio-text">Private (invitation only)</span>
               </label>
@@ -423,11 +425,23 @@ function PostJob() {
           gap: 0.5rem;
           cursor: pointer;
           font-weight: normal;
+          user-select: none;
         }
 
         .radio-label input[type="radio"] {
           margin: 0;
           width: auto;
+          height: 16px;
+          width: 16px;
+          vertical-align: middle;
+          position: relative;
+          top: -1px;
+        }
+        
+        .radio-text {
+          display: inline-block;
+          vertical-align: middle;
+          line-height: 1;
         }
 
         .form-actions {

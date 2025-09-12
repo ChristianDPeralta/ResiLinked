@@ -459,26 +459,39 @@ function Profile() {
 
         .avatar-upload {
           position: absolute;
-          bottom: 0;
-          right: 0;
-          background: #2b6cb0;
+          bottom: 6px;
+          right: 6px;
+          background: #a78bfa;
+          border: 2px solid #fff;
           border-radius: 50%;
-          width: 30px;
-          height: 30px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 2px 8px rgba(80,0,120,0.08);
+          z-index: 2;
         }
 
         .upload-btn {
-          color: white;
+          color: #fff;
+          background: transparent;
           cursor: pointer;
-          font-size: 0.8rem;
+          font-size: 1.2rem;
           display: flex;
           align-items: center;
           justify-content: center;
           width: 100%;
           height: 100%;
+          border: none;
+          outline: none;
+          transition: background 0.2s;
+        }
+
+        .upload-btn:hover, .upload-btn:focus {
+          background: #7c3aed;
+          color: #fff;
+          border-radius: 50%;
         }
 
         .verified-badge {

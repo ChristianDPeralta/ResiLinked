@@ -90,19 +90,31 @@ function Home() {
         </div>
       </section>
 
-      <section className="jobs-section">
-        <div className="jobs-section-container">
-          <h2>Sikat na Trabaho</h2>
+      <section className="jobs-section jobs-section-white">
+        <div className="jobs-section-container jobs-section-container-white">
+          <h2 className="jobs-section-title-white">Sikat na Trabaho</h2>
           <div className="jobs-list">
             {loading ? (
               <div className="no-data">📊 Loading popular jobs...</div>
             ) : popularJobs.length > 0 ? (
               popularJobs.map((job, index) => (
-                <div key={index} className="job-card">
+                <button
+                  key={index}
+                  className="job-card job-card-btn"
+                  type="button"
+                  tabIndex={0}
+                  aria-label={`Tingnan ang mga trabaho para sa ${job.title || job.jobCategory}`}
+                  onClick={() => navigate(`/search-jobs?title=${encodeURIComponent(job.title || job.jobCategory)}`)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      navigate(`/search-jobs?title=${encodeURIComponent(job.title || job.jobCategory)}`)
+                    }
+                  }}
+                >
                   <div className="job-title">
                     {job.title || job.jobCategory}
                   </div>
-                </div>
+                </button>
               ))
             ) : (
               <div className="no-data">
@@ -227,8 +239,8 @@ function Home() {
         }
         
         .btn, .hero button {
-          background: linear-gradient(135deg, var(--success-500), var(--success-600));
-          color: white;
+          background: linear-gradient(135deg, #a78bfa, #7c3aed);
+          color: #fff;
           border: none;
           padding: var(--spacing-4) var(--spacing-8);
           border-radius: var(--radius-lg);
@@ -240,7 +252,7 @@ function Home() {
           align-items: center;
           gap: var(--spacing-2);
           transition: all var(--transition-normal);
-          box-shadow: var(--shadow-lg);
+          box-shadow: var(--shadow-md);
           min-width: 180px;
           justify-content: center;
           margin: 0;
@@ -248,8 +260,9 @@ function Home() {
         
         .btn:hover, .hero button:hover {
           transform: translateY(-2px);
-          box-shadow: var(--shadow-xl);
-          background: linear-gradient(135deg, var(--success-600), var(--success-700));
+          box-shadow: var(--shadow-lg);
+          background: linear-gradient(135deg, #7c3aed, #a78bfa);
+          color: #fff;
         }
         
         /* Modern How Section */
@@ -275,20 +288,25 @@ function Home() {
         }
         
         .how-steps {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: var(--spacing-8);
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          gap: var(--spacing-4);
+          flex-wrap: nowrap;
+          overflow-x: auto;
         }
         
         .how-steps div {
           background: white;
           border-radius: var(--radius-2xl);
-          padding: var(--spacing-8);
+          padding: var(--spacing-6);
           box-shadow: var(--shadow-lg);
           border: 1px solid var(--gray-100);
           transition: all var(--transition-normal);
           position: relative;
           overflow: hidden;
+          flex: 1;
+          min-width: 200px;
         }
         
         .how-steps div::before {
@@ -331,7 +349,7 @@ function Home() {
         
         /* Modern Jobs Section */
         .jobs-section {
-          background: white;
+          background: #fff;
           padding: var(--spacing-20) 0;
           text-align: center;
           width: 100%;
@@ -357,45 +375,72 @@ function Home() {
           margin: 0 auto var(--spacing-8);
         }
         
+        .jobs-section-white {
+          background: #fff;
+        }
+        .jobs-section-container-white {
+          background: #fff;
+          border-radius: var(--radius-2xl);
+          box-shadow: 0 2px 12px rgba(80, 0, 120, 0.04);
+          padding: var(--spacing-12) var(--spacing-8);
+        }
+        .jobs-section-title-white {
+          background: #fff;
+          color: #5b21b6;
+          font-weight: 700;
+          padding-bottom: var(--spacing-4);
+        }
         .job-card {
-          background: var(--gray-50);
+          background: #fff;
           border-radius: var(--radius-2xl);
           padding: var(--spacing-6);
           text-align: center;
           box-shadow: var(--shadow-md);
-          border: 1px solid var(--gray-100);
+          border: 2px solid #ede9fe;
           transition: all var(--transition-normal);
           cursor: pointer;
           position: relative;
           overflow: hidden;
+          outline: none;
+          color: #5b21b6;
+          font-size: var(--font-size-lg);
+          font-weight: 600;
         }
-        
+        .job-card-btn {
+          border: none;
+          background: #fff;
+          width: 100%;
+          display: block;
+          color: #5b21b6;
+          font-weight: 600;
+        }
         .job-card::before {
           content: '';
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
-          height: 3px;
-          background: linear-gradient(135deg, var(--success-500), var(--success-600));
+          height: 4px;
+          background: linear-gradient(90deg, #a78bfa 0%, #818cf8 100%);
           transform: scaleX(0);
           transition: transform var(--transition-normal);
+          border-top-left-radius: var(--radius-2xl);
+          border-top-right-radius: var(--radius-2xl);
         }
-        
-        .job-card:hover {
-          transform: translateY(-4px);
+        .job-card:hover, .job-card-btn:hover {
+          /* Only the top effect changes, background stays white */
           box-shadow: var(--shadow-xl);
-          background: white;
+          background: #fff;
+          border-color: #a78bfa;
+          color: #ffffffff;
         }
-        
-        .job-card:hover::before {
+        .job-card:hover::before, .job-card-btn:hover::before {
           transform: scaleX(1);
         }
-        
-        .job-card {
-          color: var(--gray-700);
-          font-size: var(--font-size-lg);
-          font-weight: 600;
+        .job-card-btn:focus {
+          outline: 2px solid #a78bfa;
+          outline-offset: 2px;
+          box-shadow: 0 0 0 3px #ddd6fe;
         }
         
         /* Modern Testimonials Section */
@@ -557,6 +602,20 @@ function Home() {
           }
         }
 
+        @media (max-width: 768px) {
+          .how-steps {
+            overflow-x: auto;
+            padding-bottom: var(--spacing-4);
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+          }
+          
+          .how-steps div {
+            scroll-snap-align: start;
+            min-width: 80%;
+          }
+        }
+        
         @media (max-width: 480px) {
           .hero {
             padding: var(--spacing-12) 0;
