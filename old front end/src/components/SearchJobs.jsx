@@ -135,7 +135,7 @@ function SearchJobs() {
     <div className="search-jobs-container">
       <div className="search-jobs-header">
         <h1>Search Jobs</h1>
-        <Link to="/landing" className="back-btn">Back to Dashboard</Link>
+  <Link to="/employee-dashboard" className="back-btn">Back to Dashboard</Link>
       </div>
 
       {/* Search Form */}
@@ -303,10 +303,20 @@ function SearchJobs() {
                       <button 
                         className="apply-btn"
                         onClick={(e) => applyToJob(job._id, e)}
-                        disabled={!isLoggedIn}
-                        title={!isLoggedIn ? "Please login to apply" : "Apply for this job"}
+                        disabled={!isLoggedIn || (user && job.applicants && job.applicants.some(a => (a.user && (a.user._id === user.id || a.user === user.id))))}
+                        title={
+                          !isLoggedIn
+                            ? "Please login to apply"
+                            : (user && job.applicants && job.applicants.some(a => (a.user && (a.user._id === user.id || a.user === user.id))))
+                              ? "You have already applied to this job"
+                              : "Apply for this job"
+                        }
                       >
-                        {!isLoggedIn ? 'Login to Apply' : 'Apply Now'}
+                        {!isLoggedIn
+                          ? 'Login to Apply'
+                          : (user && job.applicants && job.applicants.some(a => (a.user && (a.user._id === user.id || a.user === user.id))))
+                            ? 'Already Applied'
+                            : 'Apply Now'}
                       </button>
                     </div>
                   </div>

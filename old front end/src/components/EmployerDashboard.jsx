@@ -598,11 +598,14 @@ function EmployerDashboard() {
           flex: 1;
           padding: 1rem 1.5rem;
           border: none;
-          background: transparent;
+          background: #f3f6fa;
+          color: #2b6cb0;
           cursor: pointer;
           font-size: 1rem;
-          transition: background-color 0.2s;
+          transition: background-color 0.2s, color 0.2s;
           border-radius: 12px 12px 0 0;
+          border-bottom: 3px solid #e2e8f0;
+          font-weight: 500;
         }
 
         .tab-btn:first-child {
@@ -615,7 +618,9 @@ function EmployerDashboard() {
 
         .tab-btn.active {
           background: #2b6cb0;
-          color: white;
+          color: #fff;
+          font-weight: bold;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.15);
         }
 
         .tab-btn:not(.active):hover {

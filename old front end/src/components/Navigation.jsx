@@ -84,7 +84,7 @@ function Navigation() {
                 {(user?.userType === 'employee' || user?.userType === 'both') && (
                   <NavLink to="/employee-dashboard">
                     <span className="nav-icon">👤</span>
-                    Dashboard
+                    <span style={{ fontWeight: 'bold', color: '#fff', letterSpacing: '0.5px' }}>Employee Dashboard</span>
                   </NavLink>
                 )}
 
@@ -92,7 +92,7 @@ function Navigation() {
                   <>
                     <NavLink to="/employer-dashboard">
                       <span className="nav-icon">💼</span>
-                      Employer
+                      <span style={{ fontWeight: 'bold', color: '#fff', letterSpacing: '0.5px' }}>Employer Dashboard</span>
                     </NavLink>
                     <NavLink to="/post-job">
                       <span className="nav-icon">➕</span>

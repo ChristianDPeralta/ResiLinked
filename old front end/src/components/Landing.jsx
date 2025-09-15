@@ -60,10 +60,16 @@ function Landing() {
         ) : recentJobs.length > 0 ? (
           <div className="jobs-grid">
             {recentJobs.slice(0, 6).map((job, index) => (
-              <div key={job._id || index} className="job-card">
+              <Link
+                key={job._id || index}
+                className="job-card job-card-link"
+                to={job._id ? `/search-jobs?highlight=${job._id}` : '/search-jobs'}
+                title="View job details"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
                 <h3>{job.title}</h3>
                 <p>{job.barangay || 'Location not specified'}</p>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
@@ -264,28 +270,29 @@ function Landing() {
           border-color: var(--primary-300);
         }
 
-        .job-card h3 {
-          color: var(--primary-700);
-          margin-bottom: var(--spacing-3);
-          font-size: var(--font-size-xl);
-          font-weight: 600;
+        .jobs-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: var(--spacing-4);
+          margin-top: var(--spacing-4);
         }
 
-        .job-card p {
-          color: var(--gray-600);
-          margin: 0;
-          font-size: var(--font-size-base);
+        .job-card {
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 2px 12px rgba(120, 72, 255, 0.08);
+          padding: var(--spacing-4);
+          transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+          cursor: pointer;
+          border: 2px solid transparent;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-          .landing-page {
-            padding: var(--spacing-4);
-          }
-          
-          .welcome-section {
-            padding: var(--spacing-12) var(--spacing-6);
-          }
+        .job-card-link:hover, .job-card-link:focus {
+          box-shadow: 0 4px 24px rgba(120, 72, 255, 0.18);
+          border-color: #a084fa;
+          transform: translateY(-2px) scale(1.02);
+          text-decoration: none;
+        }
           
           .welcome-section h1 {
             font-size: var(--font-size-3xl);

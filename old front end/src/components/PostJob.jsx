@@ -150,7 +150,7 @@ function PostJob() {
       <div className="post-job-card">
         <div className="post-job-header">
           <h1>Post a Job</h1>
-          <Link to="/landing" className="back-btn">Back to Dashboard</Link>
+          <Link to="/employer-dashboard" className="back-btn">Back to Dashboard</Link>
         </div>
 
         <form onSubmit={handleSubmit} className="post-job-form">

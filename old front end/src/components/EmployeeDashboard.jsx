@@ -128,8 +128,22 @@ function EmployeeDashboard() {
       })
       
       if (response.ok) {
-        const applications = await response.json()
-        setMyApplications(applications)
+        // The backend returns an array of Job objects where the user is an applicant
+        // We need to flatten this into an array of application objects with job details
+        const jobs = await response.json();
+        const userId = user?.id || (JSON.parse(localStorage.getItem('userData') || '{}').userId);
+        // For each job, find the applicant object for the current user
+        const applications = jobs.flatMap(job => {
+          if (!Array.isArray(job.applicants)) return [];
+          return job.applicants
+            .filter(app => app.user && (app.user._id === userId || app.user === userId))
+            .map(app => ({
+              ...app,
+              jobId: job,
+              appliedAt: app.appliedAt || app.createdAt || job.datePosted,
+            }));
+        });
+        setMyApplications(applications);
       } else {
         showError('Error loading applications')
       }
@@ -143,17 +157,49 @@ function EmployeeDashboard() {
 
   const applyForJob = async (jobId) => {
     try {
-      const result = await apiService.applyToJob(jobId)
-      if (result.success) {
-        success('Application submitted successfully!')
-        loadMyApplications() // Refresh applications
-        loadRecommendedJobs() // Refresh job list
+      // Check for token and user type before applying
+      const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      if (!token) {
+        showError('You must be logged in to apply for jobs.');
+        return;
+      }
+      if (!userData.userType || (userData.userType !== 'employee' && userData.userType !== 'both')) {
+        showError('You need an employee profile to apply for jobs.');
+        return;
+      }
+      const result = await apiService.applyToJob(jobId);
+      if (result.success || result.message === 'Application submitted') {
+        success('Application submitted successfully!');
+        loadMyApplications(); // Refresh applications
+        loadRecommendedJobs(); // Refresh job list
       } else {
-        showError(result.message || 'Error applying for job')
+        // Friendly error labels for common cases
+        let friendlyMsg = '';
+        const msg = (result.alert || result.message || '').toLowerCase();
+        if (msg.includes('already applied')) {
+          friendlyMsg = 'You have already applied to this job.';
+        } else if (msg.includes('job is closed')) {
+          friendlyMsg = 'This job is no longer accepting applications.';
+        } else if (msg.includes('employee profile required')) {
+          friendlyMsg = 'You need an employee profile to apply for jobs.';
+        } else if (msg.includes('cannot apply to own job')) {
+          friendlyMsg = 'You cannot apply to your own job posting.';
+        } else if (msg.includes('job not found')) {
+          friendlyMsg = 'This job is no longer available.';
+        } else {
+          friendlyMsg = result.alert || result.message || 'Error applying for job';
+        }
+        showError(friendlyMsg);
       }
     } catch (error) {
-      console.error('Error applying for job:', error)
-      showError('Failed to apply for job')
+      console.error('Error applying for job:', error);
+      // Try to show backend error message if available
+      if (error && error.message) {
+        showError(error.message);
+      } else {
+        showError('Failed to apply for job');
+      }
     }
   }
 
