@@ -28,6 +28,7 @@ exports.exportData = async (req, res) => {
     let filename;
     let fields;
     let filterParams = {};
+    let analytics = null; // Declare analytics before the switch
     
     // Parse filters if provided
     if (filters) {
@@ -41,7 +42,7 @@ exports.exportData = async (req, res) => {
     // Build query based on filters
     let query = {};
     
-    switch (type) {
+  switch (type) {
       case 'users':
         // User filters
         if (filterParams.search) {
@@ -144,6 +145,74 @@ exports.exportData = async (req, res) => {
         ];
         break;
         
+      case 'analytics':
+        // Gather analytics data
+        const [
+          totalUsers,
+          totalJobs,
+          totalRatings,
+          totalReports
+        ] = await Promise.all([
+          User.countDocuments(),
+          Job.countDocuments(),
+          Rating.countDocuments(),
+          require('../models/Report').countDocuments()
+        ]);
+
+        // User distribution
+        const userDistribution = {
+          employee: await User.countDocuments({ userType: 'employee' }),
+          employer: await User.countDocuments({ userType: 'employer' })
+        };
+        userDistribution.employeePercentage = totalUsers ? (userDistribution.employee / totalUsers) * 100 : 0;
+        userDistribution.employerPercentage = totalUsers ? (userDistribution.employer / totalUsers) * 100 : 0;
+
+        // Job stats
+        const jobStats = {
+          active: await Job.countDocuments({ status: 'open' }),
+          completed: await Job.countDocuments({ status: 'completed' }),
+          totalValue: (await Job.aggregate([{ $group: { _id: null, total: { $sum: "$price" } } }]))[0]?.total || 0,
+          averagePrice: (await Job.aggregate([{ $group: { _id: null, avg: { $avg: "$price" } } }]))[0]?.avg || 0
+        };
+
+        // Popular barangays
+        const popularBarangays = await Job.aggregate([
+          { $group: { _id: "$barangay", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 5 },
+          { $project: { barangay: "$_id", count: 1, _id: 0 } }
+        ]);
+
+        // Recent activity (last 6 jobs or users)
+        const recentJobs = await Job.find().sort({ createdAt: -1 }).limit(3);
+        const recentUsers = await User.find().sort({ createdAt: -1 }).limit(3);
+        const recentActivity = [
+          ...recentJobs.map(j => ({ type: 'job', description: `Job posted: ${j.title}`, createdAt: j.createdAt })),
+          ...recentUsers.map(u => ({ type: 'user', description: `User registered: ${u.firstName} ${u.lastName}`, createdAt: u.createdAt }))
+        ].sort((a, b) => b.createdAt - a.createdAt).slice(0, 6);
+
+        // System performance (mocked for now)
+        const performance = {
+          responseTime: '142ms',
+          uptime: '99.8%',
+          errorRate: '0.2%',
+          activeSessions: 23
+        };
+
+      analytics = {
+          totalUsers,
+          totalJobs,
+          totalRatings,
+          totalReports,
+          userDistribution,
+          jobStats,
+          popularBarangays,
+          recentActivity,
+          performance
+        };
+
+        filename = `resilinked-analytics-${new Date().toISOString().split('T')[0]}`;
+        break;
       default:
         return res.status(400).json({ message: "Invalid export type" });
     }
@@ -154,23 +223,26 @@ exports.exportData = async (req, res) => {
     }
     
     if (format === 'csv') {
+      if (type === 'analytics') {
+        return res.status(400).json({ message: "CSV export not available for analytics" });
+      }
       const csv = convertToCSV(data, fields);
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.csv"`);
       return res.send(csv);
     } else if (format === 'pdf') {
       let pdfPath;
-      
       if (type === 'users') {
         pdfPath = await generateUserReport(data, filterParams);
       } else if (type === 'jobs') {
         pdfPath = await generateJobReport(data, filterParams);
       } else if (type === 'ratings') {
         pdfPath = await generateCustomReport(data, `${type.toUpperCase()} REPORT`, fields, filterParams);
+      } else if (type === 'analytics') {
+        pdfPath = await require('../utils/pdfGenerator').generateAnalyticsReport(analytics, filterParams);
       } else {
         return res.status(400).json({ message: "PDF export not available for this type" });
       }
-      
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
       return res.download(pdfPath, () => {

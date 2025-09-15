@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const emailVerificationToken = crypto.randomBytes(20).toString('hex');
+        const verificationToken = crypto.randomBytes(20).toString('hex');
 
         const user = new User({
             ...req.body,
@@ -42,25 +42,34 @@ exports.register = async (req, res) => {
             idFrontImage: req.files?.idFrontImage?.[0]?.buffer.toString('base64') || '',
             idBackImage: req.files?.idBackImage?.[0]?.buffer.toString('base64') || '',
             isVerified: false,
-            isEmailVerified: false,
-            emailVerificationToken,
-            emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+            verificationToken,
+            verificationExpires: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
         });
 
         await user.save();
 
-        await sendVerificationEmail(user.email, emailVerificationToken);
+        await sendVerificationEmail(user.email, verificationToken);
+
+        // Notify admin
+        const adminUser = await User.findOne({ userType: 'admin' });
+        if (adminUser) {
+            await createNotification({
+                recipient: adminUser._id,
+                type: 'admin_message',
+                message: `New user ${user.email} requires verification`
+            });
+        }
 
         res.status(201).json({
             success: true,
-            message: "Registration successful - please check your email to verify your account",
+            message: "Registration successful - please check your email",
             data: {
-                userId: user._id,
+                userId: user._id,       // explicitly showing the user's id
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName
             },
-            alert: "Verification email sent! Please check your inbox to verify your email address."
+            alert: "Verification email sent!"
         });
 
     } catch (error) {
@@ -117,23 +126,11 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Check email verification first
-        if (!user.isEmailVerified) {
-            return res.status(403).json({
-                success: false,
-                message: "Email not verified",
-                alert: "Please verify your email address first",
-                needsEmailVerification: true
-            });
-        }
-
-        // Then check admin verification
         if (!user.isVerified) {
             return res.status(403).json({
                 success: false,
-                message: "Account awaiting admin approval or deactivated",
-                alert: "Your account is either awaiting admin approval or has been deactivated by an administrator",
-                needsAdminVerification: true
+                message: "Account not verified",
+                alert: "Please verify your email first"
             });
         }
 
@@ -155,7 +152,6 @@ exports.login = async (req, res) => {
             userId: user._id,
             userType: user.userType,
             isVerified: user.isVerified,
-            isEmailVerified: user.isEmailVerified,
             alert: "Login successful"
         });
 
@@ -336,22 +332,22 @@ exports.resendVerification = async (req, res) => {
             });
         }
 
-        if (user.isEmailVerified) {
+        if (user.isVerified) {
             return res.status(400).json({
                 success: false,
-                message: "Email already verified",
-                alert: "Your email address is already verified"
+                message: "Already verified",
+                alert: "This account is already verified"
             });
         }
 
         // Renew token if expired
-        if (!user.emailVerificationToken || user.emailVerificationExpires < Date.now()) {
-            user.emailVerificationToken = crypto.randomBytes(20).toString('hex');
-            user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+        if (!user.verificationToken || user.verificationExpires < Date.now()) {
+            user.verificationToken = crypto.randomBytes(20).toString('hex');
+            user.verificationExpires = Date.now() + 24 * 60 * 60 * 1000;
             await user.save();
         }
 
-        await sendVerificationEmail(user.email, user.emailVerificationToken);
+        await sendVerificationEmail(user.email, user.verificationToken);
 
         res.status(200).json({
             success: true,
@@ -388,61 +384,6 @@ exports.verifyToken = async (req, res) => {
     res.status(200).json({ valid: true, user });
   } catch (error) {
     res.status(401).json({ valid: false, message: "Invalid or expired token" });
-  }
-};
-
-// Verify Email
-exports.verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.params;
-
-    const user = await User.findOne({ 
-      emailVerificationToken: token,
-      emailVerificationExpires: { $gt: Date.now() }
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired verification token",
-        alert: "Your verification link is invalid or has expired"
-      });
-    }
-
-    // Mark email as verified
-    user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
-    await user.save();
-
-    // Notify admin that a new user needs verification
-    const adminUser = await User.findOne({ userType: 'admin' });
-    if (adminUser) {
-      await createNotification({
-        recipient: adminUser._id,
-        type: 'admin_message',
-        message: `New user ${user.firstName} ${user.lastName} (${user.email}) requires verification`
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-      alert: "Your email has been verified! Your account is now awaiting admin approval.",
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
-      }
-    });
-  } catch (error) {
-    console.error("Email verification error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Email verification failed",
-      error: error.message,
-      alert: "Failed to verify email. Please try again."
-    });
   }
 };
 

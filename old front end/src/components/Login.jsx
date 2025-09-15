@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAlert } from '../context/AlertContext'
 import apiService from '../api'
@@ -13,14 +13,11 @@ function Login() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
-  const [showPassword, setShowPassword] = useState(false)
   
   const { login, isAuthenticated } = useAuth()
   const { success, error: showError } = useAlert()
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     // Redirect if already authenticated
@@ -39,15 +36,7 @@ function Login() {
         }))
       }
     }
-    
-    // Check if redirected from verification page
-    if (location.state?.verificationSuccess) {
-      setSuccessMessage(location.state.message || 'Email verified successfully!')
-      
-      // Clear the state after displaying the message
-      window.history.replaceState({}, document.title)
-    }
-  }, [isAuthenticated, navigate, location.state])
+  }, [isAuthenticated, navigate])
 
   const validateField = (name, value) => {
     switch (name) {
@@ -73,9 +62,8 @@ function Login() {
       [name]: newValue
     }))
     
-    // Clear messages when user starts typing
+    // Clear errors when user starts typing
     if (error) setError('')
-    if (successMessage) setSuccessMessage('')
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
         ...prev,
@@ -159,38 +147,9 @@ function Login() {
       }
     } catch (err) {
       console.error('Login error:', err)
-      
-      // Debug output for troubleshooting
-      if (err.response) {
-        console.log('Error status:', err.response.status)
-        console.log('Error data:', err.response.data)
-      }
-      
-      // Handle specific verification errors
-      if (err.response?.status === 403) {
-        const responseData = err.response.data;
-        
-        if (responseData.needsEmailVerification) {
-          setError('Your email address has not been verified yet. Please check your inbox for the verification email or request a new one using the button below.')
-          setFieldErrors(prev => ({ ...prev, verificationNeeded: true, email: formData.email }))
-        } else if (responseData.needsAdminVerification) {
-          setError('ACCOUNT NOT ACTIVATED: Your email has been verified, but you cannot log in because your account either (1) is still awaiting administrator approval or (2) has been deactivated by an administrator. If your account is new, please allow 1-2 business days for review.')
-          setFieldErrors(prev => ({ ...prev, adminVerificationNeeded: true }))
-        } else {
-          // Fall back to the alert message from the server
-          setError(responseData.alert || 'Access denied: ' + responseData.message)
-        }
-      } else if (err.response?.data) {
-        // Use the server's error message if available
-        const errorMessage = err.response.data.alert || err.response.data.message || 'An error occurred during login'
-        setError(errorMessage)
-        showError(errorMessage)
-      } else {
-        // Fall back to a generic error if no response data
-        const errorMessage = err.message || 'Connection error. Please try again.'
-        setError(errorMessage)
-        showError(errorMessage)
-      }
+      const errorMessage = err.message || 'Connection error. Please try again.'
+      setError(errorMessage)
+      showError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -216,26 +175,9 @@ function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          {successMessage && (
-            <div className="success-message" id="loginSuccess">
-              <div className="success-icon">✓</div>
-              {successMessage}
-            </div>
-          )}
-          
           {error && (
-            <div className={`error-message ${fieldErrors.adminVerificationNeeded ? 'admin-verification-error' : ''}`} id="loginError">
+            <div className="error-message" id="loginError">
               {error}
-              {fieldErrors.verificationNeeded && (
-                <Link to={`/resend-verification?email=${encodeURIComponent(fieldErrors.email)}`} className="resend-verification-btn">
-                  Resend Verification Email
-                </Link>
-              )}
-              {fieldErrors.adminVerificationNeeded && (
-                <div className="admin-verification-note">
-                  <strong>Note:</strong> If you believe your account should be active, please contact support for assistance.
-                </div>
-              )}
             </div>
           )}
 
@@ -278,7 +220,7 @@ function Login() {
             <label htmlFor="password">Password</label>
             <div className="input-wrapper">
               <input
-                type={showPassword ? "text" : "password"}
+                type="password"
                 id="password"
                 name="password"
                 value={formData.password}
@@ -289,20 +231,6 @@ function Login() {
                 placeholder="Ilagay ang inyong password"
                 className={fieldErrors.password ? 'error' : formData.password && !fieldErrors.password ? 'valid' : ''}
               />
-              <div 
-                className="password-toggle"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowPassword(!showPassword);
-                }}
-                role="button"
-                tabIndex="-1"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? '👁️' : '👁️'}
-              </div>
               <div className="input-status">
                 {fieldErrors.password && (
                   <span className="error-icon" title={fieldErrors.password}>
@@ -330,8 +258,8 @@ function Login() {
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
-                style={{ marginRight: "5px" }}
               />
+              <span className="checkmark"></span>
               Remember me
             </label>
           </div>
@@ -408,7 +336,7 @@ function Login() {
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
           padding: 3rem 2.5rem;
           width: 100%;
-          max-width: 500px; /* Increased width from 440px to 500px */
+          max-width: 440px;
           position: relative;
           border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -459,31 +387,26 @@ function Login() {
         }
 
         input[type="email"],
-        input[type="password"],
-        input[type="text"] {
+        input[type="password"] {
           width: 100%;
-          padding: 1rem 4.5rem 1rem 1.25rem;
+          padding: 1rem 3rem 1rem 1.25rem;
           border: 2px solid rgba(147, 51, 234, 0.1);
           border-radius: 16px;
           font-size: 1rem;
-          transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
           background: rgba(255, 255, 255, 0.8);
           backdrop-filter: blur(10px);
           font-family: inherit;
-          text-align: left;
-          vertical-align: middle;
-          position: relative;
         }
 
         input[type="email"]:focus,
-        input[type="password"]:focus,
-        input[type="text"]:focus {
+        input[type="password"]:focus {
           outline: none;
           border-color: #9333ea;
           background: rgba(255, 255, 255, 0.95);
           box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-          /* Remove the transform to prevent movement */
+          transform: translateY(-1px);
         }
 
         input[type="email"]:hover,
@@ -510,65 +433,10 @@ function Login() {
           box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
 
-        /* Add placeholder styles to ensure alignment */
-        input::placeholder {
-          color: #9CA3AF;
-          opacity: 0.7;
-          text-align: left;
-          vertical-align: middle;
-        }
-
         .input-wrapper {
           position: relative;
           display: flex;
           align-items: center;
-          width: 100%;
-        }
-        
-        .password-toggle {
-          position: absolute;
-          right: 2.8rem;
-          top: 50%;
-          transform: translateY(-50%);
-          background: transparent;
-          border: none;
-          color: #64748b;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.1rem;
-          width: 30px;
-          height: 30px;
-          min-width: 30px;
-          min-height: 30px;
-          padding: 0;
-          margin: 0;
-          z-index: 2;
-          opacity: 0.7;
-          transition: opacity 0.2s ease;
-          user-select: none;
-          box-shadow: none;
-          pointer-events: auto;
-        }
-        
-        .password-toggle:hover {
-          opacity: 1;
-        }
-        
-        .password-toggle:focus {
-          outline: none;
-          opacity: 1;
-          box-shadow: none;
-          transform: translateY(-50%);
-        }
-        
-        /* Prevent layout shift when clicking */
-        .password-toggle:active {
-          transform: translateY(-50%);
-          outline: none;
-          box-shadow: none;
-          border: none;
         }
 
         .input-status {
@@ -608,7 +476,6 @@ function Login() {
           color: #dc2626;
           font-weight: 500;
           animation: slideIn 0.2s ease;
-          text-align: left;
         }
 
         @keyframes slideIn {
@@ -626,19 +493,16 @@ function Login() {
 
         .checkbox-group {
           margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          user-select: none;
         }
 
         .checkbox-label {
-          display: inline-flex;
+          display: flex;
           align-items: center;
           cursor: pointer;
           font-size: 0.95rem;
           color: #64748b;
           font-weight: 500;
-          gap: 0.5rem;
+          gap: 0.75rem;
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -647,9 +511,6 @@ function Login() {
           margin: 0;
           accent-color: #9333ea;
           border-radius: 4px;
-          vertical-align: middle;
-          position: relative;
-          top: -1px;
         }
 
         .login-btn {
@@ -814,97 +675,14 @@ function Login() {
           border: 1px solid rgba(220, 38, 38, 0.2);
           backdrop-filter: blur(10px);
           display: flex;
-          flex-direction: column;
-          align-items: flex-start;
+          align-items: center;
+          gap: 0.75rem;
         }
 
         .error-message::before {
           content: '⚠';
           font-size: 1.1rem;
-          margin-right: 0.75rem;
-          display: inline-block;
-        }
-        
-        .success-message {
-          background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-          color: #166534;
-          padding: 1rem 1.25rem;
-          border-radius: 16px;
-          margin-bottom: 1.5rem;
-          font-size: 0.95rem;
-          font-weight: 500;
-          border: 1px solid rgba(22, 101, 52, 0.2);
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          animation: fadeInDown 0.5s ease;
-        }
-        
-        @keyframes fadeInDown {
-          from { 
-            opacity: 0; 
-            transform: translateY(-10px);
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0);
-          }
-        }
-        
-        .success-message .success-icon {
-          background-color: #16a34a;
-          color: white;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
           flex-shrink: 0;
-        }
-        
-        .resend-verification-btn {
-          background-color: #ffffff;
-          color: #8a3ffc;
-          border: 1px solid #8a3ffc;
-          border-radius: 8px;
-          padding: 0.5rem 1rem;
-          margin-top: 0.75rem;
-          font-size: 0.9rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-decoration: none;
-        }
-        
-        .resend-verification-btn:hover {
-          background-color: rgba(138, 63, 252, 0.1);
-          transform: translateY(-1px);
-        }
-        
-        .resend-verification-btn::before {
-          content: '↻';
-          margin-right: 8px;
-          font-size: 1.1rem;
-        }
-        
-        .admin-verification-error {
-          background: linear-gradient(135deg, #fff5f5, #fed7d7);
-          border: 1px solid rgba(229, 62, 62, 0.3);
-        }
-        
-        .admin-verification-note {
-          margin-top: 12px;
-          padding: 8px 10px;
-          background-color: rgba(255, 255, 255, 0.7);
-          border-radius: 8px;
-          font-size: 0.9rem;
-          color: #c53030;
         }
 
         .fade-in {

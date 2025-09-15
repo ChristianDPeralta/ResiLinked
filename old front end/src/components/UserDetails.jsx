@@ -201,7 +201,7 @@ function UserDetails() {
           <div className="spinner"></div>
           <p>Loading user details...</p>
         </div>
-        <style jsx>{`
+  <style>{`
           .container {
             max-width: 1000px;
             margin: 40px auto;
@@ -240,7 +240,7 @@ function UserDetails() {
           <p>The requested user could not be found.</p>
           <Link to="/admin-dashboard" className="btn primary">Back to Admin Dashboard</Link>
         </div>
-        <style jsx>{`
+  <style>{`
           .container {
             max-width: 1000px;
             margin: 40px auto;
@@ -465,7 +465,7 @@ function UserDetails() {
         )}
       </div>
 
-      <style jsx>{`
+  <style>{`
         .container {
           max-width: 1000px;
           margin: 40px auto;

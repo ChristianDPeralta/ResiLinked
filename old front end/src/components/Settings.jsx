@@ -460,7 +460,7 @@ function Settings() {
         </div>
       )}
 
-      <style jsx>{`
+  <style>{`
         .settings-container {
           max-width: 800px;
           margin: 0 auto;

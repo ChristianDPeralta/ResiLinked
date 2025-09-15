@@ -1553,7 +1553,7 @@ function AdminDashboard() {
         />
       )}
 
-      <style jsx>{`
+  <style>{`
         .dashboard-container {
           max-width: 1400px;
           margin: 0 auto;

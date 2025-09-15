@@ -16,7 +16,7 @@ const LoadingSpinner = ({ size = 'medium', text = 'Loading...', className = '' }
       <div className={`spinner ${sizeClasses[size]}`}></div>
       {text && <span className={`loading-text ${textSizes[size]}`}>{text}</span>}
 
-      <style jsx>{`
+  <style>{`
         .loading-spinner {
           display: flex;
           align-items: center;

@@ -24,31 +24,17 @@ const sendVerificationEmail = async (email, token) => {
             to: email,
             subject: 'Verify Your ResiLinked Account',
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e4e4e4; border-radius: 5px;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h2 style="color: #8a3ffc;">Welcome to ResiLinked!</h2>
-                    </div>
-                    
-                    <p style="font-size: 16px; line-height: 1.5;">Thank you for registering with ResiLinked. Please verify your email address to continue with your registration:</p>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${verificationLink}" 
-                          style="display: inline-block; background: #8a3ffc; color: white; 
-                                 padding: 12px 25px; text-decoration: none; border-radius: 5px;
-                                 font-size: 16px; font-weight: bold;">
-                            Verify Email Address
-                        </a>
-                    </div>
-                    
-                    <p style="font-size: 14px; color: #666;">After verifying your email, your account will need to be approved by an administrator before you can log in.</p>
-                    
-                    <p style="font-size: 14px; color: #666; margin-top: 30px;">This verification link will expire in 24 hours.</p>
-                    
-                    <p style="font-size: 14px; color: #666;">If you didn't create this account, please ignore this email.</p>
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e4e4e4; text-align: center; font-size: 12px; color: #999;">
-                        &copy; ${new Date().getFullYear()} ResiLinked. All rights reserved.
-                    </div>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #0066ee;">Welcome to ResiLinked!</h2>
+                    <p>Please verify your email address to complete your registration:</p>
+                    <a href="${verificationLink}" 
+                       style="display: inline-block; background: #0066ee; color: white; 
+                              padding: 10px 20px; text-decoration: none; border-radius: 5px;
+                              margin: 15px 0;">
+                        Verify Email Address
+                    </a>
+                    <p>This link will expire in 24 hours.</p>
+                    <p>If you didn't create this account, please ignore this email.</p>
                 </div>
             `
         };

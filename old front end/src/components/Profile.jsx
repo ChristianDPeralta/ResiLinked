@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAlert } from '../context/AlertContext'
 import apiService from '../api'
-import GoalMeter from './GoalMeter'
 
 function Profile() {
   const [profile, setProfile] = useState(null)
@@ -257,11 +256,6 @@ function Profile() {
             </Link>
           </div>
         </div>
-        
-        {/* Financial Goal Meter Section */}
-        {profile?.userType === 'employee' && (
-          <GoalMeter userId={user?.userId} />
-        )}
 
         {/* Edit Profile Modal */}
         {showEditModal && (

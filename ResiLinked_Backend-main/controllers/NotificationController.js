@@ -40,7 +40,7 @@ exports.createNotification = async (req, res) => {
 
 exports.getMyNotifications = async (req, res) => {
     try {
-        const { type, isRead, page = 1, limit = 10, autoMarkSeen = true } = req.query;
+        const { type, isRead, page = 1, limit = 10 } = req.query;
 
         const pageNum = parseInt(page, 10) || 1;
         const limitNum = parseInt(limit, 10) || 10;
@@ -49,7 +49,7 @@ exports.getMyNotifications = async (req, res) => {
         if (type) query.type = type;
         if (isRead !== undefined) query.isRead = isRead === 'true';
 
-        const [notifications, total, unreadCount, unseenCount] = await Promise.all([
+        const [notifications, total, unreadCount] = await Promise.all([
             Notification.find(query)
                 .sort({ createdAt: -1 })
                 .skip((pageNum - 1) * limitNum)
@@ -58,35 +58,8 @@ exports.getMyNotifications = async (req, res) => {
             Notification.countDocuments({ 
                 recipient: req.user.id, 
                 isRead: false 
-            }),
-            Notification.countDocuments({
-                recipient: req.user.id,
-                isSeen: false
             })
         ]);
-        
-        // Automatically mark retrieved notifications as seen if requested
-        if (autoMarkSeen === true || autoMarkSeen === 'true') {
-            // Get the IDs of all notifications that were just fetched and aren't already seen
-            const notificationIds = notifications
-                .filter(notification => !notification.isSeen)
-                .map(notification => notification._id);
-            
-            if (notificationIds.length > 0) {
-                // Mark these notifications as seen
-                await Notification.updateMany(
-                    { _id: { $in: notificationIds } },
-                    { $set: { isSeen: true } }
-                );
-                
-                // Update the isSeen flag in the response data too
-                notifications.forEach(notification => {
-                    if (notificationIds.includes(notification._id)) {
-                        notification.isSeen = true;
-                    }
-                });
-            }
-        }
 
         res.status(200).json({
             success: true,
@@ -94,7 +67,6 @@ exports.getMyNotifications = async (req, res) => {
             meta: {
                 total,
                 unreadCount,
-                unseenCount,
                 pagination: {
                     page: pageNum,
                     limit: limitNum,
@@ -116,105 +88,42 @@ exports.getMyNotifications = async (req, res) => {
 
 exports.markAsRead = async (req, res) => {
     try {
-        // For marking all notifications as read
-        if (req.path === '/all/read' || req.body.all) {
+        if (req.body.all) {
             const result = await Notification.updateMany(
                 { recipient: req.user.id, isRead: false },
-                { $set: { isRead: true, isSeen: true } }
+                { $set: { isRead: true } }
             );
 
             return res.status(200).json({
                 message: "All notifications marked as read",
                 updatedCount: result.modifiedCount,
-                data: [],  // Return empty array to match expected format
-                meta: { unreadCount: 0, unseenCount: 0 },  // Update unread and unseen counts
                 alert: `Marked ${result.modifiedCount} notifications as read`
             });
         }
-        
-        // For marking a single notification as read - the ID is in the URL params
-        console.log('Marking notification as read:', {
-            path: req.path,
-            params: req.params,
-            user: req.user.id
-        });
-        
+
         const notification = await Notification.findOneAndUpdate(
-            { _id: req.params.id, recipient: req.user.id },
-            { $set: { isRead: true, isSeen: true } },
+            { _id: req.params.id, recipient: req.user.id, isRead: false },
+            { isRead: true },
             { new: true }
         );
 
         if (!notification) {
             return res.status(404).json({ 
-                message: "Notification not found",
-                alert: "Notification not found"
+                message: "Notification not found or already read",
+                alert: "Notification not found or already read"
             });
         }
 
         res.status(200).json({
             message: "Notification marked as read",
-            data: notification,  // Use consistent response format
-            success: true,
+            notification,
             alert: "Notification marked as read"
         });
     } catch (err) {
-        console.error('Error marking notification as read:', err, {
-            path: req.path, 
-            params: req.params
-        });
         res.status(500).json({ 
             message: "Error updating notification", 
             error: err.message,
             alert: "Failed to update notification status"
-        });
-    }
-};
-
-exports.markAsSeen = async (req, res) => {
-    try {
-        // For marking all notifications as seen
-        if (req.path === '/all/seen' || req.body.all) {
-            const result = await Notification.updateMany(
-                { recipient: req.user.id, isSeen: false },
-                { $set: { isSeen: true } }
-            );
-
-            return res.status(200).json({
-                message: "All notifications marked as seen",
-                updatedCount: result.modifiedCount,
-                data: [],  
-                meta: { unseenCount: 0 },
-                alert: `Marked ${result.modifiedCount} notifications as seen`
-            });
-        }
-        
-        // For marking a single notification as seen
-        const notification = await Notification.findOneAndUpdate(
-            { _id: req.params.id, recipient: req.user.id },
-            { $set: { isSeen: true } },
-            { new: true }
-        );
-
-        if (!notification) {
-            return res.status(404).json({ 
-                message: "Notification not found",
-                alert: "Notification not found"
-            });
-        }
-
-        res.status(200).json({
-            message: "Notification marked as seen",
-            data: notification,
-            success: true,
-            alert: "Notification marked as seen"
-        });
-    } catch (err) {
-        console.error('Error marking notification as seen:', err);
-        res.status(500).json({ 
-            message: "Error updating notification seen status", 
-            error: err.message,
-            alert: "Failed to update notification seen status"
         });
     }
 };

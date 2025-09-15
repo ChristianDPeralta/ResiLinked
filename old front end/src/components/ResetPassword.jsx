@@ -457,7 +457,7 @@ function ResetPassword() {
         </div>
       </div>
       
-      <style jsx>{`
+  <style>{`
         .reset-password-container {
           min-height: 100vh;
           display: flex;

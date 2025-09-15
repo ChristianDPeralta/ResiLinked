@@ -1,3 +1,136 @@
+// --- Analytics PDF Generation ---
+function generateAnalyticsReport(analytics, filters = {}) {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50 });
+      const filename = `analytics-report-${Date.now()}.pdf`;
+      const filepath = path.join(__dirname, '..', 'temp', filename);
+
+      // Ensure temp directory exists
+      const tempDir = path.join(__dirname, '..', 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+
+      const stream = fs.createWriteStream(filepath);
+      doc.pipe(stream);
+
+      // Add logo and header
+      addReportHeader(doc, 'ANALYTICS REPORT');
+
+      // Add filter information
+      addFilterSection(doc, filters);
+
+      // --- Analytics Summary Section ---
+      doc.moveDown(1);
+      doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('KEY PERFORMANCE INDICATORS', { align: 'left' });
+      doc.moveDown(0.2);
+      doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+      doc.moveDown(0.5);
+      doc.font('Helvetica').fontSize(11).fillColor('#222');
+      if (analytics) {
+        const kpis = [
+          { label: 'Total Users', value: analytics.totalUsers },
+          { label: 'Total Jobs', value: analytics.totalJobs },
+          { label: 'Total Ratings', value: analytics.totalRatings },
+          { label: 'Total Reports', value: analytics.totalReports },
+        ];
+        // Table-like layout for KPIs
+        const startX = 70, startY = doc.y, colW = 110, rowH = 22;
+        kpis.forEach((kpi, i) => {
+          doc.rect(startX + i * colW, startY, colW, rowH).strokeColor('#e0e7ef').stroke();
+          doc.font('Helvetica-Bold').fontSize(11).text(kpi.label, startX + i * colW + 8, startY + 4, { width: colW - 16, align: 'center' });
+          doc.font('Helvetica').fontSize(13).fillColor('#2b6cb0').text(kpi.value ?? 0, startX + i * colW + 8, startY + 14, { width: colW - 16, align: 'center' });
+        });
+        doc.y = startY + rowH + 10;
+      }
+
+      // --- User Distribution ---
+      if (analytics && analytics.userDistribution) {
+        doc.moveDown(1);
+        doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('USER DISTRIBUTION', { align: 'left' });
+        doc.moveDown(0.2);
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11).fillColor('#222');
+        const dist = analytics.userDistribution;
+        doc.text(`Employees:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${dist.employee ?? 0} (${dist.employeePercentage?.toFixed(1) ?? 0}%)`);
+        doc.font('Helvetica').text(`Employers:`, 270, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${dist.employer ?? 0} (${dist.employerPercentage?.toFixed(1) ?? 0}%)`);
+        doc.moveDown(1);
+      }
+
+      // --- Job Statistics ---
+      if (analytics && analytics.jobStats) {
+        doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('JOB STATISTICS', { align: 'left' });
+        doc.moveDown(0.2);
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11).fillColor('#222');
+        const js = analytics.jobStats;
+        doc.text(`Active Jobs:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${js.active ?? 0}`);
+        doc.font('Helvetica').text(`Completed Jobs:`, 270, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${js.completed ?? 0}`);
+        doc.moveDown(0.2);
+        doc.font('Helvetica').text(`Total Value:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ₱${js.totalValue?.toLocaleString() ?? 0}`);
+        doc.font('Helvetica').text(`Average Price:`, 270, doc.y, { continued: true }).font('Helvetica-Bold').text(` ₱${js.averagePrice?.toLocaleString() ?? 0}`);
+        doc.moveDown(1);
+      }
+
+      // --- Popular Barangays ---
+      if (analytics && analytics.popularBarangays && analytics.popularBarangays.length > 0) {
+        doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('POPULAR BARANGAYS', { align: 'left' });
+        doc.moveDown(0.2);
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11).fillColor('#222');
+        analytics.popularBarangays.slice(0, 5).forEach((item, i) => {
+          doc.text(`${i + 1}. ${item.barangay}:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${item.count} jobs`);
+        });
+        doc.moveDown(1);
+      }
+
+      // --- Recent Activity ---
+      if (analytics && analytics.recentActivity && analytics.recentActivity.length > 0) {
+        doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('RECENT ACTIVITY', { align: 'left' });
+        doc.moveDown(0.2);
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11).fillColor('#222');
+        analytics.recentActivity.slice(0, 6).forEach((activity, i) => {
+          doc.text(`- ${activity.description} (${new Date(activity.createdAt).toLocaleDateString()})`, 70, doc.y);
+        });
+        doc.moveDown(1);
+      }
+
+      // --- System Performance ---
+      if (analytics && analytics.performance) {
+        doc.fontSize(13).font('Helvetica-Bold').fillColor('#2b6cb0').text('SYSTEM PERFORMANCE', { align: 'left' });
+        doc.moveDown(0.2);
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#b5d0ea').stroke();
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11).fillColor('#222');
+        const perf = analytics.performance;
+        doc.text(`Response Time:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${perf.responseTime ?? 'N/A'}`);
+        doc.font('Helvetica').text(`Uptime:`, 270, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${perf.uptime ?? 'N/A'}`);
+        doc.moveDown(0.2);
+        doc.font('Helvetica').text(`Error Rate:`, 70, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${perf.errorRate ?? 'N/A'}`);
+        doc.font('Helvetica').text(`Active Sessions:`, 270, doc.y, { continued: true }).font('Helvetica-Bold').text(` ${perf.activeSessions ?? 'N/A'}`);
+        doc.moveDown(1);
+      }
+
+      // Add footer
+      addReportFooter(doc);
+
+      doc.end();
+
+      stream.on('finish', () => {
+        resolve(filepath);
+      });
+      stream.on('error', reject);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
@@ -127,20 +260,28 @@ function generateCustomReport(data, title, fields, filters = {}) {
 }
 
 function addReportHeader(doc, title) {
-  // Logo placeholder - in a real app, you'd use your actual logo
-  doc.image(path.join(__dirname, 'logo.png'), 50, 45, { width: 50 })
-     .fillColor('#444444');
-  
+  // Try to add logo, but skip if not found
+  try {
+    const logoPath = path.join(__dirname, 'logo.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 45, { width: 50 }).fillColor('#444444');
+    }
+  } catch (err) {
+    // Logo not found or error reading, skip logo
+  }
+
   // Company info
-  doc.fontSize(20).text('ResiLinked', 110, 50);
-  doc.fontSize(10).text('123 Main Street, Barangay 1', 110, 70);
-  doc.fontSize(10).text('City, Philippines 1000', 110, 85);
-  
+  doc.fontSize(22).font('Helvetica-Bold').fillColor('#2b6cb0').text('ResiLinked', { align: 'center' });
+  doc.moveDown(0.2);
+  doc.fontSize(10).font('Helvetica').fillColor('#444').text('123 Main Street, Barangay 1, City, Philippines 1000', { align: 'center' });
+  doc.moveDown(0.5);
   // Report title
-  doc.fontSize(16).text(title, 50, 120);
-  
+  doc.fontSize(18).font('Helvetica-Bold').fillColor('#222').text(title, { align: 'center', underline: true });
+  doc.moveDown(0.5);
   // Horizontal line
-  doc.moveTo(50, 140).lineTo(550, 140).stroke();
+  doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#2b6cb0').stroke();
+  doc.moveDown(1.2);
+  doc.fillColor('#000');
 }
 
 function addFilterSection(doc, filters) {
@@ -422,5 +563,6 @@ function addReportFooter(doc) {
 module.exports = { 
   generateUserReport, 
   generateJobReport, 
-  generateCustomReport 
+  generateCustomReport,
+  generateAnalyticsReport
 };

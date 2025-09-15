@@ -162,7 +162,7 @@ function Home() {
         </div>
       </section>
 
-      <style jsx>{`
+  <style>{`
         .home-container {
           width: 100%;
           margin: 0;

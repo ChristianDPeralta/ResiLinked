@@ -301,7 +301,7 @@ function PostJob() {
         </form>
       </div>
 
-      <style jsx>{`
+  <style>{`
         .post-job-container {
           max-width: 800px;
           margin: 0 auto;

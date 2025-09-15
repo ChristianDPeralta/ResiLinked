@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import NotificationDropdown from './NotificationDropdown';
 
 function Navigation() {
   const { user, logout, hasAccessTo, isAuthenticated, loading } = useContext(AuthContext);
@@ -110,10 +109,6 @@ function Navigation() {
                 )}
               </div>
 
-              {/* User Menu */}
-              {/* Notification Dropdown */}
-              <NotificationDropdown />
-              
               {/* User Menu */}
               <div className="user-menu" ref={userMenuRef}>
                 <button 

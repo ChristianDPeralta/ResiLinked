@@ -20,16 +20,13 @@ import Help from './components/Help'
 import UserDetails from './components/UserDetails'
 import ResetRequest from './components/ResetRequest'
 import ResetPassword from './components/ResetPassword'
-import VerifyEmail from './components/VerifyEmail'
-import ResendVerification from './components/ResendVerification'
 
 // Layout component
 import Layout from './components/Layout'
 
-// Context providers
+// Auth context for managing user state
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AlertProvider } from './context/AlertContext'
-import { NotificationProvider } from './context/NotificationContext'
 
 // Protected Route component
 function ProtectedRoute({ children, requiredUserType = null }) {
@@ -95,18 +92,15 @@ function App() {
   return (
     <AlertProvider>
       <AuthProvider>
-        <NotificationProvider>
-          <Router>
-            <Layout>
-              <Routes>
+        <Router>
+          <Layout>
+            <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/reset-request" element={<ResetRequest />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/verify-email/:token" element={<VerifyEmail />} />
-            <Route path="/resend-verification" element={<ResendVerification />} />
             <Route path="/help" element={<Help />} />
             
             {/* Protected routes */}
@@ -182,7 +176,6 @@ function App() {
             </Routes>
           </Layout>
         </Router>
-        </NotificationProvider>
       </AuthProvider>
     </AlertProvider>
   )

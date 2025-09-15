@@ -126,7 +126,7 @@ const FormInput = ({
         </div>
       )}
 
-      <style jsx>{`
+  <style>{`
         .form-input-container {
           margin-bottom: 1.75rem;
           position: relative;

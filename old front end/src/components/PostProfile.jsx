@@ -397,7 +397,7 @@ function PostProfile() {
         </div>
       </form>
 
-      <style jsx>{`
+  <style>{`
         .container {
           max-width: 800px;
           margin: 0 auto;

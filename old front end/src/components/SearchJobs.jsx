@@ -317,7 +317,7 @@ function SearchJobs() {
         </div>
       </div>
 
-      <style jsx>{`
+  <style>{`
         .search-jobs-container {
           max-width: 1200px;
           margin: 0 auto;

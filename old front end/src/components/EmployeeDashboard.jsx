@@ -384,7 +384,7 @@ function EmployeeDashboard() {
         </div>
       </div>
 
-      <style jsx>{`
+  <style>{`
         .dashboard-container {
           max-width: 1200px;
           margin: 0 auto;

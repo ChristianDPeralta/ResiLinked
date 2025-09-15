@@ -221,7 +221,7 @@ function ResetRequest() {
         </div>
       </div>
       
-      <style jsx>{`
+  <style>{`
         .reset-request-container {
           min-height: 100vh;
           display: flex;
